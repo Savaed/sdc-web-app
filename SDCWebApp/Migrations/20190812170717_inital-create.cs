@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace SDCWebApp.Migrations
 {
-    public partial class initialcreate : Migration
+    public partial class initalcreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -350,97 +350,97 @@ namespace SDCWebApp.Migrations
             migrationBuilder.InsertData(
                 table: "ActivityLogs",
                 columns: new[] { "Id", "CreatedAt", "Date", "Description", "Type", "UpdatedAt", "User" },
-                values: new object[] { "80cacb5b-aa99-44aa-8f96-409b2b3ff55d", new DateTime(2019, 8, 12, 14, 9, 28, 973, DateTimeKind.Utc).AddTicks(7676), new DateTime(2019, 8, 12, 16, 9, 28, 972, DateTimeKind.Local).AddTicks(2095), "Attempt to steal the Dead Man's Chest", "LogIn", null, "jacks" });
+                values: new object[] { "17fb7a6a-956f-4fd6-a469-6d55f072b39b", new DateTime(2019, 8, 12, 17, 7, 17, 650, DateTimeKind.Utc).AddTicks(7365), new DateTime(2019, 8, 12, 19, 7, 17, 648, DateTimeKind.Local).AddTicks(9448), "Attempt to steal the Dead Man's Chest", "LogIn", null, "jacks" });
 
             migrationBuilder.InsertData(
                 table: "ActivityLogs",
                 columns: new[] { "Id", "CreatedAt", "Date", "Description", "Type", "UpdatedAt", "User" },
-                values: new object[] { "7491bf87-6337-491d-90ac-aad7e2c6f868", new DateTime(2019, 8, 12, 14, 9, 28, 973, DateTimeKind.Utc).AddTicks(9724), new DateTime(2019, 8, 12, 16, 9, 28, 973, DateTimeKind.Local).AddTicks(9711), "Revolting on a black pearl", "LogOut", null, "hektorb" });
+                values: new object[] { "18a0d2a9-d05f-46e2-8d44-1ea691b6da5c", new DateTime(2019, 8, 12, 17, 7, 17, 650, DateTimeKind.Utc).AddTicks(9780), new DateTime(2019, 8, 12, 19, 7, 17, 650, DateTimeKind.Local).AddTicks(9764), "Revolting on a black pearl", "LogOut", null, "hektorb" });
 
             migrationBuilder.InsertData(
                 table: "Articles",
                 columns: new[] { "Id", "Author", "CreatedAt", "Text", "Title", "UpdatedAt" },
-                values: new object[] { "ef1a25f4-8118-4f4b-bc22-7dd07bffccb2", "Jack Sparrow", new DateTime(2019, 8, 12, 14, 9, 28, 974, DateTimeKind.Utc).AddTicks(2365), "BlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearl", "The bast pirate i'v every seen", null });
+                values: new object[] { "43802ebc-dd05-4183-9a62-92610ea426de", "Jack Sparrow", new DateTime(2019, 8, 12, 17, 7, 17, 651, DateTimeKind.Utc).AddTicks(2823), "BlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearl", "The bast pirate i'v every seen", null });
 
             migrationBuilder.InsertData(
                 table: "Articles",
                 columns: new[] { "Id", "Author", "CreatedAt", "Text", "Title", "UpdatedAt" },
-                values: new object[] { "a10b933e-f4f0-4b64-b090-ff56ceb11572", "Hektor Barbossa", new DateTime(2019, 8, 12, 14, 9, 28, 974, DateTimeKind.Utc).AddTicks(3848), "BlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearl", "The captain of Black Pearl", null });
+                values: new object[] { "3df4e52e-471d-45a7-b709-b16a6a5d6ea4", "Hektor Barbossa", new DateTime(2019, 8, 12, 17, 7, 17, 651, DateTimeKind.Utc).AddTicks(4161), "BlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearl", "The captain of Black Pearl", null });
 
             migrationBuilder.InsertData(
                 table: "Customers",
                 columns: new[] { "Id", "CreatedAt", "DateOfBirth", "EmailAddres", "HasFamilyCard", "IsDisabled", "UpdatedAt" },
-                values: new object[] { "b2703e11-4c73-4f46-990c-e7d12822db0c", new DateTime(2019, 8, 12, 14, 9, 28, 975, DateTimeKind.Utc).AddTicks(7214), new DateTime(1996, 8, 12, 16, 9, 28, 975, DateTimeKind.Local).AddTicks(7224), "example@mail.com", false, false, null });
+                values: new object[] { "3ade1019-2157-4259-91eb-319343e9447e", new DateTime(2019, 8, 12, 17, 7, 17, 652, DateTimeKind.Utc).AddTicks(9529), new DateTime(1996, 8, 12, 19, 7, 17, 652, DateTimeKind.Local).AddTicks(9540), "example@mail.com", false, false, null });
 
             migrationBuilder.InsertData(
                 table: "Customers",
                 columns: new[] { "Id", "CreatedAt", "DateOfBirth", "EmailAddres", "HasFamilyCard", "IsDisabled", "UpdatedAt" },
-                values: new object[] { "e59fb471-9e65-4aa0-91c3-d89a04a41a96", new DateTime(2019, 8, 12, 14, 9, 28, 975, DateTimeKind.Utc).AddTicks(8591), new DateTime(2015, 8, 12, 16, 9, 28, 975, DateTimeKind.Local).AddTicks(8600), " example2@mail.uk", true, false, null });
+                values: new object[] { "662efe49-dfe3-4073-ab70-1f700532d311", new DateTime(2019, 8, 12, 17, 7, 17, 653, DateTimeKind.Utc).AddTicks(785), new DateTime(2015, 8, 12, 19, 7, 17, 653, DateTimeKind.Local).AddTicks(793), " example2@mail.uk", true, false, null });
 
             migrationBuilder.InsertData(
                 table: "Discounts",
                 columns: new[] { "Id", "CreatedAt", "Description", "DiscountValueInPercentage", "GroupSizeForDiscount", "Type", "UpdatedAt" },
-                values: new object[] { "e02aff62-b27a-4ed8-bd63-90c0532e1c82", new DateTime(2019, 8, 12, 14, 9, 28, 974, DateTimeKind.Utc).AddTicks(8778), "Discount for disabled people.", 50, null, "ForDisabled", null });
+                values: new object[] { "5c4a5b84-d67e-48c5-87b8-4b873ff60eb2", new DateTime(2019, 8, 12, 17, 7, 17, 651, DateTimeKind.Utc).AddTicks(9029), "Discount for disabled people.", 50, null, "ForDisabled", null });
 
             migrationBuilder.InsertData(
                 table: "Discounts",
                 columns: new[] { "Id", "CreatedAt", "Description", "DiscountValueInPercentage", "GroupSizeForDiscount", "Type", "UpdatedAt" },
-                values: new object[] { "f08af5ac-c199-4bbb-ae55-c3db5a251956", new DateTime(2019, 8, 12, 14, 9, 28, 974, DateTimeKind.Utc).AddTicks(8787), "Discount only for kids under specific age.", 100, null, "ForChild", null });
+                values: new object[] { "137e452d-aa32-43d6-b4a8-c10b4ea03d5d", new DateTime(2019, 8, 12, 17, 7, 17, 651, DateTimeKind.Utc).AddTicks(9038), "Discount only for kids under specific age.", 100, null, "ForChild", null });
 
             migrationBuilder.InsertData(
                 table: "Discounts",
                 columns: new[] { "Id", "CreatedAt", "Description", "DiscountValueInPercentage", "GroupSizeForDiscount", "Type", "UpdatedAt" },
-                values: new object[] { "6f1d4082-b187-4ce0-b7c9-0756fb4c0ddd", new DateTime(2019, 8, 12, 14, 9, 28, 974, DateTimeKind.Utc).AddTicks(6986), "Discount for groups", 15, 20, "ForGroup", null });
+                values: new object[] { "04247bfb-f459-4489-9375-8f87aa7c3ecb", new DateTime(2019, 8, 12, 17, 7, 17, 651, DateTimeKind.Utc).AddTicks(6925), "Discount for groups", 15, 20, "ForGroup", null });
 
             migrationBuilder.InsertData(
                 table: "Discounts",
                 columns: new[] { "Id", "CreatedAt", "Description", "DiscountValueInPercentage", "GroupSizeForDiscount", "Type", "UpdatedAt" },
-                values: new object[] { "75ed6464-d709-4e39-ac8b-0033b9ef7502", new DateTime(2019, 8, 12, 14, 9, 28, 974, DateTimeKind.Utc).AddTicks(8760), "Discount for people with Family Card", 15, null, "ForFamily", null });
+                values: new object[] { "e3e33c0a-0148-4d67-8fed-a7dc802979c9", new DateTime(2019, 8, 12, 17, 7, 17, 651, DateTimeKind.Utc).AddTicks(8837), "Discount for people with Family Card", 15, null, "ForFamily", null });
 
             migrationBuilder.InsertData(
                 table: "GeneralSightseeingInfo",
                 columns: new[] { "Id", "ClosingHour", "CreatedAt", "Description", "MaxAllowedGroupSize", "MaxChildAge", "OpeningHour", "UpdatedAt" },
-                values: new object[] { "098e18fe-eb3e-4993-8609-31681141ba78", 17f, new DateTime(2019, 8, 12, 14, 9, 28, 975, DateTimeKind.Utc).AddTicks(3968), "TL;DR", 35, 5, 9f, null });
+                values: new object[] { "693eabb0-6a69-4424-8301-c01a10b1f467", 17f, new DateTime(2019, 8, 12, 17, 7, 17, 652, DateTimeKind.Utc).AddTicks(6067), "TL;DR", 35, 5, 9f, null });
 
             migrationBuilder.InsertData(
                 table: "Groups",
                 columns: new[] { "Id", "CreatedAt", "CurrentGroupSize", "IsAvailablePlace", "MaxGroupSize", "SightseeingDate", "UpdatedAt" },
-                values: new object[] { "8b5d3f0a-ea7e-484a-8078-3df4c60c26b9", new DateTime(2019, 8, 12, 14, 9, 28, 975, DateTimeKind.Utc).AddTicks(2353), 0, true, 30, new DateTime(2019, 8, 19, 16, 9, 28, 975, DateTimeKind.Local).AddTicks(2362), null });
+                values: new object[] { "f4d0f259-c9fb-4988-a7d3-eacf9747e3a1", new DateTime(2019, 8, 12, 17, 7, 17, 652, DateTimeKind.Utc).AddTicks(4337), 0, true, 30, new DateTime(2019, 8, 19, 19, 7, 17, 652, DateTimeKind.Local).AddTicks(4346), null });
 
             migrationBuilder.InsertData(
                 table: "Groups",
                 columns: new[] { "Id", "CreatedAt", "CurrentGroupSize", "IsAvailablePlace", "MaxGroupSize", "SightseeingDate", "UpdatedAt" },
-                values: new object[] { "6f1e412c-aa2d-4c00-b5ea-8eb8a66694bd", new DateTime(2019, 8, 12, 14, 9, 28, 975, DateTimeKind.Utc).AddTicks(3259), 0, true, 25, new DateTime(2019, 8, 14, 16, 9, 28, 975, DateTimeKind.Local).AddTicks(3268), null });
+                values: new object[] { "3d6c3c27-dbaa-4b84-880f-0e422cb1de58", new DateTime(2019, 8, 12, 17, 7, 17, 652, DateTimeKind.Utc).AddTicks(5360), 0, true, 25, new DateTime(2019, 8, 14, 19, 7, 17, 652, DateTimeKind.Local).AddTicks(5369), null });
 
             migrationBuilder.InsertData(
                 table: "SightseeingTariffs",
                 columns: new[] { "Id", "CreatedAt", "Name", "UpdatedAt" },
-                values: new object[] { "f2ab5cbd-280c-4e82-9ea5-60e3e6a690f8", new DateTime(2019, 8, 12, 14, 9, 28, 975, DateTimeKind.Utc).AddTicks(1219), "BasicTickets", null });
+                values: new object[] { "4a629635-c23f-47dc-9181-825aec4b320c", new DateTime(2019, 8, 12, 17, 7, 17, 652, DateTimeKind.Utc).AddTicks(2397), "BasicTickets", null });
 
             migrationBuilder.InsertData(
                 table: "TicketTariffs",
                 columns: new[] { "Id", "CreatedAt", "DefaultPrice", "Description", "IsPerHour", "IsPerPerson", "SightseeingTariffId", "UpdatedAt" },
-                values: new object[] { "990c1977-72c4-4310-92c2-5b08a1d2b302", new DateTime(2019, 8, 12, 14, 9, 28, 975, DateTimeKind.Utc).AddTicks(490), 22f, "Centrum Dziedzictwa Szkła.", false, true, null, null });
+                values: new object[] { "1b242ddb-c7ae-455c-a6d6-a7ff40ce8776", new DateTime(2019, 8, 12, 17, 7, 17, 652, DateTimeKind.Utc).AddTicks(1262), 22f, "Centrum Dziedzictwa Szkła.", false, true, null, null });
 
             migrationBuilder.InsertData(
                 table: "TicketTariffs",
                 columns: new[] { "Id", "CreatedAt", "DefaultPrice", "Description", "IsPerHour", "IsPerPerson", "SightseeingTariffId", "UpdatedAt" },
-                values: new object[] { "f519f87a-8a12-4d9a-9d52-691a4f78a745", new DateTime(2019, 8, 12, 14, 9, 28, 974, DateTimeKind.Utc).AddTicks(9606), 28f, "Centrum Dziedzictwa Szkła i Piwnice Przedprożne.", false, true, null, null });
+                values: new object[] { "2ee14071-5b87-4c86-8b84-bfd7eb3ebe97", new DateTime(2019, 8, 12, 17, 7, 17, 651, DateTimeKind.Utc).AddTicks(9996), 28f, "Centrum Dziedzictwa Szkła i Piwnice Przedprożne.", false, true, null, null });
 
             migrationBuilder.InsertData(
                 table: "TicketTariffs",
                 columns: new[] { "Id", "CreatedAt", "DefaultPrice", "Description", "IsPerHour", "IsPerPerson", "SightseeingTariffId", "UpdatedAt" },
-                values: new object[] { "27707966-5b7f-44d8-a7e8-1849d843e609", new DateTime(2019, 8, 12, 14, 9, 28, 975, DateTimeKind.Utc).AddTicks(504), 10f, "Piwnice Przedprożne.", false, true, null, null });
+                values: new object[] { "9b974eb7-4922-4438-8709-129db5e353f2", new DateTime(2019, 8, 12, 17, 7, 17, 652, DateTimeKind.Utc).AddTicks(1277), 10f, "Piwnice Przedprożne.", false, true, null, null });
 
             migrationBuilder.InsertData(
                 table: "Tickets",
                 columns: new[] { "Id", "CreatedAt", "CustomerId", "DiscountId", "GroupId", "Price", "PurchaseDate", "TariffId", "TicketUniqueId", "UpdatedAt", "ValidFor" },
-                values: new object[] { "8a322294-4fe7-416a-b6e7-b76e787af1b6", new DateTime(2019, 8, 12, 14, 9, 28, 974, DateTimeKind.Utc).AddTicks(5172), null, null, null, 0f, new DateTime(2019, 8, 12, 16, 9, 28, 974, DateTimeKind.Local).AddTicks(5163), null, "c598bf66-9911-473a-ac4d-926d63fcde97", null, new DateTime(2019, 8, 19, 16, 9, 28, 974, DateTimeKind.Local).AddTicks(5632) });
+                values: new object[] { "cf75b711-5f93-4847-8713-99fa955f93c9", new DateTime(2019, 8, 12, 17, 7, 17, 651, DateTimeKind.Utc).AddTicks(5231), null, null, null, 0f, new DateTime(2019, 8, 12, 19, 7, 17, 651, DateTimeKind.Local).AddTicks(5222), null, "879a7abe-9330-43f4-97ee-53a9b4371256", null, new DateTime(2019, 8, 19, 19, 7, 17, 651, DateTimeKind.Local).AddTicks(5671) });
 
             migrationBuilder.InsertData(
                 table: "Tickets",
                 columns: new[] { "Id", "CreatedAt", "CustomerId", "DiscountId", "GroupId", "Price", "PurchaseDate", "TariffId", "TicketUniqueId", "UpdatedAt", "ValidFor" },
-                values: new object[] { "cd58fa69-fc64-443a-9f7c-e10069b9222a", new DateTime(2019, 8, 12, 14, 9, 28, 974, DateTimeKind.Utc).AddTicks(6133), null, null, null, 0f, new DateTime(2019, 8, 12, 16, 9, 28, 974, DateTimeKind.Local).AddTicks(6125), null, "26508b81-dfc7-4e77-be1b-b8c6e7308108", null, new DateTime(2019, 9, 2, 16, 9, 28, 974, DateTimeKind.Local).AddTicks(6192) });
+                values: new object[] { "a9302528-4257-4abf-b817-5069b43017d8", new DateTime(2019, 8, 12, 17, 7, 17, 651, DateTimeKind.Utc).AddTicks(6148), null, null, null, 0f, new DateTime(2019, 8, 12, 19, 7, 17, 651, DateTimeKind.Local).AddTicks(6141), null, "d8f4a395-25b4-46da-9d48-d922ea05adbf", null, new DateTime(2019, 9, 2, 19, 7, 17, 651, DateTimeKind.Local).AddTicks(6160) });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
