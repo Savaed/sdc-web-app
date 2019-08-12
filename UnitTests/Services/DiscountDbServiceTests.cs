@@ -1,24 +1,21 @@
-﻿using NUnit.Framework;
+﻿using FluentAssertions;
+using FluentValidation.Results;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Moq;
+using NUnit.Framework;
+using SDCWebApp.Data;
+using SDCWebApp.Data.Validators;
+using SDCWebApp.Models;
+using SDCWebApp.Services;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using Moq;
-using FluentAssertions;
-using SDCWebApp.Data;
-using Microsoft.EntityFrameworkCore;
-using SDCWebApp.Services;
-using System.Threading.Tasks;
-using SDCWebApp.Models;
-using NLog;
-using UnitTests.Helpers;
 using System.Linq;
 using System.Linq.Expressions;
-using FluentValidation.TestHelper;
-using FluentValidation.Results;
-using Microsoft.Extensions.Logging;
-using SDCWebApp.Data.Validators;
+using System.Threading.Tasks;
+using UnitTests.Helpers;
 
-namespace UnitTests
+namespace UnitTests.Services
 {
     [TestFixture]
     public class DiscountDbServiceTests

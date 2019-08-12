@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using NUnit.Framework;
+﻿using FluentAssertions;
 using FluentValidation.TestHelper;
-using Moq;
+using NUnit.Framework;
 using SDCWebApp.Data.Validators;
 using SDCWebApp.Models;
-using FluentAssertions;
 
-namespace UnitTests
+namespace UnitTests.Validators
 {
     [TestFixture]
     public class DiscountValidatorTests

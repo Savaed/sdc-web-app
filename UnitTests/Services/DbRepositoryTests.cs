@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using NLog;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SDCWebApp.Data;
@@ -11,9 +11,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UnitTests.Helpers;
-using Microsoft.Extensions.Logging;
 
-namespace UnitTests
+namespace UnitTests.Services
 {
     [TestFixture]
     public class DbRepositoryTests

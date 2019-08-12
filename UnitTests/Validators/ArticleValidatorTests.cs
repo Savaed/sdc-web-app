@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using NUnit.Framework;
+﻿using FluentAssertions;
 using FluentValidation.TestHelper;
-using FluentAssertions;
-using SDCWebApp.Models;
+using NUnit.Framework;
 using SDCWebApp.Data.Validators;
+using SDCWebApp.Models;
 
-namespace UnitTests
+namespace UnitTests.Validators
 {
     [TestFixture]
     public class ArticleValidatorTests

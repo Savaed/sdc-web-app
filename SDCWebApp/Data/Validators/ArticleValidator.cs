@@ -1,10 +1,5 @@
 ﻿using FluentValidation;
-using FluentValidation.Results;
 using SDCWebApp.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace SDCWebApp.Data.Validators
 {
@@ -25,7 +20,6 @@ namespace SDCWebApp.Data.Validators
             RuleFor(x => x.Text)
               .Cascade(CascadeMode.StopOnFirstFailure)
               .NotEmpty();
-
         }
     }
 }
