@@ -1,5 +1,6 @@
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using AutoMapper;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -13,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SDCWebApp.Data;
 using SDCWebApp.Helpers;
 using System;
+using System.Reflection;
 
 namespace SDCWebApp
 {
@@ -92,6 +94,9 @@ namespace SDCWebApp
                 // TODO Move this policy to appsettings.json for future resusability.
                 options.AddPolicy(AdminAuthorizationPolicyName, config => config.RequireAuthenticatedUser().RequireRole("ADMIN"));
             });
+
+            // Adding AutoMapper
+            services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
             // Replacement of built-in service container with Autofac.
             // TODO Wrap following code in private method for future reusability.

@@ -17,18 +17,18 @@ namespace SDCWebApp.Data.Validators
 
             RuleFor(x => x.EmailAddress)
                 .Cascade(CascadeMode.StopOnFirstFailure)
-                .NotEmpty()
+                .NotEmpty().WithMessage("{PropertyName} is required.")
                 .BeEmailAddress().WithMessage("{PropertyName} has invalid format.");
 
             RuleFor(x => x.UserName)
                 .Cascade(CascadeMode.StopOnFirstFailure)
-                .NotEmpty()
+                .NotEmpty().WithMessage("{PropertyName} is required.")
                 .Length(2, 20)
                 .Matches(new Regex(@"^[a-z]+$")).WithMessage("{PropertyName} can contain only lowercase letters.");
 
             RuleFor(x => x.Role)
                 .Cascade(CascadeMode.StopOnFirstFailure)
-                .NotEmpty()
+                .NotEmpty().WithMessage("{PropertyName} is required.")
                 .Custom((role, context) =>
                 {
                     var dbRoles = dbContext.Roles.ToList();

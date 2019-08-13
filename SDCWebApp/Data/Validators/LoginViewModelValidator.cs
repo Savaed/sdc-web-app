@@ -16,7 +16,7 @@ namespace SDCWebApp.Data.Validators
 
             RuleFor(x => x.UserName)
                .Cascade(CascadeMode.StopOnFirstFailure)
-               .NotEmpty()
+               .NotEmpty().WithMessage("{PropertyName} is required.")
                .Length(2, 20)
                .Matches(new Regex(@"^[a-z]+$")).WithMessage("{PropertyName} can contain only lowercase letters.");
         }
