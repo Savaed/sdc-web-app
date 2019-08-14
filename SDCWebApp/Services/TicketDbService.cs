@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SDCWebApp.Data;
+using SDCWebApp.Helpers.Extensions;
 using SDCWebApp.Models;
 using System;
 using System.Collections.Generic;

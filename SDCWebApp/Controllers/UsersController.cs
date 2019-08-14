@@ -24,6 +24,8 @@ using AutoMapper;
 
 namespace SDCWebApp.Controllers
 {
+    // TODO Add 500 Internal Server Error when db doesnt exist and any request that reffered to db can be fullfiled
+
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase, IUsersController
@@ -104,7 +106,7 @@ namespace SDCWebApp.Controllers
 
         // [POST] users/register
         [HttpPost("register")]
-        //[Authorize(Policy = "OnlyForAdmin")]
+        [Authorize(Policy = "OnlyForAdmin")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

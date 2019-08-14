@@ -3,7 +3,7 @@ using NLog;
 using System;
 using System.Threading.Tasks;
 
-namespace SDCWebApp.Data
+namespace SDCWebApp.Helpers.Extensions
 {
     /// <summary>
     /// Provides extension method for resolving database concurrency conflicts.

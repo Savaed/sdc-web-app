@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SDCWebApp.Data;
 using SDCWebApp.Data.Validators;
+using SDCWebApp.Helpers.Extensions;
 using SDCWebApp.Models;
 
 namespace SDCWebApp.Services

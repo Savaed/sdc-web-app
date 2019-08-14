@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net.Mail;
 using System.Text.RegularExpressions;
 
-namespace SDCWebApp.Data.Validators
+namespace SDCWebApp.Helpers.Extensions
 {
     public static class ValidatorExtensions
     {
