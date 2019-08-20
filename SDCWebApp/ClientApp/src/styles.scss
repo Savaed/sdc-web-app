@@ -1,81 +1,15 @@
-.text-custom-light{
-    color: rgb(235, 226, 215);
-}
-
-.rectangle
-{
-    height: 7px;
-    width: 40px;
-    background-color: rgb(235, 226, 215);
-    margin: 0px;
-}
-
-.main-header{
-    font-size: 55px;
-    font-style: normal;
-}
-
-button.btn-outline-sdc{
-    transition: 0.3s;
-    padding: 16px 21px;
-    background-color: transparent;
-    border: 1px;
-    border-radius: 3px;
-    border-style: solid;
-    color: rgb(235, 226, 215);
-    font-size: 14px;
-    border-color: #1074e7af;
-    font-weight: 500;
-
-    &-blue{
-        border-color: #1074e780;
-        color: #0366d6;
-        border-radius: 3px;
-        font-size: 16px;
-        font-weight: 500;
-        padding: 20px 32px;
-
-        &:hover{
-            border-color: #1074e7;
-            color: #0366d6;;
-        }
-    }    
-}
-
-button.btn-outline-sdc:hover{
-    transition: 0.3s;
-    border-color: #1074e7;
-    color: white;
-}
-
-button.btn-sdc{
-    transition: 0.3s;
-    padding: 16px 21px;
-    border-style: solid;
-    color: white;
-    font-size: 14px;
-    background-color: #1074e7;
-    font-weight: 500;
-}
-
-button.btn-sdc:hover{
-    transition: 0.3s;
-    background-color: #0f5fbb;
-    color: white;
+.bg-gray{
+    background-color: #f6f8fa;
 }
 
 .text-gray{
-    color: #586069;
+    color: #6a737d;
 }
 
 .text-mono {
     font-family: SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace;
 }
 
-.bold{
-    font-weight: 400;
-}
-
-.grayscale{
+.graysacale{
     filter: grayscale(100%);
 }

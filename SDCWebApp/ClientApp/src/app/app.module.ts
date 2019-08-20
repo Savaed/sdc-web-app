@@ -3,16 +3,18 @@ import { NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { NavMenuComponent } from './nav-menu/nav-menu.component';
-import { HomeComponent } from './home/home.component';
-import { FooterComponent } from './footer/footer.component';
+import { LoginComponent } from './login/login.component';
+import { FooterLoginComponent } from './footer-login/footer-login.component';
+import { FooterLogoutComponent } from './footer-logout/footer-logout.component';
+
+
 
 @NgModule({
   declarations: [
     AppComponent,
-    NavMenuComponent,
-    HomeComponent,
-    FooterComponent
+    LoginComponent,
+    FooterLoginComponent,
+    FooterLogoutComponent
   ],
   imports: [
     BrowserModule,

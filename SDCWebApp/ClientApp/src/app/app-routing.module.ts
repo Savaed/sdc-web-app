@@ -1,11 +1,15 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { HomeComponent } from './home/home.component';
+import { LoginComponent } from './login/login.component';
+import { FooterLoginComponent } from './footer-login/footer-login.component';
+import { FooterLogoutComponent } from './footer-logout/footer-logout.component';
+
 
 const routes: Routes = [
-  { path: 'home', component: HomeComponent },
-  { path: '', component: HomeComponent },
-  { path: '**', pathMatch: 'full', redirectTo: 'home' }
+  { path: 'footer-login', component: FooterLoginComponent },
+  { path: 'footer-logout', component: FooterLogoutComponent },
+  { path: 'login', component: LoginComponent },
+  { path: '**', pathMatch: 'full', redirectTo: '' }
 ];
 
 @NgModule({
