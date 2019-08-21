@@ -27,6 +27,6 @@ namespace SDCWebApp.Models
         [MaxLength(30)]
         public string EmailAddres { get; set; }
 
-        public virtual ICollection<Ticket> Tickets { get; set; }
+        public ICollection<Ticket> Tickets { get; set; }
     }
 }

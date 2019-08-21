@@ -11,7 +11,7 @@ namespace SDCWebApp.Models
         // Ticket price without any discount
         public float DefaultPrice { get; set; }
 
-        public virtual ICollection<Ticket> Tickets { get; set; }
-        public virtual SightseeingTariff SightseeingTariff { get; set; }
+        public ICollection<Ticket> Tickets { get; set; }
+        public SightseeingTariff SightseeingTariff { get; set; }
     }
 }

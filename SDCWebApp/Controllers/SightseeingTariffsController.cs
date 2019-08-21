@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using SDCWebApp.Data;
 using SDCWebApp.Helpers;
 using SDCWebApp.Models;
 using SDCWebApp.Models.ApiDto;
@@ -19,12 +21,14 @@ namespace SDCWebApp.Controllers
     {
         private readonly ISightseeingTariffDbService _tariffDbService;
         private readonly ILogger<SightseeingTariffsController> _logger;
+        ApplicationDbContext _context;
 
 
-        public SightseeingTariffsController(ISightseeingTariffDbService tariffDbService, ILogger<SightseeingTariffsController> logger)
+        public SightseeingTariffsController(ISightseeingTariffDbService tariffDbService, ILogger<SightseeingTariffsController> logger, ApplicationDbContext context)
         {
             _tariffDbService = tariffDbService;
             _logger = logger;
+            _context = context;
         }
 
 
@@ -36,6 +40,37 @@ namespace SDCWebApp.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetTariff(string id)
         {
+            //string newId = Guid.NewGuid().ToString();
+
+            //await _tariffDbService.AddSightseeingTariffAsync(new SightseeingTariff
+            //{
+            //    Id = newId,
+            //    Name = "Sample sightseeing tariff",
+            //    TicketTariffs = new List<TicketTariff>
+            //      {
+            //          new TicketTariff
+            //          {
+            //               Description = "sample ticket tariff description",
+            //               Tickets = new List<Ticket>
+            //               {
+            //                   new Ticket
+            //                   {
+            //                       TicketUniqueId = "sdfsdfsd"
+            //                   }
+            //               }
+            //          },
+            //           new TicketTariff
+            //          {
+            //               Description = "sample ticket tariff description4234234234",
+            //          }
+            //      }
+            //});
+
+
+
+
+
+
             SightseeingTariff tariff;
             ApiError error;
 
@@ -89,7 +124,7 @@ namespace SDCWebApp.Controllers
                     StatusCode = StatusCodes.Status404NotFound
                 };
                 return errorResponse;
-            }      
+            }
         }
 
         // [GET] sightseeing-tariffs

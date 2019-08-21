@@ -6,10 +6,10 @@ import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
 import { FooterLoginComponent } from './footer-login/footer-login.component';
 import { FooterLogoutComponent } from './footer-logout/footer-logout.component';
-import { OrderGroupComponent } from './order-group/order-group.component';
 import { TicketOverviewComponent } from './ticket-overview/ticket-overview.component';
 import { TicketTariffComponent } from './ticket-tariff/ticket-tariff.component';
 import { TicketOrderComponent } from './ticket-order/ticket-order.component';
+import { TicketsSummaryComponent } from './tickets-summary/tickets-summary.component';
 
 
 
@@ -19,10 +19,10 @@ import { TicketOrderComponent } from './ticket-order/ticket-order.component';
     LoginComponent,
     FooterLoginComponent,
     FooterLogoutComponent,
-    OrderGroupComponent,
     TicketOverviewComponent,
     TicketTariffComponent,
-    TicketOrderComponent
+    TicketOrderComponent,
+    TicketsSummaryComponent
   ],
   imports: [
     BrowserModule,

@@ -1,3 +1,12 @@
+
+@import url('https://fonts.googleapis.com/css?family=Roboto&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Montserrat&display=swap');
+@import "../node_modules//@fortawesome/fontawesome-free/css/all.min.css";
+
+label{
+    font-weight: 600;
+}
+
 .bg-gray{
     background-color: #f6f8fa;
 }
@@ -17,7 +26,6 @@
 .border{
     border: 1px solid rgba(33, 33, 33, .2);
     border-radius: 5px;
-    box-shadow: 0 0 5px rgba(33, 33, 33, .2);
     padding: 20px;
 }
 
@@ -39,4 +47,13 @@
 
 .btn{
     border-radius: 3px !important;
+    font-weight: 600;
+
+    &-danger{
+        border: 1px solid rgb(155, 8, 8);
+    }
+
+    &-success{
+        border: 1px solid rgb(3, 78, 19);
+    }
 }
