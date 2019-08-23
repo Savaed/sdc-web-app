@@ -12,14 +12,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SDCWebApp.Data.Validators;
 using SDCWebApp.Models.ViewModels;
-using SDCWebApp.Models.ApiDto;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Options;
 using SDCWebApp.Helpers;
-using SDCWebApp.Models.ApiDtos;
 using AutoMapper;
 
 namespace SDCWebApp.Controllers
@@ -60,39 +58,42 @@ namespace SDCWebApp.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> LoginAsync([FromBody] LoginViewModel loginData)
         {
-            var tempUser = await _userManager.FindByNameAsync(loginData.UserName);
 
-            if (tempUser is null || await _userManager.CheckPasswordAsync(tempUser, loginData.Password) == false)
-            {
-                var errorResponse = new CommonWrapper
-                {
-                    Success = false,
-                    Errors = new List<ApiError>
-                    {
-                        new ApiError
-                        {
-                            ErrorCode = "IncorrectCredentials",
-                            ErrorMessage = "Incorrect login or password."
-                        }
-                    }
-                };
-                return Ok(errorResponse);
-            }
-            else
-            {
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var tokenDescriptor = await CreateTokenDescriptorAsync(tempUser);
-                var token = tokenHandler.CreateToken(tokenDescriptor);
+            throw new NotImplementedException();
 
-                var user = _mapper.Map<UserDto>(tempUser);
-                user.Token = tokenHandler.WriteToken(token);
-                var response = new CommonWrapper
-                {
-                    Success = true,
-                    Data = user
-                };
-                return Ok(response);
-            }
+            //var tempUser = await _userManager.FindByNameAsync(loginData.UserName);
+
+            //if (tempUser is null || await _userManager.CheckPasswordAsync(tempUser, loginData.Password) == false)
+            //{
+            //    var errorResponse = new CommonWrapper
+            //    {
+            //        Success = false,
+            //        Errors = new List<ApiError>
+            //        {
+            //            new ApiError
+            //            {
+            //                ErrorCode = "IncorrectCredentials",
+            //                ErrorMessage = "Incorrect login or password."
+            //            }
+            //        }
+            //    };
+            //    return Ok(errorResponse);
+            //}
+            //else
+            //{
+            //    var tokenHandler = new JwtSecurityTokenHandler();
+            //    var tokenDescriptor = await CreateTokenDescriptorAsync(tempUser);
+            //    var token = tokenHandler.CreateToken(tokenDescriptor);
+
+                //var user = _mapper.Map<UserDto>(tempUser);
+                //user.Token = tokenHandler.WriteToken(token);
+                //var response = new CommonWrapper
+                //{
+                //    Success = true,
+                //    Data = user
+                //};
+                //return Ok(response);
+            //}
         }
 
         // [POST] users/logout
@@ -114,48 +115,51 @@ namespace SDCWebApp.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> RegisterAsync([FromBody] RegisterViewModel registerData)
         {
-            var newUser = new IdentityUser
-            {
-                Email = registerData.EmailAddress,
-                UserName = registerData.UserName
-            };
 
-            var createUserResult = await _userManager.CreateAsync(newUser, registerData.Password);
+            throw new NotImplementedException();
 
-            if (createUserResult.Succeeded)
-            {
-                // TODO Sending email confirmation.
+            //var newUser = new IdentityUser
+            //{
+            //    Email = registerData.EmailAddress,
+            //    UserName = registerData.UserName
+            //};
 
-                await _userManager.AddToRoleAsync(newUser, registerData.Role);
-                string url = $"https://localhost:44377/api/users/{ await _userManager.GetUserIdAsync(newUser)}";
+            //var createUserResult = await _userManager.CreateAsync(newUser, registerData.Password);
 
-                var response = new CommonWrapper
-                {
-                    Success = true,
-                    Data = _mapper.Map<UserDto>(newUser)
-                };
-                return Created(url, response);
-            }
-            else
-            {
-                List<ApiError> errors = new List<ApiError>();
+            //if (createUserResult.Succeeded)
+            //{
+            //    // TODO Sending email confirmation.
 
-                foreach (var error in createUserResult.Errors)
-                {
-                    errors.Add(new ApiError
-                    {
-                        ErrorCode = error.Code,
-                        ErrorMessage = error.Description
-                    });
-                }
+            //    await _userManager.AddToRoleAsync(newUser, registerData.Role);
+            //    string url = $"https://localhost:44377/api/users/{ await _userManager.GetUserIdAsync(newUser)}";
 
-                var errorResponse = new CommonWrapper
-                {
-                    Success = false,
-                    Errors = errors
-                };
-                return Ok(errorResponse);
-            }
+            //    var response = new CommonWrapper
+            //    {
+            //        Success = true,
+            //        Data = _mapper.Map<UserDto>(newUser)
+            //    };
+            //    return Created(url, response);
+            //}
+            //else
+            //{
+            //    List<ApiError> errors = new List<ApiError>();
+
+            //    foreach (var error in createUserResult.Errors)
+            //    {
+            //        errors.Add(new ApiError
+            //        {
+            //            ErrorCode = error.Code,
+            //            ErrorMessage = error.Description
+            //        });
+            //    }
+
+            //    var errorResponse = new CommonWrapper
+            //    {
+            //        Success = false,
+            //        Errors = errors
+            //    };
+            //    return Ok(errorResponse);
+            //}
         }
 
 

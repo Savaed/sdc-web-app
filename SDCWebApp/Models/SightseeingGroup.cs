@@ -22,7 +22,7 @@ namespace SDCWebApp.Models
         public bool IsAvailablePlace => _isAvailablePlace = CurrentGroupSize < MaxGroupSize;
 
 
-        public ICollection<Ticket> Tickets { get; set; }
+        public virtual ICollection<Ticket> Tickets { get; set; }
 
 
         public object Clone()

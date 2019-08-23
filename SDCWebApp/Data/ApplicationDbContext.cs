@@ -12,15 +12,15 @@ namespace SDCWebApp.Data
     public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     {
         // All DbSet<TEntity> properties are marked as virtual for enabling unit testing and using Mock.Setup / Verifiable functionality
-        public DbSet<Ticket> Tickets { get; set; }
-        public DbSet<Discount> Discounts { get; set; }
-        public DbSet<SightseeingTariff> SightseeingTariffs { get; set; }
-        public DbSet<TicketTariff> TicketTariffs { get; set; }
-        public DbSet<Article> Articles { get; set; }
-        public DbSet<ActivityLog> ActivityLogs { get; set; }
-        public DbSet<SightseeingGroup> Groups { get; set; }
-        public DbSet<Customer> Customers { get; set; }
-        public DbSet<GeneralSightseeingInfo> GeneralSightseeingInfo { get; set; }
+        public virtual DbSet<Ticket> Tickets { get; set; }
+        public virtual DbSet<Discount> Discounts { get; set; }
+        public virtual DbSet<SightseeingTariff> SightseeingTariffs { get; set; }
+        public virtual DbSet<TicketTariff> TicketTariffs { get; set; }
+        public virtual DbSet<Article> Articles { get; set; }
+        public virtual DbSet<ActivityLog> ActivityLogs { get; set; }
+        public virtual DbSet<SightseeingGroup> Groups { get; set; }
+        public virtual DbSet<Customer> Customers { get; set; }
+        public virtual DbSet<GeneralSightseeingInfo> GeneralSightseeingInfo { get; set; }
 
 
         public ApplicationDbContext()

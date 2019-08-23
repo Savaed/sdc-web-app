@@ -1,19 +1,18 @@
 ﻿using SDCWebApp.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SDCWebApp.Services
 {
     public interface IDiscountDbService
     {
-        Task<Discount> GetDiscountAsync(string id);
-        Task<IEnumerable<Discount>> GetDiscountsAsync(IEnumerable<string> ids);
-        Task<IEnumerable<Discount>> GetAllDiscountsAsync();
-        Task<IEnumerable<Discount>> GetDiscountsByAsync(Expression<Func<Discount, bool>> predicate);
-        Task<Discount> AddDiscountAsync(Discount discount);
-        Task<Discount> UpdateDiscountAsync(Discount discount);
-        Task DeleteDiscountAsync(string id);
+        Task<Discount> GetAsync(string id);
+        Task<IEnumerable<Discount>> GetAllAsync();
+        Task<IEnumerable<Discount>> GetWithPaginationAsync(int pageNumber, int pageSize);
+        Task<Discount> UpdateAsync(Discount discount);
+        Task DeleteAsync(string id);
+        Task<Discount> AddAsync(Discount discount);
     }
 }

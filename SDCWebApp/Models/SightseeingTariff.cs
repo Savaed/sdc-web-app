@@ -7,7 +7,7 @@ namespace SDCWebApp.Models
     {
         public string Name { get; set; }
 
-        public ICollection<TicketTariff> TicketTariffs { get; set; }
+        public virtual ICollection<TicketTariff> TicketTariffs { get; set; }
 
 
         public object Clone()

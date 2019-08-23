@@ -11,7 +11,7 @@ namespace SDCWebApp.Models
 
 
         [Column(TypeName = "date")]
-        public DateTime DateOfBirth { get; set; } = DateTime.MinValue;
+        public DateTime? DateOfBirth { get; set; } = DateTime.MinValue;
 
         //public bool IsChild
         //{
@@ -27,6 +27,6 @@ namespace SDCWebApp.Models
         [MaxLength(30)]
         public string EmailAddres { get; set; }
 
-        public ICollection<Ticket> Tickets { get; set; }
+        public virtual ICollection<Ticket> Tickets { get; set; }
     }
 }

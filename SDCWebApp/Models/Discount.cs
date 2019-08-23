@@ -23,7 +23,7 @@ namespace SDCWebApp.Models
 
         public int? GroupSizeForDiscount { get; set; } = null;
 
-        public  ICollection<Ticket> Tickets { get; set; }
+        public virtual ICollection<Ticket> Tickets { get; set; }
 
 
         public object Clone()

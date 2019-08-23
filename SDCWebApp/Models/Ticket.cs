@@ -32,10 +32,10 @@ namespace SDCWebApp.Models
             private set => _price = value;
         }
 
-        public TicketTariff Tariff { get; set; }
-        public Discount Discount { get; set; }
-        public SightseeingGroup Group { get; set; }
-        public Customer Customer { get; set; }
+        public virtual TicketTariff Tariff { get; set; }
+        public virtual Discount Discount { get; set; }
+        public virtual SightseeingGroup Group { get; set; }
+        public virtual Customer Customer { get; set; }
 
 
         public object Clone()
