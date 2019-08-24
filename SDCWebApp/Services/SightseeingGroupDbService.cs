@@ -30,9 +30,9 @@ namespace SDCWebApp.Services
         /// Asynchronously adds <see cref="SightseeingGroup"/> entity to the database. Throws an exception if 
         /// already there is the same entity in database or any problem with saving changes occurred.
         /// </summary>
-        /// <param name="discount">The discount to be added. Cannot be null.</param>
+        /// <param name="group">The group to be added. Cannot be null.</param>
         /// <returns>The added entity.</returns>
-        /// <exception cref="ArgumentNullException">The value of discount to be added is null.</exception>
+        /// <exception cref="ArgumentNullException">The value of <paramref name="group"/> to be added is null.</exception>
         /// <exception cref="InvalidOperationException">There is the same entity that one to be added in database.</exception>
         /// <exception cref="InternalDbServiceException">The table with <see cref="SightseeingGroup"/> entities does not exist or it is null or 
         /// cannot save properly any changes made by add operation.</exception>
@@ -261,7 +261,7 @@ namespace SDCWebApp.Services
         /// Asynchronously updates <see cref="SightseeingGroup"/> entity. 
         /// Throws an exception if cannot found entity or any problem with updating occurred.
         /// </summary>
-        /// <param name="group">The discount to be updated. Cannot be null or has Id property set to null or empty string.</param>
+        /// <param name="group">The group to be updated. Cannot be null or has Id property set to null or empty string.</param>
         /// <returns>Updated entity.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="group"/> is null.</exception>
         /// <exception cref="ArgumentException"><paramref name="group"/> has Id property set to null or empty string.</exception>
