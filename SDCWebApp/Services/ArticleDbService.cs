@@ -23,8 +23,6 @@ namespace SDCWebApp.Services
         }
 
 
-
-
         /// <summary>
         /// Asynchronously adds <see cref="Article"/> entity to the database. Throws an exception if 
         /// already there is the same entity in database or any problem with saving changes occurred.
