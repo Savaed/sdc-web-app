@@ -17,9 +17,11 @@ namespace SDCWebApp.Data.Validators
                     .LessThanOrEqualTo(DateTime.Now).WithMessage("{PropertyName} should be in the past.");
 
             // Info about email adresses acording https://en.wikipedia.org/wiki/Email_address
+            // and http://isemail.info
             RuleFor(x => x.EmailAddres)
                     .Cascade(CascadeMode.StopOnFirstFailure)
                     .NotEmpty()
+                    .MaximumLength(132)
                     .BeEmailAddress().WithMessage("Invalid email format");
         }
     }

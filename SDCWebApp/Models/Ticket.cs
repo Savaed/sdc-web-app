@@ -9,12 +9,9 @@ namespace SDCWebApp.Models
         private float _price = 0.0f;
 
 
-        [Required]
         public string TicketUniqueId { get; set; }
-
         [Column(TypeName = "datetime2(0)")]
         public DateTime PurchaseDate { get; set; } = DateTime.Now;
-
         [Column(TypeName = "date")]
         public DateTime ValidFor { get; set; }
 

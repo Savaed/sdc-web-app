@@ -10,16 +10,16 @@ namespace SDCWebApp.Data.Validators
         public LoginViewModelValidator()
         {
             RuleFor(x => x.Password)
-                  .Cascade(CascadeMode.StopOnFirstFailure)
-                  .NotEmpty().WithMessage("{PropertyName} is required.")
-                  .MaximumLength(20)
-                  .BeValidPassword().WithMessage("{PropertyName} has invalid format.");
+                .Cascade(CascadeMode.StopOnFirstFailure)
+                .NotEmpty().WithMessage("{PropertyName} is required.")
+                .MaximumLength(20)
+                .BeValidPassword().WithMessage("{PropertyName} has invalid format.");
 
             RuleFor(x => x.UserName)
-               .Cascade(CascadeMode.StopOnFirstFailure)
-               .NotEmpty().WithMessage("{PropertyName} is required.")
-               .Length(2, 20)
-               .Matches(new Regex(@"^[a-z]+$")).WithMessage("{PropertyName} can contain only lowercase letters.");
+                .Cascade(CascadeMode.StopOnFirstFailure)
+                .NotEmpty().WithMessage("{PropertyName} is required.")
+                .Length(2, 20)
+                .Matches(new Regex(@"^[a-z]+$")).WithMessage("{PropertyName} can contain only lowercase letters.");
         }
     }
 }

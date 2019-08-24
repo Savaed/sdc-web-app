@@ -44,6 +44,7 @@ namespace UnitTests.Services
         // 0 znaleziono -> invalid oper exc
         // zasob jest pusty -> invalid oper exc
         // znalazlo -> zwraca tylko jeden element
+        // znalazlo  -> zwraca i sightseeing tariff zawiera ticket tariffs
 
         [Test]
         public async Task GetAsync__Resource_is_null__Should_throw_InternalDbServiceException()
@@ -142,7 +143,7 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    expectedSightseeingTariff = await context.SightseeingTariffs.FirstOrDefaultAsync();
+                    expectedSightseeingTariff = await context.SightseeingTariffs.Include(x => x.TicketTariffs).FirstOrDefaultAsync();
                 }
 
                 using (var context = await factory.CreateContextAsync())
@@ -150,7 +151,31 @@ namespace UnitTests.Services
                     var service = new SightseeingTariffDbService(context, _logger);
 
                     var result = await service.GetAsync(expectedSightseeingTariff.Id);
+
                     result.Should().BeEquivalentTo(expectedSightseeingTariff);
+                }
+            }
+        }
+
+        [Test]
+        public async Task GetAsync__SightseeingTariff_found__Should_return_this_sightseeing_tariff_with_not_null_ticket_tariffs_list()
+        {
+            SightseeingTariff expectedSightseeingTariff;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    expectedSightseeingTariff = await context.SightseeingTariffs.Include(x => x.TicketTariffs).FirstOrDefaultAsync();
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new SightseeingTariffDbService(context, _logger);
+
+                    var result = await service.GetAsync(expectedSightseeingTariff.Id);
+
+                    result.TicketTariffs.Should().NotBeNull();
                 }
             }
         }
@@ -163,6 +188,7 @@ namespace UnitTests.Services
         // tabela jest nullem - > internal exc
         // zasob jest pusty -> pusty ienumer
         // znalazlo -> ienum<SightseeingTariff> dla wszystkich z zasobu
+        // znalazlo -> wszystkie zwrocome ele zawieraja ticket tariff
 
         [Test]
         public async Task GetAllAsync__Resource_is_null__Should_throw_InternalDbServiceException()
@@ -239,6 +265,26 @@ namespace UnitTests.Services
                     var result = await service.GetAllAsync();
 
                     result.Count().Should().Be(expectedLength);
+                }
+            }
+        }
+
+        [Test]
+        public async Task GetAllAsync__SightseeingTariffs_found__Should_return_IEnumerable_for_all_sightseeing_groups_with_not_null_ticket_tariffs_list()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    int expectedLength = context.SightseeingTariffs.ToArray().Length;
+                    var service = new SightseeingTariffDbService(context, _logger);
+
+                    var result = await service.GetAllAsync();
+
+                    foreach (var sightseeingTariff in result)
+                    {
+                        sightseeingTariff.TicketTariffs.Should().NotBeNull();
+                    }
                 }
             }
         }
@@ -911,6 +957,26 @@ namespace UnitTests.Services
                     var result = await service.GetWithPaginationAsync(4, 5);
 
                     result.Count().Should().Be(0);
+                }
+            }
+        }
+
+        [Test]
+        public async Task GetWithPaginationAsync__Found_any_sightseeing_tariff__Should_return_these_elements_with_not_null_ticket_tariffs()
+        {
+            using (var factory = new DbContextFactory())
+            {              
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new SightseeingTariffDbService(context, _logger);
+                    int elementsCount = await context.SightseeingTariffs.CountAsync();
+
+                    var result = await service.GetWithPaginationAsync(1, elementsCount);
+
+                    foreach (var sightseeingTariff in result)
+                    {
+                        sightseeingTariff.TicketTariffs.Should().NotBeNull();
+                    }
                 }
             }
         }

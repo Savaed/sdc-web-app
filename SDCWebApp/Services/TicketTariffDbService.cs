@@ -287,7 +287,7 @@ namespace SDCWebApp.Services
                 // Refference to Groups while it does not exist cause throwing exception and without this 2 conditions below you cannot check 
                 // is there any element for update in database.
                 if (_context.TicketTariffs.Count() == 0)
-                    throw new InvalidOperationException($"Cannot found element with id '{tariff.Id}' for update. Resource {_context.Groups.GetType().Name} does not contain any element.");
+                    throw new InvalidOperationException($"Cannot found element with id '{tariff.Id}' for update. Resource {_context.TicketTariffs.GetType().Name} does not contain any element.");
 
                 if (await _context.TicketTariffs.ContainsAsync(tariff) == false)
                     throw new InvalidOperationException($"Cannot found element with id '{tariff.Id}' for update. Any element does not match to the one to be updated.");

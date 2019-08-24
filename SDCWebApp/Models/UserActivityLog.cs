@@ -34,17 +34,10 @@ namespace SDCWebApp.Models
             StatisticDownload
         }
 
-
         [Column(TypeName = "datetime2(0)")]
         public DateTime Date { get; private set; } = DateTime.Now;
-
-        [Required, MaxLength(20)]
         public string User { get; set; }
-
-        [Required]
         public ActivityType Type { get; set; }
-
-        [MaxLength(150)]
         public string Description { get; set; }
     }
 }

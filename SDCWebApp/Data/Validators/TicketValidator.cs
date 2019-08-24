@@ -15,12 +15,12 @@ namespace SDCWebApp.Data.Validators
             RuleFor(x => x.PurchaseDate)
                 .Cascade(CascadeMode.StopOnFirstFailure)
                 .NotEmpty()
-                .InclusiveBetween(new DateTime(2012, 6, 2), DateTime.Now);
+                .InclusiveBetween(new DateTime(2012, 6, 2), DateTime.Now);  // 2.06.2012 is date of company established.
 
             RuleFor(x => x.ValidFor)
                 .Cascade(CascadeMode.StopOnFirstFailure)
                 .NotEmpty()
-                .InclusiveBetween(DateTime.Now, DateTime.Now.AddYears(1));
+                .InclusiveBetween(DateTime.Now, DateTime.Now.AddYears(1));  // Maybe in future change this for lookin to db for max valid for date?
 
             RuleFor(x => x.TicketUniqueId)
                 .Cascade(CascadeMode.StopOnFirstFailure)

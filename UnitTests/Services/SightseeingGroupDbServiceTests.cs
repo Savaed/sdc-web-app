@@ -136,7 +136,7 @@ namespace UnitTests.Services
         }
 
         [Test]
-        public async Task GetAsync__SightseeingGroup_found__Should_return_this_sightseeing_group()
+        public async Task GetAsync__Sightseeing_group_found__Should_return_this_sightseeing_group()
         {
             SightseeingGroup expectedSightseeingGroup;
 
@@ -144,7 +144,7 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    expectedSightseeingGroup = await context.Groups.FirstOrDefaultAsync();
+                    expectedSightseeingGroup = await context.Groups.Include(x => x.Tickets).FirstOrDefaultAsync();
                 }
 
                 using (var context = await factory.CreateContextAsync())

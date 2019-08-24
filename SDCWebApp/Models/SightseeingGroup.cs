@@ -14,16 +14,11 @@ namespace SDCWebApp.Models
         // Time must be full hour
         [Required, Column(TypeName = "datetime2(0)")]
         public DateTime SightseeingDate { get; set; }
-
         // < max allowed group size
         public int MaxGroupSize { get; set; } = 30;
-
         public int CurrentGroupSize => _currentGroupSize = Tickets != null ? Tickets.Count : _currentGroupSize;
         public bool IsAvailablePlace => _isAvailablePlace = CurrentGroupSize < MaxGroupSize;
-
-
         public virtual ICollection<Ticket> Tickets { get; set; }
-
 
         public object Clone()
         {

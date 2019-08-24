@@ -14,12 +14,12 @@ namespace SDCWebApp.Data.Validators
 
             RuleFor(x => x.Title)
                 .Cascade(CascadeMode.StopOnFirstFailure)
-              .NotEmpty()
-              .MaximumLength(50);
+                .NotEmpty()
+                .MaximumLength(50);
 
             RuleFor(x => x.Text)
-              .Cascade(CascadeMode.StopOnFirstFailure)
-              .NotEmpty();
+                .Cascade(CascadeMode.StopOnFirstFailure)
+                .NotEmpty();
         }
     }
 }

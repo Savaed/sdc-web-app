@@ -141,7 +141,7 @@ namespace SDCWebApp.Services
             try
             {
                 _logger.LogDebug($"Starting retrieve all sightseeing tariffs from database.");
-                var tariffs = await _context.SightseeingTariffs.ToListAsync();
+                var tariffs = await _context.SightseeingTariffs.Include(x => x.TicketTariffs).ToListAsync();
                 _logger.LogDebug("Retrieve data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(GetAllAsync)}'. Returning {tariffs.Count} elements.");
                 return tariffs.AsEnumerable();
@@ -177,7 +177,7 @@ namespace SDCWebApp.Services
             try
             {
                 _logger.LogDebug($"Starting retrieve sighseeing tariff with id: '{id}' from database.");
-                var tariff = await _context.SightseeingTariffs.SingleAsync(x => x.Id.Equals(id));
+                var tariff = await _context.SightseeingTariffs.Include(x => x.TicketTariffs).SingleAsync(x => x.Id.Equals(id));
                 _logger.LogDebug("Retrieve data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(GetAsync)}'.");
                 return tariff;
@@ -244,7 +244,7 @@ namespace SDCWebApp.Services
                 }
 
                 _logger.LogDebug($"Starting retrieve data. {nameof(pageNumber)} '{pageNumber.ToString()}', {nameof(pageSize)} '{pageSize.ToString()}'.");
-                tariffs = _context.SightseeingTariffs.Skip(pageSize * (pageNumber - 1)).Take(pageSize);
+                tariffs = _context.SightseeingTariffs.Include(x => x.TicketTariffs).Skip(pageSize * (pageNumber - 1)).Take(pageSize);
                 _logger.LogDebug("Retrieve data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(GetWithPaginationAsync)}'.");
                 return tariffs;
