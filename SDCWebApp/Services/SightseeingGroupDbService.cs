@@ -1,32 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SDCWebApp.Data;
 using SDCWebApp.Helpers.Extensions;
 using SDCWebApp.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SDCWebApp.Services
 {
-    // NOTE The code repeats in catch blocks, so why not wrap it in a function and call it when needed?
-    // The answer is that an exception is caught in the catch block, and then a new exception with the caught exception as 
-    // inner is thrown up. But if we catch the exception, then we call the function that creates and throws
-    // new exception with caught one, stack persistence will not be preserved.
-    // Using this approach in small projects like this one can be the triumph of form over content, but in larger projects 
-    // will be very useful and helpful for future maintenance.
-
     /// <summary>
-    /// Provides methods for get, add, update and delete operations for <see cref="Discount"/> entities in the database.
+    /// Provides methods for get, add, update and delete operations for <see cref="SightseeingGroup"/> entities in the database.
     /// </summary>
-    public class DiscountDbService : IDiscountDbService
+    public class SightseeingGroupDbService : ISightseeingGroupDbService
     {
-        private readonly ILogger<DiscountDbService> _logger;
+        private readonly ILogger<SightseeingGroupDbService> _logger;
         private readonly ApplicationDbContext _context;
 
 
-        public DiscountDbService(ApplicationDbContext context, ILogger<DiscountDbService> logger)
+        public SightseeingGroupDbService(ApplicationDbContext context, ILogger<SightseeingGroupDbService> logger)
         {
             _logger = logger;
             _context = context;
@@ -34,36 +27,36 @@ namespace SDCWebApp.Services
 
 
         /// <summary>
-        /// Asynchronously adds <see cref="Discount"/> entity to the database. Throws an exception if 
+        /// Asynchronously adds <see cref="SightseeingGroup"/> entity to the database. Throws an exception if 
         /// already there is the same entity in database or any problem with saving changes occurred.
         /// </summary>
         /// <param name="discount">The discount to be added. Cannot be null.</param>
         /// <returns>The added entity.</returns>
         /// <exception cref="ArgumentNullException">The value of discount to be added is null.</exception>
         /// <exception cref="InvalidOperationException">There is the same entity that one to be added in database.</exception>
-        /// <exception cref="InternalDbServiceException">The table with <see cref="Discount"/> entities does not exist or it is null or 
+        /// <exception cref="InternalDbServiceException">The table with <see cref="SightseeingGroup"/> entities does not exist or it is null or 
         /// cannot save properly any changes made by add operation.</exception>
-        public async Task<Discount> AddAsync(Discount discount)
+        public async Task<SightseeingGroup> AddAsync(SightseeingGroup group)
         {
             _logger.LogInformation($"Starting method '{nameof(AddAsync)}'.");
 
-            if (discount is null)
-                throw new ArgumentNullException($"Argument '{nameof(discount)}' cannot be null.");
+            if (group is null)
+                throw new ArgumentNullException($"Argument '{nameof(group)}' cannot be null.");
 
             await EnsureDatabaseCreatedAsync();
-            _ = _context?.Discounts ?? throw new InternalDbServiceException($"Table of type '{typeof(Discount).Name}' is null.");
+            _ = _context?.Groups ?? throw new InternalDbServiceException($"Table of type '{typeof(SightseeingGroup).Name}' is null.");
 
             try
             {
-                if (_context.Discounts.Contains(discount))
-                    throw new InvalidOperationException($"There is already the same element in the database as the one to be added. Id of this element: '{discount.Id}'.");
+                if (_context.Groups.Contains(group))
+                    throw new InvalidOperationException($"There is already the same element in the database as the one to be added. Id of this element: '{group.Id}'.");
 
-                _logger.LogDebug($"Starting add discount with id '{discount.Id}'.");
-                var addedDiscount = _context.Discounts.Add(discount).Entity;
+                _logger.LogDebug($"Starting add group with id '{group.Id}'.");
+                var addedGroup = _context.Groups.Add(group).Entity;
                 await _context.TrySaveChangesAsync();
                 _logger.LogDebug("Add data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(AddAsync)}'.");
-                return addedDiscount;
+                return addedGroup;
             }
             catch (DbUpdateException ex)
             {
@@ -73,25 +66,25 @@ namespace SDCWebApp.Services
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogError($"{ex.GetType().Name} There is already the same element in the database as the one to be added. Id of this element: '{discount.Id}'.", ex);
+                _logger.LogError($"{ex.GetType().Name} There is already the same element in the database as the one to be added. Id of this element: '{group.Id}'.", ex);
                 throw;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when adding disount with id '{discount?.Id}' to database. See inner excpetion for more details.", ex);
+                var internalException = new InternalDbServiceException($"Encountered problem when adding element with id '{group?.Id}' to the database. See inner excpetion for more details.", ex);
                 throw internalException;
             }
         }
 
         /// <summary>
-        /// Asynchronously deletes <see cref="Discount"/> entity from the database. Throws an exception if cannot found entity 
+        /// Asynchronously deletes <see cref="SightseeingGroup"/> entity from the database. Throws an exception if cannot found entity 
         /// to be deleted or any problem with saving changes occurred.
         /// </summary>
         /// <param name="id">The id of entity to be deleted. Cannot be null or empty.</param>
         /// <exception cref="ArgumentException">Argument <paramref name="id"/> is null or empty string.</exception>
         /// <exception cref="InvalidOperationException">Cannot foound entity with given <paramref name="id"/> for delete.</exception>
-        /// <exception cref="InternalDbServiceException">The table with <see cref="Discount"/> entities does not exist or it is null or 
+        /// <exception cref="InternalDbServiceException">The table with <see cref="SightseeingGroup"/> entities does not exist or it is null or 
         /// cannot save properly any changes made by add operation.</exception>
         public async Task DeleteAsync(string id)
         {
@@ -101,19 +94,19 @@ namespace SDCWebApp.Services
                 throw new ArgumentException($"Argument '{nameof(id)}' cannot be null or empty.");
 
             await EnsureDatabaseCreatedAsync();
-            _ = _context?.Discounts ?? throw new InternalDbServiceException($"Table of type '{typeof(Discount).Name}' is null.");
+            _ = _context?.Groups ?? throw new InternalDbServiceException($"Table of type '{typeof(SightseeingGroup).Name}' is null.");
 
             try
             {
-                if (_context.Discounts.Count() == 0)
-                    throw new InvalidOperationException($"Cannot found element with id '{id}'. Resource {_context.Discounts.GetType().Name} does not contain any element.");
+                if (_context.Groups.Count() == 0)
+                    throw new InvalidOperationException($"Cannot found element with id '{id}'. Resource {_context.Groups.GetType().Name} does not contain any element.");
 
-                if (await _context.Discounts.AnyAsync(x => x.Id.Equals(id)) == false)
+                if (await _context.Groups.AnyAsync(x => x.Id.Equals(id)) == false)
                     throw new InvalidOperationException($"Cannot found element with id '{id}'. Any element does not match to the one to be updated.");
 
-                var disountToBeDeleted = await _context.Discounts.SingleAsync(x => x.Id.Equals(id));
-                _logger.LogDebug($"Starting remove discount with id '{disountToBeDeleted.Id}'.");
-                _context.Discounts.Remove(disountToBeDeleted);
+                var groupToBeDeleted = await _context.Groups.SingleAsync(x => x.Id.Equals(id));
+                _logger.LogDebug($"Starting remove sightseeing group with id '{groupToBeDeleted.Id}'.");
+                _context.Groups.Remove(groupToBeDeleted);
                 await _context.TrySaveChangesAsync();
                 _logger.LogDebug("Remove data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(DeleteAsync)}'.");
@@ -126,43 +119,43 @@ namespace SDCWebApp.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when removing disounts with id '{id}' from database. See inner excpetion for more details.", ex);
+                var internalException = new InternalDbServiceException($"Encountered problem when removing element with id '{id}' from database. See inner excpetion for more details.", ex);
                 throw internalException;
             }
         }
 
         /// <summary>
-        /// Asynchronously retrievs all <see cref="Discount"/> entities from the database. 
+        /// Asynchronously retrievs all <see cref="SightseeingGroup"/> entities from the database. 
         /// Throws an exception if any problem with retrieving occurred.
         /// </summary>
-        /// <returns>Set of all <see cref="Discount"/> entities from database.</returns>
+        /// <returns>Set of all <see cref="SightseeingGroup"/> entities from database.</returns>
         /// <exception cref="InternalDbServiceException">The resource does not exist or has a null value or any
         /// other problems with retrieving data from database occurred.</exception>
-        public async Task<IEnumerable<Discount>> GetAllAsync()
+        public async Task<IEnumerable<SightseeingGroup>> GetAllAsync()
         {
             _logger.LogInformation($"Starting method '{nameof(GetAllAsync)}'.");
 
             await EnsureDatabaseCreatedAsync();
-            _ = _context?.Discounts ?? throw new InternalDbServiceException($"Table of type '{typeof(Discount).Name}' is null.");
+            _ = _context?.Groups ?? throw new InternalDbServiceException($"Table of type '{typeof(SightseeingGroup).Name}' is null.");
 
             try
             {
-                _logger.LogDebug($"Starting retrieve all discounts from database.");
-                var discounts = await _context.Discounts.ToListAsync();
+                _logger.LogDebug($"Starting retrieve all sightseeing groups from database.");
+                var groups = await _context.Groups.ToListAsync();
                 _logger.LogDebug("Retrieve data succeeded.");
-                _logger.LogInformation($"Finished method '{nameof(GetAllAsync)}'. Returning {discounts.Count} elements.");
-                return discounts.AsEnumerable();
+                _logger.LogInformation($"Finished method '{nameof(GetAllAsync)}'. Returning {groups.Count} elements.");
+                return groups.AsEnumerable();
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when retrieving disounts from database. See inner excpetion for more details.", ex);
+                var internalException = new InternalDbServiceException($"Encountered problem when retrieving sightseeing group from database. See inner excpetion for more details.", ex);
                 throw internalException;
             }
         }
 
         /// <summary>
-        /// Asynchronously retrievs <see cref="Discount"/> entity with given <paramref name="id"/> from the database. 
+        /// Asynchronously retrievs <see cref="SightseeingGroup"/> entity with given <paramref name="id"/> from the database. 
         /// Throws an exception if cannot found entity or any problem with retrieving occurred.
         /// </summary>
         /// <param name="id">The id of entity to be retrived. Cannot be nul or empty.</param>
@@ -171,7 +164,7 @@ namespace SDCWebApp.Services
         /// <exception cref="InvalidOperationException">Cannot found entity with given <paramref name="id"/>.</exception>
         /// <exception cref="InternalDbServiceException">The resource does not exist or has a null value or any
         /// other problems with retrieving data from database occurred.</exception>
-        public async Task<Discount> GetAsync(string id)
+        public async Task<SightseeingGroup> GetAsync(string id)
         {
             _logger.LogInformation($"Starting method '{nameof(GetAsync)}'.");
 
@@ -179,19 +172,19 @@ namespace SDCWebApp.Services
                 throw new ArgumentException($"Argument '{nameof(id)}' cannot be null or empty.");
 
             await EnsureDatabaseCreatedAsync();
-            _ = _context?.Discounts ?? throw new InternalDbServiceException($"Table of type '{typeof(Discount).Name}' is null.");
+            _ = _context?.Groups ?? throw new InternalDbServiceException($"Table of type '{typeof(SightseeingGroup).Name}' is null.");
 
             try
             {
-                _logger.LogDebug($"Starting retrieve discount with id: '{id}' from database.");
-                var discount = await _context.Discounts.SingleAsync(x => x.Id.Equals(id));
+                _logger.LogDebug($"Starting retrieve sighseeing group with id: '{id}' from database.");
+                var group = await _context.Groups.SingleAsync(x => x.Id.Equals(id));
                 _logger.LogDebug("Retrieve data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(GetAsync)}'.");
-                return discount;
+                return group;
             }
             catch (InvalidOperationException ex)
             {
-                string message = _context.Discounts.Count() == 0 ? $"Element not found because resource {_context.Discounts.GetType().Name} is empty. See inner exception for more details."
+                string message = _context.Groups.Count() == 0 ? $"Element not found because resource {_context.Groups.GetType().Name} is empty. See inner exception for more details."
                     : "Element not found. See inner exception for more details.";
                 _logger.LogError(ex, $"{ex.GetType().Name} {message} Operation failed.");
                 throw;
@@ -199,22 +192,22 @@ namespace SDCWebApp.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when retriving discount with id '{id}' from database. See inner exception for more details.", ex);
+                var internalException = new InternalDbServiceException($"Encountered problem when retriving sighseeing group with id '{id}' from database. See inner exception for more details.", ex);
                 throw internalException;
             }
         }
 
         /// <summary>
-        /// Asynchronously retrieves <see cref="Discount"/> entities with specified page size and page number.
+        /// Asynchronously retrieves <see cref="SightseeingGroup"/> entities with specified page size and page number.
         /// Throws an exception if arguments is out of range or any problem with retrieving occurred.
         /// </summary>
         /// <param name="pageNumber">Page number that will be retrieved. Must be greater than 0.</param>
         /// <param name="pageSize">Page size. Must be a positive number.</param>
-        /// <returns>Set of <see cref="Discount"/> entities.</returns>
+        /// <returns>Set of <see cref="SightseeingGroup"/> entities.</returns>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageSize"/> is a negative number or <paramref name="pageNumber"/> is less than 1.</exception>
         /// <exception cref="InternalDbServiceException">The resource does not exist or has a null value or any
         /// other problems with retrieving data from database occurred.</exception>
-        public async Task<IEnumerable<Discount>> GetWithPaginationAsync(int pageNumber, int pageSize)
+        public async Task<IEnumerable<SightseeingGroup>> GetWithPaginationAsync(int pageNumber, int pageSize)
         {
             _logger.LogInformation($"Starting method '{nameof(GetWithPaginationAsync)}'.");
 
@@ -225,14 +218,14 @@ namespace SDCWebApp.Services
                 throw new ArgumentOutOfRangeException(nameof(pageSize), $"'{pageSize}' is not valid value for argument '{nameof(pageSize)}'. Only number greater or equal to 0 are valid.");
 
             await EnsureDatabaseCreatedAsync();
-            _ = _context?.Discounts ?? throw new InternalDbServiceException($"Table of type '{typeof(Discount).Name}' is null.");
+            _ = _context?.Discounts ?? throw new InternalDbServiceException($"Table of type '{typeof(SightseeingGroup).Name}' is null.");
 
             try
             {
-                IEnumerable<Discount> discounts = new Discount[] { }.AsEnumerable();
+                IEnumerable<SightseeingGroup> groups = new SightseeingGroup[] { }.AsEnumerable();
                 int maxNumberOfPageWithData;
 
-                int numberOfResourceElements = await _context.Discounts.CountAsync();
+                int numberOfResourceElements = await _context.Groups.CountAsync();
                 int numberOfElementsOnLastPage = numberOfResourceElements % pageSize;
                 int numberOfFullPages = (numberOfResourceElements - numberOfElementsOnLastPage) / pageSize;
 
@@ -246,67 +239,67 @@ namespace SDCWebApp.Services
 
                 if (numberOfResourceElements == 0 || pageSize == 0 || pageNumber > maxNumberOfPageWithData)
                 {
-                    _logger.LogInformation($"Finished method '{nameof(GetWithPaginationAsync)}'. Returning {discounts.Count()} elements.");
-                    return discounts;
+                    _logger.LogInformation($"Finished method '{nameof(GetWithPaginationAsync)}'. Returning {groups.Count()} elements.");
+                    return groups;
                 }
 
-                discounts = _context.Discounts.Skip(pageSize * (pageNumber - 1)).Take(pageSize);
+                groups = _context.Groups.Skip(pageSize * (pageNumber - 1)).Take(pageSize);
                 _logger.LogDebug("Retrieve data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(GetWithPaginationAsync)}'.");
-                return discounts;
+                return groups;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when retrieving disounts from database. See inner excpetion for more details.", ex);
+                var internalException = new InternalDbServiceException($"Encountered problem when retrieving sightseeing groups from database. See inner excpetion for more details.", ex);
                 throw internalException;
             }
         }
 
         /// <summary>
-        /// Asynchronously updates <see cref="Discount"/> entity. 
+        /// Asynchronously updates <see cref="SightseeingGroup"/> entity. 
         /// Throws an exception if cannot found entity or any problem with updating occurred.
         /// </summary>
-        /// <param name="discount">The discount to be updated. Cannot be null or has Id property set to null or empty string.</param>
+        /// <param name="group">The discount to be updated. Cannot be null or has Id property set to null or empty string.</param>
         /// <returns>Updated entity.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="discount"/> is null.</exception>
-        /// <exception cref="ArgumentException"><paramref name="discount"/> has Id property set to null or empty string.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="group"/> is null.</exception>
+        /// <exception cref="ArgumentException"><paramref name="group"/> has Id property set to null or empty string.</exception>
         /// <exception cref="InvalidOperationException">Cannot found entity to be updated.</exception>
         /// <exception cref="InternalDbServiceException">The resource does not exist or has a null value or any
         /// other problems with retrieving data from database occurred.</exception>
-        public async Task<Discount> UpdateAsync(Discount discount)
+        public async Task<SightseeingGroup> UpdateAsync(SightseeingGroup group)
         {
             _logger.LogInformation($"Starting method '{nameof(UpdateAsync)}'.");
 
-            _ = discount ?? throw new ArgumentNullException(nameof(discount), $"Argument '{nameof(discount)}' cannot be null.");
+            _ = group ?? throw new ArgumentNullException(nameof(group), $"Argument '{nameof(group)}' cannot be null.");
 
-            if (string.IsNullOrEmpty(discount.Id))
-                throw new ArgumentException($"Argument '{nameof(discount.Id)}' cannot be null or empty.");
+            if (string.IsNullOrEmpty(group.Id))
+                throw new ArgumentException($"Argument '{nameof(group.Id)}' cannot be null or empty.");
 
             await EnsureDatabaseCreatedAsync();
-            _ = _context?.Discounts ?? throw new InternalDbServiceException($"Table of type '{typeof(Discount).Name}' is null.");
+            _ = _context?.Groups ?? throw new InternalDbServiceException($"Table of type '{typeof(SightseeingGroup).Name}' is null.");
 
             try
             {
-                // If _context.Discounts does not null, but does not exist (as table in database, not as object using by EF Core)
-                // following if statement (exacly Count method) will throw exception about this table ("no such table: 'Discounts'." or something like that).
+                // If _context.Groups does not null, but does not exist (as table in database, not as object using by EF Core)
+                // following if statement (exacly Count method) will throw exception about this table ("no such table: 'Groups'." or something like that).
                 // So you can catch this exception and re-throw in InternalDbServiceException to next handling in next level layer e.g Controller.
 
                 // Maybe throwing exception in try block seems to be bad practice and a little bit tricky, but in this case is neccessery.
-                // Refference to Discounts while it does not exist cause throwing exception and without this 2 conditions below you cannot check 
+                // Refference to Groups while it does not exist cause throwing exception and without this 2 conditions below you cannot check 
                 // is there any element for update in database.
-                if (_context.Discounts.Count() == 0)
-                    throw new InvalidOperationException($"Cannot found element with id '{discount.Id}' for update. Resource {_context.Discounts.GetType().Name} does not contain any element.");
+                if (_context.Groups.Count() == 0)
+                    throw new InvalidOperationException($"Cannot found element with id '{group.Id}' for update. Resource {_context.Groups.GetType().Name} does not contain any element.");
 
-                if (await _context.Discounts.ContainsAsync(discount) == false)
-                    throw new InvalidOperationException($"Cannot found element with id '{discount.Id}' for update. Any element does not match to the one to be updated.");
+                if (await _context.Groups.ContainsAsync(group) == false)
+                    throw new InvalidOperationException($"Cannot found element with id '{group.Id}' for update. Any element does not match to the one to be updated.");
 
-                _logger.LogDebug($"Starting update discount with id '{discount.Id}'.");
-                var updatedDiscount = _context.Discounts.Update(discount).Entity;
+                _logger.LogDebug($"Starting update discount with id '{group.Id}'.");
+                var updatedGroup = _context.Groups.Update(group).Entity;
                 await _context.TrySaveChangesAsync();
                 _logger.LogDebug($"Update data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(UpdateAsync)}'.");
-                return updatedDiscount;
+                return updatedGroup;
             }
             catch (InvalidOperationException ex)
             {
@@ -316,7 +309,7 @@ namespace SDCWebApp.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when updating disount with id '{discount.Id}'. See inner excpetion for more details.", ex);
+                var internalException = new InternalDbServiceException($"Encountered problem when updating sighseeing group with id '{group.Id}'. See inner excpetion for more details.", ex);
                 throw internalException;
             }
         }
@@ -331,5 +324,9 @@ namespace SDCWebApp.Services
         }
 
         #endregion
+
+
+
+
     }
 }

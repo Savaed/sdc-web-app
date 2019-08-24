@@ -22,7 +22,6 @@ namespace UnitTests.Services
     public class DiscountDbServiceTests
     {
         private Mock<ApplicationDbContext> _dbContextMock;
-        private Mock<IDbRepository> _repoMock;
         private ILogger<DiscountDbService> _logger;
         private Mock<ICustomValidator<Discount>> _validatorMock;
         Discount _validDiscount = new Discount { Id = "1", Description = "Sample", DiscountValueInPercentage = 12, Type = Discount.DiscountType.ForGroup, GroupSizeForDiscount = 23 };
@@ -32,7 +31,6 @@ namespace UnitTests.Services
         public void SetUp()
         {
             _dbContextMock = new Mock<ApplicationDbContext>(Mock.Of<DbContextOptions<ApplicationDbContext>>(o => o.ContextType == typeof(ApplicationDbContext)));
-            _repoMock = new Mock<IDbRepository>();
             _logger = Mock.Of<ILogger<DiscountDbService>>();
             _validatorMock = new Mock<ICustomValidator<Discount>>();
             _validatorMock.Setup(v => v.Validate(It.IsAny<Discount>())).Returns(new ValidationResult());

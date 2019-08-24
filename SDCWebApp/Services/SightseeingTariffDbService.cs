@@ -8,20 +8,23 @@ using SDCWebApp.Models;
 
 namespace SDCWebApp.Services
 {
-    public class TariffDbService : ITariffDbService
+    /// <summary>
+    /// Provides methods for get, add, update and delete operations for <see cref="SightseeingTariff"/> entities in the database.
+    /// </summary>
+    public class SightseeingTariffDbService : ISightseeingTariffDbService
     {
+        private readonly ILogger<SightseeingTariffDbService> _logger;
         private readonly ApplicationDbContext _context;
-        private readonly ILogger<TariffDbService> _logger;
 
 
-        public TariffDbService(ApplicationDbContext context, ILogger<TariffDbService> logger)
+        public SightseeingTariffDbService(ApplicationDbContext context, ILogger<SightseeingTariffDbService> logger)
         {
             _logger = logger;
             _context = context;
         }
 
 
-        public Task<TicketTariff> AddAsync(TicketTariff tariff)
+        public Task<SightseeingTariff> AddAsync(SightseeingTariff tariff)
         {
             throw new NotImplementedException();
         }
@@ -31,22 +34,22 @@ namespace SDCWebApp.Services
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<TicketTariff>> GetAllAsync()
+        public Task<IEnumerable<SightseeingTariff>> GetAllAsync()
         {
             throw new NotImplementedException();
         }
 
-        public Task<TicketTariff> GetAsync(string id)
+        public Task<SightseeingTariff> GetAsync(string id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<TicketTariff>> GetCurrentTariffsAsync()
+        public Task<IEnumerable<SightseeingTariff>> GetWithPaginationAsync(int pageNumber, int pageSize)
         {
             throw new NotImplementedException();
         }
 
-        public Task<TicketTariff> UpdateAsync(TicketTariff tariff)
+        public Task<SightseeingTariff> UpdateAsync(SightseeingTariff tariff)
         {
             throw new NotImplementedException();
         }
