@@ -19,16 +19,19 @@ using UnitTests.Helpers;
 namespace UnitTests.Services
 {
     [TestFixture]
-    public class ArticleDbServiceTests
+    public class GeneralSightseeingInfoDbServiceTests
+
     {
         private Mock<ApplicationDbContext> _dbContextMock;
-        private ILogger<ArticleDbService> _logger;
-        private readonly Article _validArticle = new Article
+        private ILogger<GeneralSightseeingInfoDbService> _logger;
+        private readonly GeneralSightseeingInfo _validInfo = new GeneralSightseeingInfo
         {
             Id = "1",
-            Author = "Mr Test",
-            Text = "TestTestTest",
-            Title = "Id TDD worth?",
+            ClosingHour = 18,
+            OpeningHour = 10,
+            MaxChildAge = 5,
+            Description = "Sample info",
+            MaxAllowedGroupSize = 35,
             UpdatedAt = DateTime.Now.AddDays(-1)
         };
 
@@ -36,7 +39,7 @@ namespace UnitTests.Services
         public void SetUp()
         {
             _dbContextMock = new Mock<ApplicationDbContext>(Mock.Of<DbContextOptions<ApplicationDbContext>>(o => o.ContextType == typeof(ApplicationDbContext)));
-            _logger = Mock.Of<ILogger<ArticleDbService>>();
+            _logger = Mock.Of<ILogger<GeneralSightseeingInfoDbService>>();
         }
 
 
@@ -55,8 +58,8 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    context.Articles = null as DbSet<Article>;
-                    var service = new ArticleDbService(context, _logger);
+                    context.GeneralSightseeingInfo = null as DbSet<GeneralSightseeingInfo>;
+                    var service = new GeneralSightseeingInfoDbService(context, _logger);
 
                     Func<Task> action = async () => await service.GetAsync("a");
 
@@ -72,17 +75,17 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    // Drop Articles table.
-                    context.Database.ExecuteSqlCommand("DROP TABLE [Articles]");
+                    // Drop GeneralSightseeingInfos table.
+                    context.Database.ExecuteSqlCommand("DROP TABLE [GeneralSightseeingInfo]");
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new ArticleDbService(context, _logger);
+                    var service = new GeneralSightseeingInfoDbService(context, _logger);
 
                     Func<Task> action = async () => await service.GetAsync("a");
 
-                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of Article. " +
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of GeneralSightseeingInfo. " +
                         "NOTE Excaption actually is type of 'SqLiteError' only if database provider is SQLite.");
                 }
             }
@@ -91,7 +94,7 @@ namespace UnitTests.Services
         [Test]
         public async Task GetAsync__Id_is_null_or_empty__Should_throw_ArgumentException([Values(null, "")] string id)
         {
-            var service = new ArticleDbService(_dbContextMock.Object, _logger);
+            var service = new GeneralSightseeingInfoDbService(_dbContextMock.Object, _logger);
 
             Func<Task> action = async () => await service.GetAsync(id);
 
@@ -99,17 +102,17 @@ namespace UnitTests.Services
         }
 
         [Test]
-        public async Task GetAsync__Found_zero_matching_Article__Should_throw_InvalidOperationException()
+        public async Task GetAsync__Found_zero_matching_general_sightseeing_info__Should_throw_InvalidOperationException()
         {
             using (var factory = new DbContextFactory())
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new ArticleDbService(context, _logger);
+                    var service = new GeneralSightseeingInfoDbService(context, _logger);
 
                     Func<Task> action = async () => await service.GetAsync("a");
 
-                    await action.Should().ThrowExactlyAsync<InvalidOperationException>("Because Article not found.");
+                    await action.Should().ThrowExactlyAsync<InvalidOperationException>("Because GeneralSightseeingInfo not found.");
                 }
             }
         }
@@ -121,39 +124,39 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    context.Articles.RemoveRange(await context.Articles.ToListAsync());
+                    context.GeneralSightseeingInfo.RemoveRange(await context.GeneralSightseeingInfo.ToListAsync());
                     await context.SaveChangesAsync();
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new ArticleDbService(context, _logger);
+                    var service = new GeneralSightseeingInfoDbService(context, _logger);
 
                     Func<Task> action = async () => await service.GetAsync("a");
 
-                    await action.Should().ThrowExactlyAsync<InvalidOperationException>("Because resource is empty and cannot get single instance of Article.");
+                    await action.Should().ThrowExactlyAsync<InvalidOperationException>("Because resource is empty and cannot get single instance of GeneralSightseeingInfo.");
                 }
             }
         }
 
         [Test]
-        public async Task GetAsync__Article_found__Should_return_this_article()
+        public async Task GetAsync__General_sightseeing_info_found__Should_return_this_general_sightseeing_info()
         {
-            Article expectedArticle;
+            GeneralSightseeingInfo expectedGeneralSightseeingInfo;
 
             using (var factory = new DbContextFactory())
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    expectedArticle = await context.Articles.FirstOrDefaultAsync();
+                    expectedGeneralSightseeingInfo = await context.GeneralSightseeingInfo.FirstOrDefaultAsync();
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new ArticleDbService(context, _logger);
+                    var service = new GeneralSightseeingInfoDbService(context, _logger);
 
-                    var result = await service.GetAsync(expectedArticle.Id);
-                    result.Should().BeEquivalentTo(expectedArticle);
+                    var result = await service.GetAsync(expectedGeneralSightseeingInfo.Id);
+                    result.Should().BeEquivalentTo(expectedGeneralSightseeingInfo);
                 }
             }
         }
@@ -165,7 +168,7 @@ namespace UnitTests.Services
         // tabela nie istnieje -> internal exc
         // tabela jest nullem - > internal exc
         // zasob jest pusty -> pusty ienumer
-        // znalazlo -> ienum<Article> dla wszystkich z zasobu
+        // znalazlo -> ienum<GeneralSightseeingInfo> dla wszystkich z zasobu
 
         [Test]
         public async Task GetAllAsync__Resource_is_null__Should_throw_InternalDbServiceException()
@@ -174,8 +177,8 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    context.Articles = null as DbSet<Article>;
-                    var service = new ArticleDbService(context, _logger);
+                    context.GeneralSightseeingInfo = null as DbSet<GeneralSightseeingInfo>;
+                    var service = new GeneralSightseeingInfoDbService(context, _logger);
 
                     Func<Task> action = async () => await service.GetAllAsync();
 
@@ -191,17 +194,17 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    // Drop Articles table.
-                    context.Database.ExecuteSqlCommand("DROP TABLE [Articles]");
+                    // Drop GeneralSightseeingInfos table.
+                    context.Database.ExecuteSqlCommand("DROP TABLE [GeneralSightseeingInfo]");
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new ArticleDbService(context, _logger);
+                    var service = new GeneralSightseeingInfoDbService(context, _logger);
 
                     Func<Task> action = async () => await service.GetAllAsync();
 
-                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of Article. " +
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of GeneralSightseeingInfo. " +
                         "NOTE Excaption actually is type of 'SqLiteError' only if database provider is SQLite.");
                 }
             }
@@ -214,13 +217,13 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    context.Articles.RemoveRange(await context.Articles.ToArrayAsync());
+                    context.GeneralSightseeingInfo.RemoveRange(await context.GeneralSightseeingInfo.ToArrayAsync());
                     await context.SaveChangesAsync();
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new ArticleDbService(context, _logger);
+                    var service = new GeneralSightseeingInfoDbService(context, _logger);
 
                     var result = await service.GetAllAsync();
 
@@ -230,14 +233,14 @@ namespace UnitTests.Services
         }
 
         [Test]
-        public async Task GetAllAsync__All_Articles_found__Should_return_IEnumerable_for_all_ticket_groups()
+        public async Task GetAllAsync__All_general_sightseeing_infos_found__Should_return_IEnumerable_for_all_ticket_groups()
         {
             using (var factory = new DbContextFactory())
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    int expectedLength = context.Articles.ToArray().Length;
-                    var service = new ArticleDbService(context, _logger);
+                    int expectedLength = context.GeneralSightseeingInfo.ToArray().Length;
+                    var service = new GeneralSightseeingInfoDbService(context, _logger);
 
                     var result = await service.GetAllAsync();
 
@@ -249,7 +252,7 @@ namespace UnitTests.Services
         #endregion
 
 
-        #region Add(Article Article)
+        #region Add(GeneralSightseeingInfo info)
         // zasob nie istnieje -> exc z msg
         // zasob jest nullem -> null ref exc
         // problem z zapisaniem zmian -> inter | Nie mam pojecia jak to przetestowac xD
@@ -266,10 +269,10 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    context.Articles = null as DbSet<Article>;
-                    var service = new ArticleDbService(context, _logger);
+                    context.GeneralSightseeingInfo = null as DbSet<GeneralSightseeingInfo>;
+                    var service = new GeneralSightseeingInfoDbService(context, _logger);
 
-                    Func<Task> action = async () => await service.AddAsync(_validArticle);
+                    Func<Task> action = async () => await service.AddAsync(_validInfo);
 
                     await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource reference is set to null");
                 }
@@ -283,17 +286,17 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    // Drop Articles table.
-                    context.Database.ExecuteSqlCommand("DROP TABLE [Articles]");
+                    // Drop GeneralSightseeingInfos table.
+                    context.Database.ExecuteSqlCommand("DROP TABLE [GeneralSightseeingInfo]");
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new ArticleDbService(context, _logger);
+                    var service = new GeneralSightseeingInfoDbService(context, _logger);
 
-                    Func<Task> action = async () => await service.AddAsync(_validArticle);
+                    Func<Task> action = async () => await service.AddAsync(_validInfo);
 
-                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of Article. " +
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of 'GeneralSightseeingInfo'. " +
                         "NOTE Excaption actually is type of 'SqLiteError' only if database provider is SQLite.");
                 }
             }
@@ -302,49 +305,49 @@ namespace UnitTests.Services
         [Test]
         public async Task AddAsync__Argument_is_null__Should_throw_ArgumentNullException()
         {
-            var service = new ArticleDbService(_dbContextMock.Object, _logger);
+            var service = new GeneralSightseeingInfoDbService(_dbContextMock.Object, _logger);
 
-            Func<Task> result = async () => await service.AddAsync(null as Article);
+            Func<Task> result = async () => await service.AddAsync(null as GeneralSightseeingInfo);
 
-            await result.Should().ThrowExactlyAsync<ArgumentNullException>("Because argument 'Article' is null.");
+            await result.Should().ThrowExactlyAsync<ArgumentNullException>("Because argument 'info' is null.");
         }
 
 
         [Test]
-        public async Task AddAsync__In_resource_exists_the_same_Article_as_this_one_to_be_added__Should_throw_InvalidOperationException()
+        public async Task AddAsync__In_resource_exists_the_same_general_sightseeing_info_as_this_one_to_be_added__Should_throw_InvalidOperationException()
         {
             using (var factory = new DbContextFactory())
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    context.Articles.Add(_validArticle);
+                    context.GeneralSightseeingInfo.Add(_validInfo);
                     await context.SaveChangesAsync();
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
                     // Testing method
-                    var service = new ArticleDbService(context, _logger);
+                    var service = new GeneralSightseeingInfoDbService(context, _logger);
 
-                    Func<Task> result = async () => await service.AddAsync(_validArticle);
+                    Func<Task> result = async () => await service.AddAsync(_validInfo);
 
-                    await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because in resource exists the same Article as this one to be added.");
+                    await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because in resource exists the same GeneralSightseeingInfo as this one to be added.");
                 }
             }
         }
 
         [Test]
-        public async Task AddAsync__Add_successful__Should_return_added_article()
+        public async Task AddAsync__Add_successful__Should_return_added_general_sightseeing_info()
         {
             using (var factory = new DbContextFactory())
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new ArticleDbService(context, _logger);
+                    var service = new GeneralSightseeingInfoDbService(context, _logger);
 
-                    var result = await service.AddAsync(_validArticle);
+                    var result = await service.AddAsync(_validInfo);
 
-                    result.Should().BeEquivalentTo(_validArticle);
+                    result.Should().BeEquivalentTo(_validInfo);
                 }
             }
         }
@@ -356,28 +359,28 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    int expectedLength = context.Articles.Count() + 1;
-                    var service = new ArticleDbService(context, _logger);
+                    int expectedLength = context.GeneralSightseeingInfo.Count() + 1;
+                    var service = new GeneralSightseeingInfoDbService(context, _logger);
 
-                    await service.AddAsync(_validArticle);
+                    await service.AddAsync(_validInfo);
 
-                    context.Articles.Count().Should().Be(expectedLength);
+                    context.GeneralSightseeingInfo.Count().Should().Be(expectedLength);
                 }
             }
         }
 
         [Test]
-        public async Task AddAsync__Add_successful__Resource_contains_added_article()
+        public async Task AddAsync__Add_successful__Resource_contains_added_general_sightseeing_info()
         {
             using (var factory = new DbContextFactory())
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new ArticleDbService(context, _logger);
+                    var service = new GeneralSightseeingInfoDbService(context, _logger);
 
-                    await service.AddAsync(_validArticle);
+                    await service.AddAsync(_validInfo);
 
-                    context.Articles.Contains(_validArticle).Should().BeTrue();
+                    context.GeneralSightseeingInfo.Contains(_validInfo).Should().BeTrue();
                 }
             }
         }
@@ -385,7 +388,7 @@ namespace UnitTests.Services
         #endregion
 
 
-        #region UpdateAsync(Article tariff)
+        #region UpdateAsync(GeneralSightseeingInfo info)
         // arg jest nullem -> arg null exc
         // arg ma id ktore jest nullem albo pusty -> arg exc   
         // zasob jest nullem -> inter exc
@@ -404,10 +407,10 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    context.Articles = null as DbSet<Article>;
-                    var service = new ArticleDbService(context, _logger);
+                    context.GeneralSightseeingInfo = null as DbSet<GeneralSightseeingInfo>;
+                    var service = new GeneralSightseeingInfoDbService(context, _logger);
 
-                    Func<Task> action = async () => await service.UpdateAsync(_validArticle);
+                    Func<Task> action = async () => await service.UpdateAsync(_validInfo);
 
                     await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource reference is set to null");
                 }
@@ -421,17 +424,17 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    // Drop Articles table.
-                    context.Database.ExecuteSqlCommand("DROP TABLE [Articles]");
+                    // Drop GeneralSightseeingInfos table.
+                    context.Database.ExecuteSqlCommand("DROP TABLE [GeneralSightseeingInfo]");
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new ArticleDbService(context, _logger);
+                    var service = new GeneralSightseeingInfoDbService(context, _logger);
 
-                    Func<Task> action = async () => await service.UpdateAsync(_validArticle);
+                    Func<Task> action = async () => await service.UpdateAsync(_validInfo);
 
-                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of Article. " +
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of GeneralSightseeingInfo. " +
                         "NOTE Excaption actually is type of 'SqLiteError' only if database provider is SQLite.");
                 }
             }
@@ -444,11 +447,11 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new ArticleDbService(context, _logger);
+                    var service = new GeneralSightseeingInfoDbService(context, _logger);
 
-                    Func<Task> result = async () => await service.UpdateAsync(null as Article);
+                    Func<Task> result = async () => await service.UpdateAsync(null as GeneralSightseeingInfo);
 
-                    await result.Should().ThrowExactlyAsync<ArgumentNullException>("Because argument 'Article' cannot be null.");
+                    await result.Should().ThrowExactlyAsync<ArgumentNullException>("Because argument 'GeneralSightseeingInfo' cannot be null.");
                 }
             }
         }
@@ -456,16 +459,16 @@ namespace UnitTests.Services
         [Test]
         public async Task UpdateAsync__Argument_has_null_or_empty_id__Should_throw_ArgumentException([Values(null, "")] string id)
         {
-            var invalidArticle = new Article { Id = id };
+            var invalidGeneralSightseeingInfo = new GeneralSightseeingInfo { Id = id };
             using (var factory = new DbContextFactory())
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new ArticleDbService(context, _logger);
+                    var service = new GeneralSightseeingInfoDbService(context, _logger);
 
-                    Func<Task> result = async () => await service.UpdateAsync(invalidArticle);
+                    Func<Task> result = async () => await service.UpdateAsync(invalidGeneralSightseeingInfo);
 
-                    await result.Should().ThrowExactlyAsync<ArgumentException>("Because argument 'Article' has null or empty id which is invalid.");
+                    await result.Should().ThrowExactlyAsync<ArgumentException>("Because argument 'GeneralSightseeingInfo' has null or empty id which is invalid.");
                 }
             }
         }
@@ -473,25 +476,25 @@ namespace UnitTests.Services
         [Test]
         public async Task UpdateAsync__Resource_is_empty__Should_throw_InvalidOperationException()
         {
-            Article articleBeforUpdate;
-            Article article;
+            GeneralSightseeingInfo generalSightseeingInfoBeforUpdate;
+            GeneralSightseeingInfo generalSightseeingInfo;
 
             using (var factory = new DbContextFactory())
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    articleBeforUpdate = await context.Articles.FirstAsync();
-                    article = articleBeforUpdate.Clone() as Article;
-                    context.Articles.RemoveRange(await context.Articles.ToArrayAsync());
+                    generalSightseeingInfoBeforUpdate = await context.GeneralSightseeingInfo.FirstAsync();
+                    generalSightseeingInfo = generalSightseeingInfoBeforUpdate.Clone() as GeneralSightseeingInfo;
+                    context.GeneralSightseeingInfo.RemoveRange(await context.GeneralSightseeingInfo.ToArrayAsync());
                     await context.SaveChangesAsync();
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    article.Title = "Changed title.";
-                    var service = new ArticleDbService(context, _logger);
+                    generalSightseeingInfo.Description = "Changed description.";
+                    var service = new GeneralSightseeingInfoDbService(context, _logger);
 
-                    Func<Task> result = async () => await service.UpdateAsync(article);
+                    Func<Task> result = async () => await service.UpdateAsync(generalSightseeingInfo);
 
                     await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because resource is empty.");
                 }
@@ -499,14 +502,16 @@ namespace UnitTests.Services
         }
 
         [Test]
-        public async Task UpdateAsync__Matching_Article_not_found__Should_throw_InvalidOperationException()
+        public async Task UpdateAsync__Matching_general_sightseeing_info_not_found__Should_throw_InvalidOperationException()
         {
-            Article article = new Article
+            GeneralSightseeingInfo generalSightseeingInfo = new GeneralSightseeingInfo
             {
                 Id = "0",
-                Text = "Sample text for only this test.",
-                Author = "Joe Doe",
-                Title = "SJKC",
+                Description = "sample",
+                MaxAllowedGroupSize = 12,
+                MaxChildAge = 3,
+                OpeningHour = 8,
+                ClosingHour = 16,
                 UpdatedAt = DateTime.Now.AddHours(-3)
             };
 
@@ -514,80 +519,80 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new ArticleDbService(context, _logger);
+                    var service = new GeneralSightseeingInfoDbService(context, _logger);
 
-                    Func<Task> result = async () => await service.UpdateAsync(article);
+                    Func<Task> result = async () => await service.UpdateAsync(generalSightseeingInfo);
 
-                    await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because matching article not found.");
+                    await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because matching GeneralSightseeingInfo not found.");
                 }
             }
         }
 
         [Test]
-        public async Task UpdateAsync__Update_successful__Should_return_updated_article()
+        public async Task UpdateAsync__Update_successful__Should_return_updated_general_sightseeing_info()
         {
-            Article articleBeforUpdate;
+            GeneralSightseeingInfo generalSightseeingInfoBeforUpdate;
 
             using (var factory = new DbContextFactory())
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    articleBeforUpdate = await context.Articles.FirstAsync();
-                    Article article = articleBeforUpdate;
-                    article.Title = "Changed title.";
-                    var service = new ArticleDbService(context, _logger);
+                    generalSightseeingInfoBeforUpdate = await context.GeneralSightseeingInfo.FirstAsync();
+                    GeneralSightseeingInfo generalSightseeingInfo = generalSightseeingInfoBeforUpdate;
+                    generalSightseeingInfo.Description = "Changed description.";
+                    var service = new GeneralSightseeingInfoDbService(context, _logger);
 
-                    var result = await service.UpdateAsync(article);
+                    var result = await service.UpdateAsync(generalSightseeingInfo);
 
-                    result.Should().BeEquivalentTo(article);
+                    result.Should().BeEquivalentTo(generalSightseeingInfo);
                 }
             }
         }
 
         [Test]
-        public async Task UpdateAsync__Update_successful__Resource_should_contains_updated_article()
+        public async Task UpdateAsync__Update_successful__Resource_should_contains_updated_general_sightseeing_info()
         {
-            Article article;
+            GeneralSightseeingInfo generalSightseeingInfo;
 
             using (var factory = new DbContextFactory())
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    article = await context.Articles.FirstAsync();
-                    article.Title = "Changed title.";
-                    var service = new ArticleDbService(context, _logger);
+                    generalSightseeingInfo = await context.GeneralSightseeingInfo.FirstAsync();
+                    generalSightseeingInfo.Description = "Changed description.";
+                    var service = new GeneralSightseeingInfoDbService(context, _logger);
 
-                    var result = await service.UpdateAsync(article);
+                    var result = await service.UpdateAsync(generalSightseeingInfo);
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    context.Articles.Contains(article).Should().BeTrue();
+                    context.GeneralSightseeingInfo.Contains(generalSightseeingInfo).Should().BeTrue();
                 }
             }
         }
 
         [Test]
-        public async Task UpdateAsync__Update_successful__Resource_should_doesnt_contain_previous_version_of_article()
+        public async Task UpdateAsync__Update_successful__Resource_should_doesnt_contain_previous_version_of_general_sightseeing_info()
         {
-            Article articleBeforUpdate;
-            Article article;
+            GeneralSightseeingInfo generalSightseeingInfoBeforUpdate;
+            GeneralSightseeingInfo generalSightseeingInfo;
 
             using (var factory = new DbContextFactory())
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    article = await context.Articles.FirstAsync();
-                    articleBeforUpdate = article.Clone() as Article;
-                    article.Title = "Changed title.";
-                    var service = new ArticleDbService(context, _logger);
+                    generalSightseeingInfo = await context.GeneralSightseeingInfo.FirstAsync();
+                    generalSightseeingInfoBeforUpdate = generalSightseeingInfo.Clone() as GeneralSightseeingInfo;
+                    generalSightseeingInfo.Description = "Changed description.";
+                    var service = new GeneralSightseeingInfoDbService(context, _logger);
 
-                    var result = await service.UpdateAsync(article);
+                    var result = await service.UpdateAsync(generalSightseeingInfo);
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    context.Articles.Single(x => x == article).Should().NotBeSameAs(articleBeforUpdate);
+                    context.GeneralSightseeingInfo.Single(x => x == generalSightseeingInfo).Should().NotBeSameAs(generalSightseeingInfoBeforUpdate);
                 }
             }
         }
@@ -595,26 +600,26 @@ namespace UnitTests.Services
         [Test]
         public async Task UpdateAsync__Update_successful__Resource_length_should_be_unchanged()
         {
-            Article articleBeforUpdate;
-            Article article;
+            GeneralSightseeingInfo generalSightseeingInfoBeforUpdate;
+            GeneralSightseeingInfo generalSightseeingInfo;
             int expectedLength;
 
             using (var factory = new DbContextFactory())
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    articleBeforUpdate = await context.Articles.FirstAsync();
-                    article = articleBeforUpdate;
-                    article.Title = "Changed title.";
-                    var service = new ArticleDbService(context, _logger);
-                    expectedLength = await context.Articles.CountAsync();
+                    generalSightseeingInfoBeforUpdate = await context.GeneralSightseeingInfo.FirstAsync();
+                    generalSightseeingInfo = generalSightseeingInfoBeforUpdate;
+                    generalSightseeingInfo.Description = "Changed description.";
+                    var service = new GeneralSightseeingInfoDbService(context, _logger);
+                    expectedLength = await context.GeneralSightseeingInfo.CountAsync();
 
-                    await service.UpdateAsync(article);
+                    await service.UpdateAsync(generalSightseeingInfo);
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    context.Articles.Count().Should().Be(expectedLength);
+                    context.GeneralSightseeingInfo.Count().Should().Be(expectedLength);
                 }
             }
         }
@@ -638,8 +643,8 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    context.Articles = null as DbSet<Article>;
-                    var service = new ArticleDbService(context, _logger);
+                    context.GeneralSightseeingInfo = null as DbSet<GeneralSightseeingInfo>;
+                    var service = new GeneralSightseeingInfoDbService(context, _logger);
 
                     Func<Task> action = async () => await service.DeleteAsync("1");
 
@@ -655,17 +660,17 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    // Drop Articles table.
-                    context.Database.ExecuteSqlCommand("DROP TABLE [Articles]");
+                    // Drop GeneralSightseeingInfos table.
+                    context.Database.ExecuteSqlCommand("DROP TABLE [GeneralSightseeingInfo]");
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new ArticleDbService(context, _logger);
+                    var service = new GeneralSightseeingInfoDbService(context, _logger);
 
                     Func<Task> action = async () => await service.DeleteAsync("1");
 
-                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of Article. " +
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of GeneralSightseeingInfo. " +
                         "NOTE Excaption actually is type of 'SqLiteError' only if database provider is SQLite.");
                 }
             }
@@ -674,7 +679,7 @@ namespace UnitTests.Services
         [Test]
         public async Task DeleteAsync__Argument_id_is_null_or_empty__Should_throw_ArgumentException([Values(null, "")] string id)
         {
-            var service = new ArticleDbService(_dbContextMock.Object, _logger);
+            var service = new GeneralSightseeingInfoDbService(_dbContextMock.Object, _logger);
 
             Func<Task> result = async () => await service.DeleteAsync(id);
 
@@ -688,13 +693,13 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    context.Articles.RemoveRange(await context.Articles.ToArrayAsync());
+                    context.GeneralSightseeingInfo.RemoveRange(await context.GeneralSightseeingInfo.ToArrayAsync());
                     await context.SaveChangesAsync();
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new ArticleDbService(context, _logger);
+                    var service = new GeneralSightseeingInfoDbService(context, _logger);
 
                     Func<Task> result = async () => await service.DeleteAsync("1");
 
@@ -704,18 +709,18 @@ namespace UnitTests.Services
         }
 
         [Test]
-        public async Task DeleteAsync__Article_to_be_deleted_not_found__Should_throw_InvalidOperationException()
+        public async Task DeleteAsync__general_sightseeing_info_to_be_deleted_not_found__Should_throw_InvalidOperationException()
         {
             using (var factory = new DbContextFactory())
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new ArticleDbService(context, _logger);
+                    var service = new GeneralSightseeingInfoDbService(context, _logger);
 
                     // Only positive Id is valid so there is not Id = '-100'.
                     Func<Task> result = async () => await service.DeleteAsync("-100");
 
-                    await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because Article to be deleted not found.");
+                    await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because GeneralSightseeingInfo to be deleted not found.");
                 }
             }
         }
@@ -729,38 +734,38 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    expectedLength = context.Articles.Count() - 1;
-                    Article articleToBeDeleted = context.Articles.First();
-                    id = articleToBeDeleted.Id;
-                    var service = new ArticleDbService(context, _logger);
+                    expectedLength = context.GeneralSightseeingInfo.Count() - 1;
+                    GeneralSightseeingInfo generalSightseeingInfoToBeDeleted = context.GeneralSightseeingInfo.First();
+                    id = generalSightseeingInfoToBeDeleted.Id;
+                    var service = new GeneralSightseeingInfoDbService(context, _logger);
                     await service.DeleteAsync(id);
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    context.Articles.Count().Should().Be(expectedLength);
+                    context.GeneralSightseeingInfo.Count().Should().Be(expectedLength);
                 }
             }
         }
 
         [Test]
-        public async Task DeleteAsync__Delete_successful__Resources_should_not_contain_deleted_article()
+        public async Task DeleteAsync__Delete_successful__Resources_should_not_contain_deleted_general_sightseeing_info()
         {
             string id;
             using (var factory = new DbContextFactory())
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    Article articleToBeDeleted = context.Articles.First();
-                    id = articleToBeDeleted.Id;
-                    var service = new ArticleDbService(context, _logger);
+                    GeneralSightseeingInfo generalSightseeingInfoToBeDeleted = context.GeneralSightseeingInfo.First();
+                    id = generalSightseeingInfoToBeDeleted.Id;
+                    var service = new GeneralSightseeingInfoDbService(context, _logger);
 
                     await service.DeleteAsync(id);
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    context.Articles.Where(x => x.Id.Equals(id)).Count().Should().Be(0);
+                    context.GeneralSightseeingInfo.Where(x => x.Id.Equals(id)).Count().Should().Be(0);
                 }
             }
         }
@@ -785,8 +790,8 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    context.Articles = null as DbSet<Article>;
-                    var service = new ArticleDbService(context, _logger);
+                    context.GeneralSightseeingInfo = null as DbSet<GeneralSightseeingInfo>;
+                    var service = new GeneralSightseeingInfoDbService(context, _logger);
 
                     Func<Task> action = async () => await service.GetWithPaginationAsync(1, 1);
 
@@ -802,17 +807,17 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    // Drop Articles table.
-                    context.Database.ExecuteSqlCommand("DROP TABLE [Articles]");
+                    // Drop GeneralSightseeingInfos table.
+                    context.Database.ExecuteSqlCommand("DROP TABLE [GeneralSightseeingInfo]");
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new ArticleDbService(context, _logger);
+                    var service = new GeneralSightseeingInfoDbService(context, _logger);
 
                     Func<Task> action = async () => await service.GetWithPaginationAsync(1, 1);
 
-                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of Article. " +
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of GeneralSightseeingInfo. " +
                         "NOTE Excaption actually is type of 'SqLiteError' only if database provider is SQLite.");
                 }
             }
@@ -821,7 +826,7 @@ namespace UnitTests.Services
         [Test]
         public async Task GetWithPaginationAsync__Page_number_is_less_than_1__Should_throw_ArgumentOutOfRangeException()
         {
-            var service = new ArticleDbService(_dbContextMock.Object, _logger);
+            var service = new GeneralSightseeingInfoDbService(_dbContextMock.Object, _logger);
 
             Func<Task> action = async () => await service.GetWithPaginationAsync(0, 10);
 
@@ -831,7 +836,7 @@ namespace UnitTests.Services
         [Test]
         public async Task GetWithPaginationAsync__Page_size_is_negative__Should_throw_ArgumentOutOfRangeException()
         {
-            var service = new ArticleDbService(_dbContextMock.Object, _logger);
+            var service = new GeneralSightseeingInfoDbService(_dbContextMock.Object, _logger);
 
             Func<Task> action = async () => await service.GetWithPaginationAsync(3, -10);
 
@@ -845,7 +850,7 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    context.Articles.RemoveRange(await context.Articles.ToArrayAsync());
+                    context.GeneralSightseeingInfo.RemoveRange(await context.GeneralSightseeingInfo.ToArrayAsync());
                     await context.SaveChangesAsync();
                 }
 
@@ -853,14 +858,14 @@ namespace UnitTests.Services
                 {
                     for (int i = 0; i < 10; i++)
                     {
-                        await context.Articles.AddAsync(new Article { Id = i.ToString() });
+                        await context.GeneralSightseeingInfo.AddAsync(new GeneralSightseeingInfo { Id = i.ToString() });
                     }
                     await context.SaveChangesAsync();
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new ArticleDbService(context, _logger);
+                    var service = new GeneralSightseeingInfoDbService(context, _logger);
 
                     // Page will be first with 6 elements and second with 4 elements. Second page will be return.
                     var result = await service.GetWithPaginationAsync(2, 6);
@@ -880,14 +885,14 @@ namespace UnitTests.Services
                 {
                     for (int i = 0; i < 10; i++)
                     {
-                        await context.Articles.AddAsync(new Article { Id = i.ToString() });
+                        await context.GeneralSightseeingInfo.AddAsync(new GeneralSightseeingInfo { Id = i.ToString() });
                     }
                     await context.SaveChangesAsync();
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new ArticleDbService(context, _logger);
+                    var service = new GeneralSightseeingInfoDbService(context, _logger);
 
                     // In this case is only 2 pages with any data.
                     var result = await service.GetWithPaginationAsync(4, 5);
@@ -904,13 +909,13 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    context.Articles.RemoveRange(await context.Articles.ToArrayAsync());
+                    context.GeneralSightseeingInfo.RemoveRange(await context.GeneralSightseeingInfo.ToArrayAsync());
                     await context.SaveChangesAsync();
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new ArticleDbService(context, _logger);
+                    var service = new GeneralSightseeingInfoDbService(context, _logger);
 
                     var result = await service.GetWithPaginationAsync(4, 5);
 

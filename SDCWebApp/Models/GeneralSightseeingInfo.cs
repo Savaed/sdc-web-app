@@ -1,6 +1,8 @@
-﻿namespace SDCWebApp.Models
+﻿using System;
+
+namespace SDCWebApp.Models
 {
-    public class GeneralSightseeingInfo : BasicEntity
+    public class GeneralSightseeingInfo : BasicEntity, ICloneable
     {
         public string Description { get; set; }
         // 0-18
@@ -13,5 +15,10 @@
         public float OpeningHour { get; set; }
         // jw
         public float ClosingHour { get; set; }
+
+        public object Clone()
+        {
+            return MemberwiseClone();
+        }
     }
 }
