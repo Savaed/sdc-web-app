@@ -23,7 +23,6 @@ namespace UnitTests.Services
     {
         private Mock<ApplicationDbContext> _dbContextMock;
         private ILogger<SightseeingGroupDbService> _logger;
-        private Mock<ICustomValidator<SightseeingGroup>> _validatorMock;
         SightseeingGroup _validGroup = new SightseeingGroup
         {
             Id = " 1",
@@ -37,8 +36,6 @@ namespace UnitTests.Services
         {
             _dbContextMock = new Mock<ApplicationDbContext>(Mock.Of<DbContextOptions<ApplicationDbContext>>(o => o.ContextType == typeof(ApplicationDbContext)));
             _logger = Mock.Of<ILogger<SightseeingGroupDbService>>();
-            _validatorMock = new Mock<ICustomValidator<SightseeingGroup>>();
-            _validatorMock.Setup(v => v.Validate(It.IsAny<SightseeingGroup>())).Returns(new ValidationResult());
         }
 
 

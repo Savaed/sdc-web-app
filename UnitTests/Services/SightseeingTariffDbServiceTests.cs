@@ -22,23 +22,18 @@ namespace UnitTests.Services
     public class SightseeingTariffDbServiceTest
     {
         private Mock<ApplicationDbContext> _dbContextMock;
-        private ILogger<SightseeingGroupDbService> _logger;
-        private Mock<ICustomValidator<SightseeingGroup>> _validatorMock;
-        SightseeingGroup _validGroup = new SightseeingGroup
+        private ILogger<SightseeingTariffDbService> _logger;
+        SightseeingTariff _validTariff = new SightseeingTariff
         {
-            Id = " 1",
-            MaxGroupSize = 23,
-            SightseeingDate = DateTime.Now.AddDays(7),
-            UpdatedAt = DateTime.Now
+            Id = "1",
+            Name = "Sample sightseeing tariff for unit tests."
         };
 
         [OneTimeSetUp]
         public void SetUp()
         {
             _dbContextMock = new Mock<ApplicationDbContext>(Mock.Of<DbContextOptions<ApplicationDbContext>>(o => o.ContextType == typeof(ApplicationDbContext)));
-            _logger = Mock.Of<ILogger<SightseeingGroupDbService>>();
-            _validatorMock = new Mock<ICustomValidator<SightseeingGroup>>();
-            _validatorMock.Setup(v => v.Validate(It.IsAny<SightseeingGroup>())).Returns(new ValidationResult());
+            _logger = Mock.Of<ILogger<SightseeingTariffDbService>>();
         }
 
 
@@ -57,8 +52,8 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    context.Groups = null as DbSet<SightseeingGroup>;
-                    var service = new SightseeingGroupDbService(context, _logger);
+                    context.SightseeingTariffs = null as DbSet<SightseeingTariff>;
+                    var service = new SightseeingTariffDbService(context, _logger);
 
                     Func<Task> action = async () => await service.GetAsync("a");
 
@@ -74,17 +69,17 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    // Drop SightseeingGroups table.
-                    context.Database.ExecuteSqlCommand("DROP TABLE [Groups]");
+                    // Drop SightseeingTariffs table.
+                    context.Database.ExecuteSqlCommand("DROP TABLE [SightseeingTariffs]");
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new SightseeingGroupDbService(context, _logger);
+                    var service = new SightseeingTariffDbService(context, _logger);
 
                     Func<Task> action = async () => await service.GetAsync("a");
 
-                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of SightseeingGroup. " +
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of SightseeingTariff. " +
                         "NOTE Excaption actually is type of 'SqLiteError' only if database provider is SQLite.");
                 }
             }
@@ -93,7 +88,7 @@ namespace UnitTests.Services
         [Test]
         public async Task GetAsync__Id_is_null_or_empty__Should_throw_ArgumentException([Values(null, "")] string id)
         {
-            var service = new SightseeingGroupDbService(_dbContextMock.Object, _logger);
+            var service = new SightseeingTariffDbService(_dbContextMock.Object, _logger);
 
             Func<Task> action = async () => await service.GetAsync(id);
 
@@ -101,17 +96,17 @@ namespace UnitTests.Services
         }
 
         [Test]
-        public async Task GetAsync__Found_zero_matching_SightseeingGroup__Should_throw_InvalidOperationException()
+        public async Task GetAsync__Found_zero_matching_SightseeingTariff__Should_throw_InvalidOperationException()
         {
             using (var factory = new DbContextFactory())
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new SightseeingGroupDbService(context, _logger);
+                    var service = new SightseeingTariffDbService(context, _logger);
 
                     Func<Task> action = async () => await service.GetAsync("a");
 
-                    await action.Should().ThrowExactlyAsync<InvalidOperationException>("Because SightseeingGroup not found.");
+                    await action.Should().ThrowExactlyAsync<InvalidOperationException>("Because SightseeingTariff not found.");
                 }
             }
         }
@@ -123,39 +118,39 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    context.Groups.RemoveRange(await context.Groups.ToListAsync());
+                    context.SightseeingTariffs.RemoveRange(await context.SightseeingTariffs.ToListAsync());
                     await context.SaveChangesAsync();
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new SightseeingGroupDbService(context, _logger);
+                    var service = new SightseeingTariffDbService(context, _logger);
 
                     Func<Task> action = async () => await service.GetAsync("a");
 
-                    await action.Should().ThrowExactlyAsync<InvalidOperationException>("Because resource is empty and cannot get single instance of SightseeingGroup.");
+                    await action.Should().ThrowExactlyAsync<InvalidOperationException>("Because resource is empty and cannot get single instance of SightseeingTariff.");
                 }
             }
         }
 
         [Test]
-        public async Task GetAsync__SightseeingGroup_found__Should_return_this_sightseeing_tariff()
+        public async Task GetAsync__SightseeingTariff_found__Should_return_this_sightseeing_tariff()
         {
-            SightseeingGroup expectedSightseeingGroup;
+            SightseeingTariff expectedSightseeingTariff;
 
             using (var factory = new DbContextFactory())
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    expectedSightseeingGroup = await context.Groups.FirstOrDefaultAsync();
+                    expectedSightseeingTariff = await context.SightseeingTariffs.FirstOrDefaultAsync();
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new SightseeingGroupDbService(context, _logger);
+                    var service = new SightseeingTariffDbService(context, _logger);
 
-                    var result = await service.GetAsync(expectedSightseeingGroup.Id);
-                    result.Should().BeEquivalentTo(expectedSightseeingGroup);
+                    var result = await service.GetAsync(expectedSightseeingTariff.Id);
+                    result.Should().BeEquivalentTo(expectedSightseeingTariff);
                 }
             }
         }
@@ -167,7 +162,7 @@ namespace UnitTests.Services
         // tabela nie istnieje -> internal exc
         // tabela jest nullem - > internal exc
         // zasob jest pusty -> pusty ienumer
-        // znalazlo -> ienum<SightseeingGroup> dla wszystkich z zasobu
+        // znalazlo -> ienum<SightseeingTariff> dla wszystkich z zasobu
 
         [Test]
         public async Task GetAllAsync__Resource_is_null__Should_throw_InternalDbServiceException()
@@ -176,8 +171,8 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    context.Groups = null as DbSet<SightseeingGroup>;
-                    var service = new SightseeingGroupDbService(context, _logger);
+                    context.SightseeingTariffs = null as DbSet<SightseeingTariff>;
+                    var service = new SightseeingTariffDbService(context, _logger);
 
                     Func<Task> action = async () => await service.GetAllAsync();
 
@@ -193,17 +188,17 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    // Drop SightseeingGroups table.
-                    context.Database.ExecuteSqlCommand("DROP TABLE [Groups]");
+                    // Drop SightseeingTariffs table.
+                    context.Database.ExecuteSqlCommand("DROP TABLE [SightseeingTariffs]");
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new SightseeingGroupDbService(context, _logger);
+                    var service = new SightseeingTariffDbService(context, _logger);
 
                     Func<Task> action = async () => await service.GetAllAsync();
 
-                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of SightseeingGroup. " +
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of SightseeingTariff. " +
                         "NOTE Excaption actually is type of 'SqLiteError' only if database provider is SQLite.");
                 }
             }
@@ -216,13 +211,13 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    context.Groups.RemoveRange(await context.Groups.ToArrayAsync());
+                    context.SightseeingTariffs.RemoveRange(await context.SightseeingTariffs.ToArrayAsync());
                     await context.SaveChangesAsync();
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new SightseeingGroupDbService(context, _logger);
+                    var service = new SightseeingTariffDbService(context, _logger);
 
                     var result = await service.GetAllAsync();
 
@@ -232,14 +227,14 @@ namespace UnitTests.Services
         }
 
         [Test]
-        public async Task GetAllAsync__All_SightseeingGroups_found__Should_return_IEnumerable_for_all_sightseeing_groups()
+        public async Task GetAllAsync__All_SightseeingTariffs_found__Should_return_IEnumerable_for_all_sightseeing_groups()
         {
             using (var factory = new DbContextFactory())
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    int expectedLength = context.Groups.ToArray().Length;
-                    var service = new SightseeingGroupDbService(context, _logger);
+                    int expectedLength = context.SightseeingTariffs.ToArray().Length;
+                    var service = new SightseeingTariffDbService(context, _logger);
 
                     var result = await service.GetAllAsync();
 
@@ -251,7 +246,7 @@ namespace UnitTests.Services
         #endregion
 
 
-        #region Add(SightseeingGroup SightseeingGroup)
+        #region Add(SightseeingTariff SightseeingTariff)
         // zasob nie istnieje -> exc z msg
         // zasob jest nullem -> null ref exc
         // problem z zapisaniem zmian -> inter | Nie mam pojecia jak to przetestowac xD
@@ -268,10 +263,10 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    context.Groups = null as DbSet<SightseeingGroup>;
-                    var service = new SightseeingGroupDbService(context, _logger);
+                    context.SightseeingTariffs = null as DbSet<SightseeingTariff>;
+                    var service = new SightseeingTariffDbService(context, _logger);
 
-                    Func<Task> action = async () => await service.AddAsync(_validGroup);
+                    Func<Task> action = async () => await service.AddAsync(_validTariff);
 
                     await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource reference is set to null");
                 }
@@ -285,17 +280,17 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    // Drop SightseeingGroups table.
-                    context.Database.ExecuteSqlCommand("DROP TABLE [Groups]");
+                    // Drop SightseeingTariffs table.
+                    context.Database.ExecuteSqlCommand("DROP TABLE [SightseeingTariffs]");
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new SightseeingGroupDbService(context, _logger);
+                    var service = new SightseeingTariffDbService(context, _logger);
 
-                    Func<Task> action = async () => await service.AddAsync(_validGroup);
+                    Func<Task> action = async () => await service.AddAsync(_validTariff);
 
-                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of SightseeingGroup. " +
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of SightseeingTariff. " +
                         "NOTE Excaption actually is type of 'SqLiteError' only if database provider is SQLite.");
                 }
             }
@@ -304,33 +299,33 @@ namespace UnitTests.Services
         [Test]
         public async Task AddAsync__Argument_is_null__Should_throw_ArgumentNullException()
         {
-            var service = new SightseeingGroupDbService(_dbContextMock.Object, _logger);
+            var service = new SightseeingTariffDbService(_dbContextMock.Object, _logger);
 
-            Func<Task> result = async () => await service.AddAsync(null as SightseeingGroup);
+            Func<Task> result = async () => await service.AddAsync(null as SightseeingTariff);
 
-            await result.Should().ThrowExactlyAsync<ArgumentNullException>("Because argument 'SightseeingGroup' is null.");
+            await result.Should().ThrowExactlyAsync<ArgumentNullException>("Because argument 'SightseeingTariff' is null.");
         }
 
 
         [Test]
-        public async Task AddAsync__In_resource_exists_the_same_SightseeingGroup_as_this_one_to_be_added__Should_throw_InvalidOperationException()
+        public async Task AddAsync__In_resource_exists_the_same_SightseeingTariff_as_this_one_to_be_added__Should_throw_InvalidOperationException()
         {
             using (var factory = new DbContextFactory())
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    context.Groups.Add(_validGroup);
+                    context.SightseeingTariffs.Add(_validTariff);
                     await context.SaveChangesAsync();
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
                     // Testing method
-                    var service = new SightseeingGroupDbService(context, _logger);
+                    var service = new SightseeingTariffDbService(context, _logger);
 
-                    Func<Task> result = async () => await service.AddAsync(_validGroup);
+                    Func<Task> result = async () => await service.AddAsync(_validTariff);
 
-                    await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because in resource exists the same SightseeingGroup as this one to be added.");
+                    await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because in resource exists the same SightseeingTariff as this one to be added.");
                 }
             }
         }
@@ -342,11 +337,11 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new SightseeingGroupDbService(context, _logger);
+                    var service = new SightseeingTariffDbService(context, _logger);
 
-                    var result = await service.AddAsync(_validGroup);
+                    var result = await service.AddAsync(_validTariff);
 
-                    result.Should().BeEquivalentTo(_validGroup);
+                    result.Should().BeEquivalentTo(_validTariff);
                 }
             }
         }
@@ -358,12 +353,12 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    int expectedLength = context.Groups.Count() + 1;
-                    var service = new SightseeingGroupDbService(context, _logger);
+                    int expectedLength = context.SightseeingTariffs.Count() + 1;
+                    var service = new SightseeingTariffDbService(context, _logger);
 
-                    await service.AddAsync(_validGroup);
+                    await service.AddAsync(_validTariff);
 
-                    context.Groups.Count().Should().Be(expectedLength);
+                    context.SightseeingTariffs.Count().Should().Be(expectedLength);
                 }
             }
         }
@@ -375,11 +370,11 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new SightseeingGroupDbService(context, _logger);
+                    var service = new SightseeingTariffDbService(context, _logger);
 
-                    await service.AddAsync(_validGroup);
+                    await service.AddAsync(_validTariff);
 
-                    context.Groups.Contains(_validGroup).Should().BeTrue();
+                    context.SightseeingTariffs.Contains(_validTariff).Should().BeTrue();
                 }
             }
         }
@@ -387,7 +382,7 @@ namespace UnitTests.Services
         #endregion
 
 
-        #region UpdateSightseeingGroupAsync(SightseeingGroup group)
+        #region UpdateAsync(SightseeingTariff tariff)
         // arg jest nullem -> arg null exc
         // arg ma id ktore jest nullem albo pusty -> arg exc   
         // zasob jest nullem -> inter exc
@@ -406,10 +401,10 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    context.Groups = null as DbSet<SightseeingGroup>;
-                    var service = new SightseeingGroupDbService(context, _logger);
+                    context.SightseeingTariffs = null as DbSet<SightseeingTariff>;
+                    var service = new SightseeingTariffDbService(context, _logger);
 
-                    Func<Task> action = async () => await service.UpdateAsync(_validGroup);
+                    Func<Task> action = async () => await service.UpdateAsync(_validTariff);
 
                     await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource reference is set to null");
                 }
@@ -423,17 +418,17 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    // Drop SightseeingGroups table.
-                    context.Database.ExecuteSqlCommand("DROP TABLE [Groups]");
+                    // Drop SightseeingTariffs table.
+                    context.Database.ExecuteSqlCommand("DROP TABLE [SightseeingTariffs]");
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new SightseeingGroupDbService(context, _logger);
+                    var service = new SightseeingTariffDbService(context, _logger);
 
-                    Func<Task> action = async () => await service.UpdateAsync(_validGroup);
+                    Func<Task> action = async () => await service.UpdateAsync(_validTariff);
 
-                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of SightseeingGroup. " +
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of SightseeingTariff. " +
                         "NOTE Excaption actually is type of 'SqLiteError' only if database provider is SQLite.");
                 }
             }
@@ -446,11 +441,11 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new SightseeingGroupDbService(context, _logger);
+                    var service = new SightseeingTariffDbService(context, _logger);
 
-                    Func<Task> result = async () => await service.UpdateAsync(null as SightseeingGroup);
+                    Func<Task> result = async () => await service.UpdateAsync(null as SightseeingTariff);
 
-                    await result.Should().ThrowExactlyAsync<ArgumentNullException>("Because argument 'SightseeingGroup' cannot be null.");
+                    await result.Should().ThrowExactlyAsync<ArgumentNullException>("Because argument 'SightseeingTariff' cannot be null.");
                 }
             }
         }
@@ -458,16 +453,16 @@ namespace UnitTests.Services
         [Test]
         public async Task UpdateAsync__Argument_has_null_or_empty_id__Should_throw_ArgumentException([Values(null, "")] string id)
         {
-            var invalidSightseeingGroup = new SightseeingGroup { Id = id };
+            var invalidSightseeingTariff = new SightseeingTariff { Id = id };
             using (var factory = new DbContextFactory())
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new SightseeingGroupDbService(context, _logger);
+                    var service = new SightseeingTariffDbService(context, _logger);
 
-                    Func<Task> result = async () => await service.UpdateAsync(invalidSightseeingGroup);
+                    Func<Task> result = async () => await service.UpdateAsync(invalidSightseeingTariff);
 
-                    await result.Should().ThrowExactlyAsync<ArgumentException>("Because argument 'SightseeingGroup' has null or empty id which is invalid.");
+                    await result.Should().ThrowExactlyAsync<ArgumentException>("Because argument 'SightseeingTariff' has null or empty id which is invalid.");
                 }
             }
         }
@@ -475,25 +470,25 @@ namespace UnitTests.Services
         [Test]
         public async Task UpdateAsync__Resource_is_empty__Should_throw_InvalidOperationException()
         {
-            SightseeingGroup sightseeingGroupBeforUpdate;
-            SightseeingGroup sightseeingGroup;
+            SightseeingTariff sightseeingTariffBeforUpdate;
+            SightseeingTariff sightseeingTariff;
 
             using (var factory = new DbContextFactory())
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    sightseeingGroupBeforUpdate = await context.Groups.FirstAsync();
-                    sightseeingGroup = sightseeingGroupBeforUpdate.Clone() as SightseeingGroup;
-                    context.Groups.RemoveRange(await context.Groups.ToArrayAsync());
+                    sightseeingTariffBeforUpdate = await context.SightseeingTariffs.FirstAsync();
+                    sightseeingTariff = sightseeingTariffBeforUpdate.Clone() as SightseeingTariff;
+                    context.SightseeingTariffs.RemoveRange(await context.SightseeingTariffs.ToArrayAsync());
                     await context.SaveChangesAsync();
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    sightseeingGroup.MaxGroupSize = 0;
-                    var service = new SightseeingGroupDbService(context, _logger);
+                    sightseeingTariff.Name = "Changed name.";
+                    var service = new SightseeingTariffDbService(context, _logger);
 
-                    Func<Task> result = async () => await service.UpdateAsync(sightseeingGroup);
+                    Func<Task> result = async () => await service.UpdateAsync(sightseeingTariff);
 
                     await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because esource is empty.");
                 }
@@ -501,26 +496,25 @@ namespace UnitTests.Services
         }
 
         [Test]
-        public async Task UpdateAsync__Matching_SightseeingGroup_not_found__Should_throw_InvalidOperationException()
+        public async Task UpdateAsync__Matching_SightseeingTariff_not_found__Should_throw_InvalidOperationException()
         {
-            SightseeingGroup sightseeingGroup = new SightseeingGroup
+            SightseeingTariff sightseeingTariff = new SightseeingTariff
             {
                 Id = "0",
-                MaxGroupSize = 23,
-                SightseeingDate = DateTime.Now.AddDays(7),
-                UpdatedAt = DateTime.Now
+                Name = "Sample name for only this test.",
+                UpdatedAt = DateTime.Now.AddHours(-3)
             };
 
             using (var factory = new DbContextFactory())
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new SightseeingGroupDbService(context, _logger);
+                    var service = new SightseeingTariffDbService(context, _logger);
 
-                    // In db does not matching SightseeingGroup to belowe disount.
-                    Func<Task> result = async () => await service.UpdateAsync(sightseeingGroup);
+                    // In db does not matching SightseeingTariff to belowe disount.
+                    Func<Task> result = async () => await service.UpdateAsync(sightseeingTariff);
 
-                    await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because matching SightseeingGroup not found.");
+                    await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because matching SightseeingTariff not found.");
                 }
             }
         }
@@ -528,20 +522,20 @@ namespace UnitTests.Services
         [Test]
         public async Task UpdateAsync__Update_successful__Should_return_updated_sightseeing_tariff()
         {
-            SightseeingGroup sightseeingGroupBeforUpdate;
+            SightseeingTariff sightseeingTariffBeforUpdate;
 
             using (var factory = new DbContextFactory())
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    sightseeingGroupBeforUpdate = await context.Groups.FirstAsync();
-                    SightseeingGroup sightseeingGroup = sightseeingGroupBeforUpdate;
-                    sightseeingGroup.MaxGroupSize = 0;
-                    var service = new SightseeingGroupDbService(context, _logger);
+                    sightseeingTariffBeforUpdate = await context.SightseeingTariffs.FirstAsync();
+                    SightseeingTariff sightseeingTariff = sightseeingTariffBeforUpdate;
+                    sightseeingTariff.Name = "Changed name.";
+                    var service = new SightseeingTariffDbService(context, _logger);
 
-                    var result = await service.UpdateAsync(sightseeingGroup);
+                    var result = await service.UpdateAsync(sightseeingTariff);
 
-                    result.Should().BeEquivalentTo(sightseeingGroup);
+                    result.Should().BeEquivalentTo(sightseeingTariff);
                 }
             }
         }
@@ -549,22 +543,22 @@ namespace UnitTests.Services
         [Test]
         public async Task UpdateAsync__Update_successful__Resource_should_contains_updated_sightseeing_tariff()
         {
-            SightseeingGroup sightseeingGroup;
+            SightseeingTariff sightseeingTariff;
 
             using (var factory = new DbContextFactory())
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    sightseeingGroup = await context.Groups.FirstAsync();
-                    sightseeingGroup.MaxGroupSize = 0;
-                    var service = new SightseeingGroupDbService(context, _logger);
+                    sightseeingTariff = await context.SightseeingTariffs.FirstAsync();
+                    sightseeingTariff.Name = "Changed name.";
+                    var service = new SightseeingTariffDbService(context, _logger);
 
-                    var result = await service.UpdateAsync(sightseeingGroup);
+                    var result = await service.UpdateAsync(sightseeingTariff);
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    context.Groups.Contains(sightseeingGroup).Should().BeTrue();
+                    context.SightseeingTariffs.Contains(sightseeingTariff).Should().BeTrue();
                 }
             }
         }
@@ -572,24 +566,24 @@ namespace UnitTests.Services
         [Test]
         public async Task UpdateAsync__Update_successful__Resource_should_doesnt_contain_previous_version_of_sightseeing_tariff()
         {
-            SightseeingGroup sightseeingGroupBeforUpdate;
-            SightseeingGroup sightseeingGroup;
+            SightseeingTariff sightseeingTariffBeforUpdate;
+            SightseeingTariff sightseeingTariff;
 
             using (var factory = new DbContextFactory())
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    sightseeingGroup = await context.Groups.FirstAsync();
-                    sightseeingGroupBeforUpdate = sightseeingGroup.Clone() as SightseeingGroup;
-                    sightseeingGroup.MaxGroupSize = 0;
-                    var service = new SightseeingGroupDbService(context, _logger);
+                    sightseeingTariff = await context.SightseeingTariffs.FirstAsync();
+                    sightseeingTariffBeforUpdate = sightseeingTariff.Clone() as SightseeingTariff;
+                    sightseeingTariff.Name = "Changed name.";
+                    var service = new SightseeingTariffDbService(context, _logger);
 
-                    var result = await service.UpdateAsync(sightseeingGroup);
+                    var result = await service.UpdateAsync(sightseeingTariff);
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    context.Groups.Single(x => x == sightseeingGroup).Should().NotBeSameAs(sightseeingGroupBeforUpdate);
+                    context.SightseeingTariffs.Single(x => x == sightseeingTariff).Should().NotBeSameAs(sightseeingTariffBeforUpdate);
                 }
             }
         }
@@ -597,26 +591,26 @@ namespace UnitTests.Services
         [Test]
         public async Task UpdateAsync__Update_successful__Resource_length_should_be_unchanged()
         {
-            SightseeingGroup sightseeingGroupBeforUpdate;
-            SightseeingGroup sightseeingGroup;
+            SightseeingTariff sightseeingTariffBeforUpdate;
+            SightseeingTariff sightseeingTariff;
             int expectedLength;
 
             using (var factory = new DbContextFactory())
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    sightseeingGroupBeforUpdate = await context.Groups.FirstAsync();
-                    sightseeingGroup = sightseeingGroupBeforUpdate;
-                    sightseeingGroup.MaxGroupSize = 0;
-                    var service = new SightseeingGroupDbService(context, _logger);
-                    expectedLength = await context.Groups.CountAsync();
+                    sightseeingTariffBeforUpdate = await context.SightseeingTariffs.FirstAsync();
+                    sightseeingTariff = sightseeingTariffBeforUpdate;
+                    sightseeingTariff.Name = "Changed name.";
+                    var service = new SightseeingTariffDbService(context, _logger);
+                    expectedLength = await context.SightseeingTariffs.CountAsync();
 
-                    await service.UpdateAsync(sightseeingGroup);
+                    await service.UpdateAsync(sightseeingTariff);
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    context.Groups.Count().Should().Be(expectedLength);
+                    context.SightseeingTariffs.Count().Should().Be(expectedLength);
                 }
             }
         }
@@ -640,8 +634,8 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    context.Groups = null as DbSet<SightseeingGroup>;
-                    var service = new SightseeingGroupDbService(context, _logger);
+                    context.SightseeingTariffs = null as DbSet<SightseeingTariff>;
+                    var service = new SightseeingTariffDbService(context, _logger);
 
                     Func<Task> action = async () => await service.DeleteAsync("1");
 
@@ -657,17 +651,17 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    // Drop SightseeingGroups table.
-                    context.Database.ExecuteSqlCommand("DROP TABLE [Groups]");
+                    // Drop SightseeingTariffs table.
+                    context.Database.ExecuteSqlCommand("DROP TABLE [SightseeingTariffs]");
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new SightseeingGroupDbService(context, _logger);
+                    var service = new SightseeingTariffDbService(context, _logger);
 
                     Func<Task> action = async () => await service.DeleteAsync("1");
 
-                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of SightseeingGroup. " +
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of SightseeingTariff. " +
                         "NOTE Excaption actually is type of 'SqLiteError' only if database provider is SQLite.");
                 }
             }
@@ -676,7 +670,7 @@ namespace UnitTests.Services
         [Test]
         public async Task DeleteAsync__Argument_id_is_null_or_empty__Should_throw_ArgumentException([Values(null, "")] string id)
         {
-            var service = new SightseeingGroupDbService(_dbContextMock.Object, _logger);
+            var service = new SightseeingTariffDbService(_dbContextMock.Object, _logger);
 
             Func<Task> result = async () => await service.DeleteAsync(id);
 
@@ -690,13 +684,13 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    context.Groups.RemoveRange(await context.Groups.ToArrayAsync());
+                    context.SightseeingTariffs.RemoveRange(await context.SightseeingTariffs.ToArrayAsync());
                     await context.SaveChangesAsync();
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new SightseeingGroupDbService(context, _logger);
+                    var service = new SightseeingTariffDbService(context, _logger);
 
                     Func<Task> result = async () => await service.DeleteAsync("1");
 
@@ -706,18 +700,18 @@ namespace UnitTests.Services
         }
 
         [Test]
-        public async Task DeleteAsync__SightseeingGroup_to_be_deleted_not_found__Should_throw_InvalidOperationException()
+        public async Task DeleteAsync__SightseeingTariff_to_be_deleted_not_found__Should_throw_InvalidOperationException()
         {
             using (var factory = new DbContextFactory())
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new SightseeingGroupDbService(context, _logger);
+                    var service = new SightseeingTariffDbService(context, _logger);
 
                     // Only positive Id is valid so there is not Id = '-100'.
                     Func<Task> result = async () => await service.DeleteAsync("-100");
 
-                    await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because SightseeingGroup to be deleted not found.");
+                    await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because SightseeingTariff to be deleted not found.");
                 }
             }
         }
@@ -731,16 +725,16 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    expectedLength = context.Groups.Count() - 1;
-                    SightseeingGroup sightseeingGroupToBeDeleted = context.Groups.First();
-                    id = sightseeingGroupToBeDeleted.Id;
-                    var service = new SightseeingGroupDbService(context, _logger);
+                    expectedLength = context.SightseeingTariffs.Count() - 1;
+                    SightseeingTariff SightseeingTariffToBeDeleted = context.SightseeingTariffs.First();
+                    id = SightseeingTariffToBeDeleted.Id;
+                    var service = new SightseeingTariffDbService(context, _logger);
                     await service.DeleteAsync(id);
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    context.Groups.Count().Should().Be(expectedLength);
+                    context.SightseeingTariffs.Count().Should().Be(expectedLength);
                 }
             }
         }
@@ -753,16 +747,16 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    SightseeingGroup sightseeingGroupToBeDeleted = context.Groups.First();
-                    id = sightseeingGroupToBeDeleted.Id;
-                    var service = new SightseeingGroupDbService(context, _logger);
+                    SightseeingTariff SightseeingTariffToBeDeleted = context.SightseeingTariffs.First();
+                    id = SightseeingTariffToBeDeleted.Id;
+                    var service = new SightseeingTariffDbService(context, _logger);
 
                     await service.DeleteAsync(id);
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    context.Groups.Where(x => x.Id.Equals(id)).Count().Should().Be(0);
+                    context.SightseeingTariffs.Where(x => x.Id.Equals(id)).Count().Should().Be(0);
                 }
             }
         }
@@ -787,8 +781,8 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    context.Groups = null as DbSet<SightseeingGroup>;
-                    var service = new SightseeingGroupDbService(context, _logger);
+                    context.SightseeingTariffs = null as DbSet<SightseeingTariff>;
+                    var service = new SightseeingTariffDbService(context, _logger);
 
                     Func<Task> action = async () => await service.GetWithPaginationAsync(1, 1);
 
@@ -804,17 +798,17 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    // Drop SightseeingGroups table.
-                    context.Database.ExecuteSqlCommand("DROP TABLE [Groups]");
+                    // Drop SightseeingTariffs table.
+                    context.Database.ExecuteSqlCommand("DROP TABLE [SightseeingTariffs]");
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new SightseeingGroupDbService(context, _logger);
+                    var service = new SightseeingTariffDbService(context, _logger);
 
                     Func<Task> action = async () => await service.GetWithPaginationAsync(1, 1);
 
-                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of SightseeingGroup. " +
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of SightseeingTariff. " +
                         "NOTE Excaption actually is type of 'SqLiteError' only if database provider is SQLite.");
                 }
             }
@@ -823,7 +817,7 @@ namespace UnitTests.Services
         [Test]
         public async Task GetWithPaginationAsync__Page_number_is_less_than_1__Should_throw_ArgumentOutOfRangeException()
         {
-            var service = new SightseeingGroupDbService(_dbContextMock.Object, _logger);
+            var service = new SightseeingTariffDbService(_dbContextMock.Object, _logger);
 
             Func<Task> action = async () => await service.GetWithPaginationAsync(0, 10);
 
@@ -833,7 +827,7 @@ namespace UnitTests.Services
         [Test]
         public async Task GetWithPaginationAsync__Page_size_is_negative__Should_throw_ArgumentOutOfRangeException()
         {
-            var service = new SightseeingGroupDbService(_dbContextMock.Object, _logger);
+            var service = new SightseeingTariffDbService(_dbContextMock.Object, _logger);
 
             Func<Task> action = async () => await service.GetWithPaginationAsync(3, -10);
 
@@ -847,7 +841,7 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    context.Groups.RemoveRange(await context.Groups.ToArrayAsync());
+                    context.SightseeingTariffs.RemoveRange(await context.SightseeingTariffs.ToArrayAsync());
                     await context.SaveChangesAsync();
                 }
 
@@ -855,14 +849,14 @@ namespace UnitTests.Services
                 {
                     for (int i = 0; i < 10; i++)
                     {
-                        await context.Groups.AddAsync(new SightseeingGroup { Id = i.ToString() });
+                        await context.SightseeingTariffs.AddAsync(new SightseeingTariff { Id = i.ToString() });
                     }
                     await context.SaveChangesAsync();
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new SightseeingGroupDbService(context, _logger);
+                    var service = new SightseeingTariffDbService(context, _logger);
 
                     // Page will be first with 6 elements and second with 4 elements. Second page will be return.
                     var result = await service.GetWithPaginationAsync(2, 6);
@@ -882,14 +876,14 @@ namespace UnitTests.Services
                 {
                     for (int i = 0; i < 10; i++)
                     {
-                        await context.Groups.AddAsync(new SightseeingGroup { Id = i.ToString() });
+                        await context.SightseeingTariffs.AddAsync(new SightseeingTariff { Id = i.ToString() });
                     }
                     await context.SaveChangesAsync();
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new SightseeingGroupDbService(context, _logger);
+                    var service = new SightseeingTariffDbService(context, _logger);
 
                     // In this case is only 2 pages with any data.
                     var result = await service.GetWithPaginationAsync(4, 5);
@@ -906,13 +900,13 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    context.Groups.RemoveRange(await context.Groups.ToArrayAsync());
+                    context.SightseeingTariffs.RemoveRange(await context.SightseeingTariffs.ToArrayAsync());
                     await context.SaveChangesAsync();
                 }
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    var service = new SightseeingGroupDbService(context, _logger);
+                    var service = new SightseeingTariffDbService(context, _logger);
 
                     var result = await service.GetWithPaginationAsync(4, 5);
 

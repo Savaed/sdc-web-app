@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SDCWebApp.Data;
+using SDCWebApp.Helpers.Extensions;
 using SDCWebApp.Models;
 
 namespace SDCWebApp.Services
@@ -24,34 +26,251 @@ namespace SDCWebApp.Services
         }
 
 
-        public Task<SightseeingTariff> AddAsync(SightseeingTariff tariff)
+        public async Task<SightseeingTariff> AddAsync(SightseeingTariff tariff)
         {
-            throw new NotImplementedException();
+            _logger.LogInformation($"Starting method '{nameof(AddAsync)}'.");
+
+            if (tariff is null)
+                throw new ArgumentNullException($"Argument '{nameof(tariff)}' cannot be null.");
+
+            await EnsureDatabaseCreatedAsync();
+            _ = _context?.SightseeingTariffs ?? throw new InternalDbServiceException($"Table of type '{typeof(SightseeingTariff).Name}' is null.");
+
+            try
+            {
+                if (_context.SightseeingTariffs.Contains(tariff))
+                    throw new InvalidOperationException($"There is already the same element in the database as the one to be added. Id of this element: '{tariff.Id}'.");
+
+                _logger.LogDebug($"Starting add tariff with id '{tariff.Id}'.");
+                var addedTariff = _context.SightseeingTariffs.Add(tariff).Entity;
+                await _context.TrySaveChangesAsync();
+                _logger.LogDebug("Add data succeeded.");
+                _logger.LogInformation($"Finished method '{nameof(AddAsync)}'.");
+                return addedTariff;
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError($"{ex.GetType().Name} Changes made by add operations cannot be saved properly. See inner exception. Operation failed.", ex);
+                var internalException = new InternalDbServiceException("Changes made by add operations cannot be saved properly. See inner exception for more details.", ex);
+                throw internalException;
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogError($"{ex.GetType().Name} There is already the same element in the database as the one to be added. Id of this element: '{tariff.Id}'.", ex);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
+                var internalException = new InternalDbServiceException($"Encountered problem when adding sighseeing tarifff with id '{tariff?.Id}' to the database. See inner excpetion for more details.", ex);
+                throw internalException;
+            }
         }
 
-        public Task DeleteAsync(string id)
+        public async Task DeleteAsync(string id)
         {
-            throw new NotImplementedException();
+            _logger.LogInformation($"Starting method '{nameof(DeleteAsync)}'.");
+
+            if (string.IsNullOrEmpty(id))
+                throw new ArgumentException($"Argument '{nameof(id)}' cannot be null or empty.");
+
+            await EnsureDatabaseCreatedAsync();
+            _ = _context?.SightseeingTariffs ?? throw new InternalDbServiceException($"Table of type '{typeof(SightseeingTariff).Name}' is null.");
+
+            try
+            {
+                if (_context.SightseeingTariffs.Count() == 0)
+                    throw new InvalidOperationException($"Cannot found element with id '{id}'. Resource {_context.SightseeingTariffs.GetType().Name} does not contain any element.");
+
+                if (await _context.SightseeingTariffs.AnyAsync(x => x.Id.Equals(id)) == false)
+                    throw new InvalidOperationException($"Cannot found element with id '{id}'. Any element does not match to the one to be updated.");
+
+                var tariffToBeDeleted = await _context.SightseeingTariffs.SingleAsync(x => x.Id.Equals(id));
+                _logger.LogDebug($"Starting remove sightseeing tariff with id '{tariffToBeDeleted.Id}'.");
+                _context.SightseeingTariffs.Remove(tariffToBeDeleted);
+                await _context.TrySaveChangesAsync();
+                _logger.LogDebug("Remove data succeeded.");
+                _logger.LogInformation($"Finished method '{nameof(DeleteAsync)}'.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogError(ex, $"{ex.GetType().Name} Cannot found element. See exception for more details. Operation failed.");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
+                var internalException = new InternalDbServiceException($"Encountered problem when removing sightseeing tariff with id '{id}' from database. See inner excpetion for more details.", ex);
+                throw internalException;
+            }
         }
 
-        public Task<IEnumerable<SightseeingTariff>> GetAllAsync()
+        public async Task<IEnumerable<SightseeingTariff>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            _logger.LogInformation($"Starting method '{nameof(GetAllAsync)}'.");
+
+            await EnsureDatabaseCreatedAsync();
+            _ = _context?.SightseeingTariffs ?? throw new InternalDbServiceException($"Table of type '{typeof(SightseeingTariff).Name}' is null.");
+
+            try
+            {
+                _logger.LogDebug($"Starting retrieve all discounts from database.");
+                var tariffs = await _context.SightseeingTariffs.ToListAsync();
+                _logger.LogDebug("Retrieve data succeeded.");
+                _logger.LogInformation($"Finished method '{nameof(GetAllAsync)}'. Returning {tariffs.Count} elements.");
+                return tariffs.AsEnumerable();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
+                var internalException = new InternalDbServiceException($"Encountered problem when retrieving all sightseeing tariffs from database. See inner excpetion for more details.", ex);
+                throw internalException;
+            }
         }
 
-        public Task<SightseeingTariff> GetAsync(string id)
+        public async Task<SightseeingTariff> GetAsync(string id)
         {
-            throw new NotImplementedException();
+            _logger.LogInformation($"Starting method '{nameof(GetAsync)}'.");
+
+            if (string.IsNullOrEmpty(id))
+                throw new ArgumentException($"Argument '{nameof(id)}' cannot be null or empty.");
+
+            await EnsureDatabaseCreatedAsync();
+            _ = _context?.SightseeingTariffs ?? throw new InternalDbServiceException($"Table of type '{typeof(SightseeingTariff).Name}' is null.");
+
+            try
+            {
+                _logger.LogDebug($"Starting retrieve sighseeing group with id: '{id}' from database.");
+                var tariff = await _context.SightseeingTariffs.SingleAsync(x => x.Id.Equals(id));
+                _logger.LogDebug("Retrieve data succeeded.");
+                _logger.LogInformation($"Finished method '{nameof(GetAsync)}'.");
+                return tariff;
+            }
+            catch (InvalidOperationException ex)
+            {
+                string message = _context.SightseeingTariffs.Count() == 0 ? $"Element not found because resource {_context.SightseeingTariffs.GetType().Name} does contain any elements. See inner exception for more details."
+                    : "Element not found. See inner exception for more details.";
+                _logger.LogError(ex, $"{ex.GetType().Name} {message} Operation failed.");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
+                var internalException = new InternalDbServiceException($"Encountered problem when retriving sighseeing tariff with id '{id}' from database. See inner exception for more details.", ex);
+                throw internalException;
+            }
         }
 
-        public Task<IEnumerable<SightseeingTariff>> GetWithPaginationAsync(int pageNumber, int pageSize)
+        public async Task<IEnumerable<SightseeingTariff>> GetWithPaginationAsync(int pageNumber, int pageSize)
         {
-            throw new NotImplementedException();
+            _logger.LogInformation($"Starting method '{nameof(GetWithPaginationAsync)}'.");
+
+            if (pageNumber < 1)
+                throw new ArgumentOutOfRangeException(nameof(pageNumber), $"'{pageNumber}' is not valid value for argument '{nameof(pageNumber)}'. Only number greater or equal to 1 are valid.");
+
+            if (pageSize < 0)
+                throw new ArgumentOutOfRangeException(nameof(pageSize), $"'{pageSize}' is not valid value for argument '{nameof(pageSize)}'. Only number greater or equal to 0 are valid.");
+
+            await EnsureDatabaseCreatedAsync();
+            _ = _context?.SightseeingTariffs ?? throw new InternalDbServiceException($"Table of type '{typeof(SightseeingTariff).Name}' is null.");
+
+            try
+            {
+                IEnumerable<SightseeingTariff> tariffs = new SightseeingTariff[] { }.AsEnumerable();
+                int maxNumberOfPageWithData;
+
+                int numberOfResourceElements = await _context.SightseeingTariffs.CountAsync();
+                int numberOfElementsOnLastPage = numberOfResourceElements % pageSize;
+                int numberOfFullPages = (numberOfResourceElements - numberOfElementsOnLastPage) / pageSize;
+
+                if (numberOfElementsOnLastPage > 0)
+                {
+                    maxNumberOfPageWithData = ++numberOfFullPages;
+                    _logger.LogWarning($"Last page of data contain {numberOfElementsOnLastPage} elements which is less than specified in {nameof(pageSize)}: {pageSize}.");
+                }
+                else
+                    maxNumberOfPageWithData = numberOfFullPages;
+
+                if (numberOfResourceElements == 0 || pageSize == 0 || pageNumber > maxNumberOfPageWithData)
+                {
+                    _logger.LogInformation($"Finished method '{nameof(GetWithPaginationAsync)}'. Returning {tariffs.Count()} elements.");
+                    return tariffs;
+                }
+
+                _logger.LogDebug($"Starting retrieve data. {nameof(pageNumber)} '{pageNumber.ToString()}', {nameof(pageSize)} '{pageSize.ToString()}'.");
+                tariffs = _context.SightseeingTariffs.Skip(pageSize * (pageNumber - 1)).Take(pageSize);
+                _logger.LogDebug("Retrieve data succeeded.");
+                _logger.LogInformation($"Finished method '{nameof(GetWithPaginationAsync)}'.");
+                return tariffs;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
+                var internalException = new InternalDbServiceException($"Encountered problem when retrieving sightseeing groups from database. See inner excpetion for more details.", ex);
+                throw internalException;
+            }
         }
 
-        public Task<SightseeingTariff> UpdateAsync(SightseeingTariff tariff)
+        public async Task<SightseeingTariff> UpdateAsync(SightseeingTariff tariff)
         {
-            throw new NotImplementedException();
+            _logger.LogInformation($"Starting method '{nameof(UpdateAsync)}'.");
+
+            _ = tariff ?? throw new ArgumentNullException(nameof(tariff), $"Argument '{nameof(tariff)}' cannot be null.");
+
+            if (string.IsNullOrEmpty(tariff.Id))
+                throw new ArgumentException($"Argument '{nameof(tariff.Id)}' cannot be null or empty.");
+
+            await EnsureDatabaseCreatedAsync();
+            _ = _context?.SightseeingTariffs ?? throw new InternalDbServiceException($"Table of type '{typeof(SightseeingTariff).Name}' is null.");
+
+            try
+            {
+                // If _context.Groups does not null, but does not exist (as table in database, not as object using by EF Core)
+                // following if statement (exacly Count method) will throw exception about this table ("no such table: 'Groups'." or something like that).
+                // So you can catch this exception and re-throw in InternalDbServiceException to next handling in next level layer e.g Controller.
+
+                // Maybe throwing exception in try block seems to be bad practice and a little bit tricky, but in this case is neccessery.
+                // Refference to Groups while it does not exist cause throwing exception and without this 2 conditions below you cannot check 
+                // is there any element for update in database.
+                if (_context.SightseeingTariffs.Count() == 0)
+                    throw new InvalidOperationException($"Cannot found element with id '{tariff.Id}' for update. Resource {_context.Groups.GetType().Name} does not contain any element.");
+
+                if (await _context.SightseeingTariffs.ContainsAsync(tariff) == false)
+                    throw new InvalidOperationException($"Cannot found element with id '{tariff.Id}' for update. Any element does not match to the one to be updated.");
+
+                _logger.LogDebug($"Starting update tariff with id '{tariff.Id}'.");
+                var updatedTariff = _context.SightseeingTariffs.Update(tariff).Entity;
+                await _context.TrySaveChangesAsync();
+                _logger.LogDebug($"Update data succeeded.");
+                _logger.LogInformation($"Finished method '{nameof(UpdateAsync)}'.");
+                return updatedTariff;
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogError(ex, $"{ex.GetType().Name} Cannot found element for update. See exception for more details. Operation failed.");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
+                var internalException = new InternalDbServiceException($"Encountered problem when updating sighseeing tariff with id '{tariff.Id}'. See inner excpetion for more details.", ex);
+                throw internalException;
+            }
         }
+
+
+
+
+
+        #region Privates
+
+        private async Task EnsureDatabaseCreatedAsync()
+        {
+            if (await _context.Database.EnsureCreatedAsync() == false)
+                _logger.LogWarning($"Database with provider '{_context.Database.ProviderName}' does not exist. It Will be created but not using migrations so it cannot be updating using migrations later.");
+        }
+
+        #endregion
+
     }
 }
