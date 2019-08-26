@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 
 namespace SDCWebApp.Models
@@ -19,6 +20,8 @@ namespace SDCWebApp.Models
         public string Description { get; set; }
         public int DiscountValueInPercentage { get; set; }
         public int? GroupSizeForDiscount { get; set; } = null;
+
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public virtual ICollection<Ticket> Tickets { get; set; }
 
         public object Clone()

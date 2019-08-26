@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -13,6 +14,8 @@ namespace SDCWebApp.Models
         public bool IsDisabled { get; set; }
         public bool HasFamilyCard { get; set; }
         public string EmailAddres { get; set; }
+
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public virtual ICollection<Ticket> Tickets { get; set; }
 
         public object Clone()

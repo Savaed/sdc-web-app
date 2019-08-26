@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace SDCWebApp.Models
@@ -6,6 +7,7 @@ namespace SDCWebApp.Models
     public abstract class BasicEntity : IEntity
     {
         [Required]
+        [JsonProperty(Order = 1)]
         public string Id { get; set; }
 
         [Timestamp]

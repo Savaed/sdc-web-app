@@ -1,4 +1,4 @@
-﻿namespace SDCWebApp.Models.ViewModels
+﻿namespace SDCWebApp.Models.Dtos.ViewModels
 {
     public class LoginViewModel
     {

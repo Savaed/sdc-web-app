@@ -42,7 +42,12 @@ namespace SDCWebApp
             {
                 //options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
             }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-            .AddFluentValidation();
+            .AddFluentValidation()
+            .AddJsonOptions(options =>
+            {
+                // Ignore reference loops in JSON responses.
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+            });
 
             // In production, the Angular files will be served from this directory.
             services.AddSpaStaticFiles(configuration =>
@@ -81,6 +86,7 @@ namespace SDCWebApp
             services.Configure<JwtSettings>(jwtSettingsSection);
             var jwtSettings = jwtSettingsSection.Get<JwtSettings>();
 
+            // Adding authentication
             services.AddAuthentication(config =>
             {
                 config.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -122,10 +128,11 @@ namespace SDCWebApp
             }
             else
             {
-                app.UseExceptionHandler("/Error");
+                app.UseExceptionHandler("/errors/500");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            app.UseStatusCodePagesWithReExecute("/errors/{0}");
 
             // Enabling CORS.
             app.UseCors();

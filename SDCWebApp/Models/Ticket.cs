@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -29,9 +30,13 @@ namespace SDCWebApp.Models
             private set => _price = value;
         }
 
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public virtual TicketTariff Tariff { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public virtual Discount Discount { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public virtual SightseeingGroup Group { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public virtual Customer Customer { get; set; }
 
 

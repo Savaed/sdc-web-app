@@ -171,7 +171,7 @@ namespace SDCWebApp.Services
             if (string.IsNullOrEmpty(id))
                 throw new ArgumentException($"Argument '{nameof(id)}' cannot be null or empty.");
 
-            await EnsureDatabaseCreatedAsync();
+            //await EnsureDatabaseCreatedAsync();
             _ = _context?.SightseeingTariffs ?? throw new InternalDbServiceException($"Table of type '{typeof(SightseeingTariff).Name}' is null.");
 
             try

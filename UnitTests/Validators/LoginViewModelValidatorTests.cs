@@ -1,7 +1,7 @@
 ﻿using FluentValidation.TestHelper;
 using NUnit.Framework;
 using SDCWebApp.Data.Validators;
-using SDCWebApp.Models.ViewModels;
+using SDCWebApp.Models.Dtos.ViewModels;
 
 namespace UnitTests.Validators
 {
