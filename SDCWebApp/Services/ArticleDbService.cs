@@ -10,6 +10,9 @@ using SDCWebApp.Models;
 
 namespace SDCWebApp.Services
 {
+    /// <summary>
+    /// Provides methods for get, add, update and delete operations for <see cref="Article"/> entities in the database.
+    /// </summary>
     public class ArticleDbService : IArticleDbService
     {
         private readonly ILogger<ArticleDbService> _logger;
@@ -194,7 +197,6 @@ namespace SDCWebApp.Services
             }
         }
 
-
         /// <summary>
         /// Asynchronously retrieves <see cref="Article"/> entities with specified page size and page number.
         /// Throws an exception if arguments is out of range or any problem with retrieving occurred.
@@ -281,8 +283,8 @@ namespace SDCWebApp.Services
 
             try
             {
-                // If _context.Groups does not null, but does not exist (as table in database, not as object using by EF Core)
-                // following if statement (exacly Count method) will throw exception about this table ("no such table: 'Groups'." or something like that).
+                // If _context.Articles does not null, but does not exist (as table in database, not as object using by EF Core)
+                // following if statement (exactly Count method) will throw exception about this table ("no such table: 'Articles'." or something like that).
                 // So you can catch this exception and re-throw in InternalDbServiceException to next handling in next level layer e.g Controller.
 
                 // Maybe throwing exception in try block seems to be bad practice and a little bit tricky, but in this case is neccessery.
@@ -320,7 +322,7 @@ namespace SDCWebApp.Services
         private async Task EnsureDatabaseCreatedAsync()
         {
             if (await _context.Database.EnsureCreatedAsync() == false)
-                _logger.LogWarning($"Database with provider '{_context.Database.ProviderName}' does not exist. It Will be created but not using migrations so it cannot be updating using migrations later.");
+                _logger.LogWarning($"Database with provider '{_context.Database.ProviderName}' does not exist. NOTE It will be created but not using migrations so it cannot be updating using migrations later.");
         }
 
         #endregion

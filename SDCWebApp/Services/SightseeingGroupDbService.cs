@@ -283,7 +283,7 @@ namespace SDCWebApp.Services
             try
             {
                 // If _context.Groups does not null, but does not exist (as table in database, not as object using by EF Core)
-                // following if statement (exacly Count method) will throw exception about this table ("no such table: 'Groups'." or something like that).
+                // following if statement (exactly Count method) will throw exception about this table ("no such table: 'Groups'." or something like that).
                 // So you can catch this exception and re-throw in InternalDbServiceException to next handling in next level layer e.g Controller.
 
                 // Maybe throwing exception in try block seems to be bad practice and a little bit tricky, but in this case is neccessery.
@@ -325,9 +325,6 @@ namespace SDCWebApp.Services
         }
 
         #endregion
-
-
-
 
     }
 }

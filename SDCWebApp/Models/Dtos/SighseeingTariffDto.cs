@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace SDCWebApp.Models.Dtos
 {
-    public class SighseeingTariffDto : DtoBase
+    public class SightseeingTariffDto : DtoBase
     {
         public string Name { get; set; }
-        public IEnumerable<TicketTariffDto> TicketTariffs { get; set; }
+        public ICollection<TicketTariffDto> TicketTariffs { get; set; }
     }
 }

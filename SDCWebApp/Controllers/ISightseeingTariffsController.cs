@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SDCWebApp.Models;
+using SDCWebApp.Models.Dtos;
 using System.Threading.Tasks;
 
 namespace SDCWebApp.Controllers
@@ -9,8 +10,8 @@ namespace SDCWebApp.Controllers
         Task<IActionResult> GetTariffAsync(string id);
         Task<IActionResult> GetCurrentTariffAsync();
         Task<IActionResult> GetAllTariffsAsync();
-        Task<IActionResult> AddTariffAsync(SightseeingTariff tariff);
-        Task<IActionResult> UpdateTariffAsync(string id, SightseeingTariff tariff);
+        Task<IActionResult> AddTariffAsync(SightseeingTariffDto tariff);
+        Task<IActionResult> UpdateTariffAsync(string id, SightseeingTariffDto tariff);
         Task<IActionResult> DeleteTariffAsync(string id);
     }
 }

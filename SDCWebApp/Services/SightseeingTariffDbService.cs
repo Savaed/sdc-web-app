@@ -83,7 +83,7 @@ namespace SDCWebApp.Services
         /// </summary>
         /// <param name="id">The id of entity to be deleted. Cannot be null or empty.</param>
         /// <exception cref="ArgumentException">Argument <paramref name="id"/> is null or empty string.</exception>
-        /// <exception cref="InvalidOperationException">Cannot foound entity with given <paramref name="id"/> for delete.</exception>
+        /// <exception cref="InvalidOperationException">Cannot found entity with given <paramref name="id"/> for delete.</exception>
         /// <exception cref="InternalDbServiceException">The table with <see cref="SightseeingTariff"/> entities does not exist or it is null or 
         /// cannot save properly any changes made by add operation.</exception>
         public async Task DeleteAsync(string id)
@@ -171,7 +171,7 @@ namespace SDCWebApp.Services
             if (string.IsNullOrEmpty(id))
                 throw new ArgumentException($"Argument '{nameof(id)}' cannot be null or empty.");
 
-            //await EnsureDatabaseCreatedAsync();
+            await EnsureDatabaseCreatedAsync();
             _ = _context?.SightseeingTariffs ?? throw new InternalDbServiceException($"Table of type '{typeof(SightseeingTariff).Name}' is null.");
 
             try
@@ -282,8 +282,8 @@ namespace SDCWebApp.Services
 
             try
             {
-                // If _context.Groups does not null, but does not exist (as table in database, not as object using by EF Core)
-                // following if statement (exacly Count method) will throw exception about this table ("no such table: 'Groups'." or something like that).
+                // If _context.SightseeingTariffs does not null, but does not exist (as table in database, not as object using by EF Core)
+                // following if statement (exactly Count method) will throw exception about this table ("no such table: 'SightseeingTariffs'." or something like that).
                 // So you can catch this exception and re-throw in InternalDbServiceException to next handling in next level layer e.g Controller.
 
                 // Maybe throwing exception in try block seems to be bad practice and a little bit tricky, but in this case is neccessery.

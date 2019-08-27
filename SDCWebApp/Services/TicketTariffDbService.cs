@@ -10,6 +10,9 @@ using SDCWebApp.Models;
 
 namespace SDCWebApp.Services
 {
+    /// <summary>
+    /// Provides methods for get, add, update and delete operations for <see cref="TicketTariff"/> entities in the database.
+    /// </summary>
     public class TicketTariffDbService : ITicketTariffDbService
     {
         private readonly ILogger<TicketTariffDbService> _logger;
@@ -21,6 +24,7 @@ namespace SDCWebApp.Services
             _logger = logger;
             _context = context;
         }
+
 
         /// <summary>
         /// Asynchronously adds <see cref="TicketTariff"/> entity to the database. Throws an exception if 
@@ -279,8 +283,8 @@ namespace SDCWebApp.Services
 
             try
             {
-                // If _context.Groups does not null, but does not exist (as table in database, not as object using by EF Core)
-                // following if statement (exacly Count method) will throw exception about this table ("no such table: 'Groups'." or something like that).
+                // If _context.TicketTariffs does not null, but does not exist (as table in database, not as object using by EF Core)
+                // following if statement (exactly Count method) will throw exception about this table ("no such table: 'TicketTariffs'." or something like that).
                 // So you can catch this exception and re-throw in InternalDbServiceException to next handling in next level layer e.g Controller.
 
                 // Maybe throwing exception in try block seems to be bad practice and a little bit tricky, but in this case is neccessery.

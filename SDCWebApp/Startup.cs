@@ -102,7 +102,7 @@ namespace SDCWebApp
             });
 
             // Adding AutoMapper
-            services.AddAutoMapper(Assembly.GetExecutingAssembly());
+            services.AddAutoMapper(Assembly.GetExecutingAssembly().GetTypes());
 
             // Replacement of built-in service container with Autofac.
             // TODO Wrap following code in private method for future reusability.

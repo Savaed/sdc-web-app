@@ -12,7 +12,8 @@ namespace SDCWebApp.Models.Dtos
     /// </summary>
     public class ResponseWrapper
     {
-        public object Data { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public object Data { get; set; } = null;
         public ApiError Error { get; set; }
 
 
@@ -25,12 +26,10 @@ namespace SDCWebApp.Models.Dtos
         public ResponseWrapper(object data)
         {
             Data = data;
-            Error = new object() as ApiError;
         }
 
         public ResponseWrapper(ApiError error)
         {
-            Data = new object();
             Error = error;
         }        
     }

@@ -10,6 +10,9 @@ using SDCWebApp.Models;
 
 namespace SDCWebApp.Services
 {
+    /// <summary>
+    /// Provides methods for get, add, update and delete operations for <see cref="Customer"/> entities in the database.
+    /// </summary>
     public class CustomerDbService : ICustomerDbService
     {
         private readonly ILogger<CustomerDbService> _logger;
@@ -229,7 +232,7 @@ namespace SDCWebApp.Services
                 if (numberOfElementsOnLastPage > 0)
                 {
                     maxNumberOfPageWithData = ++numberOfFullPages;
-                    _logger.LogWarning($"Last page of data contain {numberOfElementsOnLastPage} elements which is less than specified in {nameof(pageSize)}: {pageSize}.");
+                    _logger.LogWarning($"Last page of data contains {numberOfElementsOnLastPage} elements which is less than specified in {nameof(pageSize)}: {pageSize}.");
                 }
                 else
                     maxNumberOfPageWithData = numberOfFullPages;
@@ -279,8 +282,8 @@ namespace SDCWebApp.Services
 
             try
             {
-                // If _context.Groups does not null, but does not exist (as table in database, not as object using by EF Core)
-                // following if statement (exacly Count method) will throw exception about this table ("no such table: 'Groups'." or something like that).
+                // If _context.Customers does not null, but does not exist (as table in database, not as object using by EF Core)
+                // following if statement (exactly Count method) will throw exception about this table ("no such table: 'Customers'." or something like that).
                 // So you can catch this exception and re-throw in InternalDbServiceException to next handling in next level layer e.g Controller.
 
                 // Maybe throwing exception in try block seems to be bad practice and a little bit tricky, but in this case is neccessery.

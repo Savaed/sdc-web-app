@@ -1,4 +1,4 @@
-﻿namespace SDCWebApp.Models.Dtos.ViewModels
+﻿namespace SDCWebApp.Models.ViewModels
 {
     public class RegisterViewModel
     {

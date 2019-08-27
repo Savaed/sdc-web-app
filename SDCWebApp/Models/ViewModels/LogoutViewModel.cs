@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SDCWebApp.Models.Dtos.ViewModels
+namespace SDCWebApp.Models.ViewModels
 {
     public class LogoutViewModel
     {

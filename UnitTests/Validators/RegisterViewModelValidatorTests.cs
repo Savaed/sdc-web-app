@@ -5,7 +5,7 @@ using Moq;
 using NUnit.Framework;
 using SDCWebApp.Data;
 using SDCWebApp.Data.Validators;
-using SDCWebApp.Models.Dtos.ViewModels;
+using SDCWebApp.Models.ViewModels;
 using System.Threading.Tasks;
 using UnitTests.Helpers;
 

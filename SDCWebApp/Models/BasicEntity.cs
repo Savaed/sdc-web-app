@@ -7,11 +7,10 @@ namespace SDCWebApp.Models
     public abstract class BasicEntity : IEntity
     {
         [Required]
-        [JsonProperty(Order = 1)]
         public string Id { get; set; }
 
         [Timestamp]
-        public byte[] ConcurrencyToken { get; set; }
+        public byte[] ConcurrencyToken { get; private set; }
 
         [Required]
         public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
