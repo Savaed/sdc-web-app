@@ -297,11 +297,12 @@ namespace SDCWebApp.Services
                     throw new InvalidOperationException($"Cannot found element with id '{info.Id}' for update. Any element does not match to the one to be updated.");
 
                 _logger.LogDebug($"Starting update singhtseeing info with id '{info.Id}'.");
-                var updatedArticle = _context.GeneralSightseeingInfo.Update(info).Entity;
+                info.UpdatedAt = DateTime.UtcNow;
+                var updatedInfo = _context.GeneralSightseeingInfo.Update(info).Entity;
                 await _context.TrySaveChangesAsync();
                 _logger.LogDebug($"Update data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(UpdateAsync)}'.");
-                return updatedArticle;
+                return updatedInfo;
             }
             catch (InvalidOperationException ex)
             {

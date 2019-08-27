@@ -618,6 +618,52 @@ namespace UnitTests.Services
             }
         }
 
+        [Test]
+        public async Task UpdateAsync__Update_successful_first_time__Updated_element_should_have_updated_at_not_set_to_MaxValue()
+        {
+            TicketTariff ticketTariffBeforUpdate;
+            TicketTariff ticketTariff;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    ticketTariff = await context.TicketTariffs.FirstAsync();
+                    ticketTariffBeforUpdate = ticketTariff.Clone() as TicketTariff;
+                    ticketTariffBeforUpdate.UpdatedAt = DateTime.MinValue;
+                    ticketTariff.Description = "Changed description";
+                    var service = new TicketTariffDbService(context, _logger);
+
+                    var result = await service.UpdateAsync(ticketTariff);
+
+                    ((DateTime)result.UpdatedAt).Should().NotBeSameDateAs(DateTime.MinValue);
+                }
+            }
+        }
+
+        [Test]
+        public async Task UpdateAsync__Update_successful_not_first_time__Updated_element_should_have_new_updated_at_date_after_previous_one()
+        {
+            TicketTariff ticketTariffBeforUpdate;
+            TicketTariff ticketTariff;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    ticketTariff = await context.TicketTariffs.FirstAsync();
+                    ticketTariffBeforUpdate = ticketTariff.Clone() as TicketTariff;
+                    ticketTariffBeforUpdate.UpdatedAt = DateTime.UtcNow.AddMinutes(-30);
+                    ticketTariff.Description = "Changed description";
+                    var service = new TicketTariffDbService(context, _logger);
+
+                    var result = await service.UpdateAsync(ticketTariff);
+
+                    ((DateTime)result.UpdatedAt).Should().BeAfter((DateTime)ticketTariffBeforUpdate.UpdatedAt);
+                }
+            }
+        }
+
         #endregion
 
 

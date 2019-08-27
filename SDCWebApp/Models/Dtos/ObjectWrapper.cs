@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace SDCWebApp.Models.Dtos
 {
     /// <summary>
-    /// Encapsulates common server response field such as Success, Data and Error.
+    /// Encapsulates common server response field such as Data and Error.
     /// </summary>
     public class ResponseWrapper
     {

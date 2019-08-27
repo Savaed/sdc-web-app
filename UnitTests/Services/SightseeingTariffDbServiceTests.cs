@@ -661,6 +661,52 @@ namespace UnitTests.Services
             }
         }
 
+        [Test]
+        public async Task UpdateAsync__Update_successful_first_time__Updated_element_should_have_updated_at_not_set_to_MaxValue()
+        {
+            SightseeingTariff sightseeingTariffBeforUpdate;
+            SightseeingTariff sightseeingTariff;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    sightseeingTariff = await context.SightseeingTariffs.FirstAsync();
+                    sightseeingTariffBeforUpdate = sightseeingTariff.Clone() as SightseeingTariff;
+                    sightseeingTariffBeforUpdate.UpdatedAt = DateTime.MinValue;
+                    sightseeingTariff.Name = "Changed name";
+                    var service = new SightseeingTariffDbService(context, _logger);
+
+                    var result = await service.UpdateAsync(sightseeingTariff);
+
+                    ((DateTime)result.UpdatedAt).Should().NotBeSameDateAs(DateTime.MinValue);
+                }
+            }
+        }
+
+        [Test]
+        public async Task UpdateAsync__Update_successful_not_first_time__Updated_element_should_have_new_updated_at_date_after_previous_one()
+        {
+            SightseeingTariff sightseeingTariffBeforUpdate;
+            SightseeingTariff sightseeingTariff;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    sightseeingTariff = await context.SightseeingTariffs.FirstAsync();
+                    sightseeingTariffBeforUpdate = sightseeingTariff.Clone() as SightseeingTariff;
+                    sightseeingTariffBeforUpdate.UpdatedAt = DateTime.UtcNow.AddMinutes(-30);
+                    sightseeingTariff.Name = "Changed name";
+                    var service = new SightseeingTariffDbService(context, _logger);
+
+                    var result = await service.UpdateAsync(sightseeingTariff);
+
+                    ((DateTime)result.UpdatedAt).Should().BeAfter((DateTime)sightseeingTariffBeforUpdate.UpdatedAt);
+                }
+            }
+        }
+
         #endregion
 
 

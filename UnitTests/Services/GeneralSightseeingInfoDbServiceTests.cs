@@ -624,6 +624,52 @@ namespace UnitTests.Services
             }
         }
 
+        [Test]
+        public async Task UpdateAsync__Update_successful_first_time__Updated_element_should_have_updated_at_not_set_to_MaxValue()
+        {
+            GeneralSightseeingInfo generalSightseeingInfoBeforUpdate;
+            GeneralSightseeingInfo generalSightseeingInfo;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    generalSightseeingInfo = await context.GeneralSightseeingInfo.FirstAsync();
+                    generalSightseeingInfoBeforUpdate = generalSightseeingInfo.Clone() as GeneralSightseeingInfo;
+                    generalSightseeingInfoBeforUpdate.UpdatedAt = DateTime.MinValue;
+                    generalSightseeingInfo.Description = "Changed description.";
+                    var service = new GeneralSightseeingInfoDbService(context, _logger);
+
+                    var result = await service.UpdateAsync(generalSightseeingInfo);
+
+                    ((DateTime)result.UpdatedAt).Should().NotBeSameDateAs(DateTime.MinValue);
+                }
+            }
+        }
+
+        [Test]
+        public async Task UpdateAsync__Update_successful_not_first_time__Updated_element_should_have_new_updated_at_date_after_previous_one()
+        {
+            GeneralSightseeingInfo generalSightseeingInfoBeforUpdate;
+            GeneralSightseeingInfo generalSightseeingInfo;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    generalSightseeingInfo = await context.GeneralSightseeingInfo.FirstAsync();
+                    generalSightseeingInfoBeforUpdate = generalSightseeingInfo.Clone() as GeneralSightseeingInfo;
+                    generalSightseeingInfoBeforUpdate.UpdatedAt = DateTime.UtcNow.AddMinutes(-30);
+                    generalSightseeingInfo.Description = "Changed description.";
+                    var service = new GeneralSightseeingInfoDbService(context, _logger);
+
+                    var result = await service.UpdateAsync(generalSightseeingInfo);
+
+                    ((DateTime)result.UpdatedAt).Should().BeAfter((DateTime)generalSightseeingInfoBeforUpdate.UpdatedAt);
+                }
+            }
+        }
+
         #endregion
 
 

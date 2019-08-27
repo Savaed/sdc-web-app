@@ -10,11 +10,19 @@ namespace SDCWebApp.Models
         public string Id { get; set; }
 
         [Timestamp]
-        public byte[] ConcurrencyToken { get; private set; }
+        public byte[] ConcurrencyToken { get; set; }
 
         [Required]
         public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
 
-        public DateTime? UpdatedAt { get; set; } = null;
+        public DateTime? UpdatedAt { get; set; } = DateTime.MinValue;
+
+
+        public BasicEntity() { }
+
+        public BasicEntity(DateTime createdAt)
+        {
+            CreatedAt = createdAt;
+        }
     }
 }

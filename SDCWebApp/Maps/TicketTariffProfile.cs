@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SDCWebApp.Helpers.Extensions;
 
 namespace SDCWebApp.Maps
 {
@@ -12,7 +13,8 @@ namespace SDCWebApp.Maps
     {
         public TicketTariffProfile()
         {
-            CreateMap<TicketTariff, TicketTariffDto>();
+            CreateMap<TicketTariff, TicketTariffDto>()
+                .ForMember(x => x.CreatedAt, options => options.AddTransform(d => d.Truncate(TimeSpan.FromSeconds(1))));
 
             CreateMap<TicketTariffDto, TicketTariff>()
                 .ForMember(x => x.ConcurrencyToken, options => options.Ignore())

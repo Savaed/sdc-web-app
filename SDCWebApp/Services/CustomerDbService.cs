@@ -296,6 +296,7 @@ namespace SDCWebApp.Services
                     throw new InvalidOperationException($"Cannot found element with id '{customer.Id}' for update. Any element does not match to the one to be updated.");
 
                 _logger.LogDebug($"Starting update customer with id '{customer.Id}'.");
+                customer.UpdatedAt = DateTime.UtcNow;
                 var updatedCustomer = _context.Customers.Update(customer).Entity;
                 await _context.TrySaveChangesAsync();
                 _logger.LogDebug($"Update data succeeded.");

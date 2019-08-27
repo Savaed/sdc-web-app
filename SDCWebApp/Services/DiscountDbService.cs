@@ -303,6 +303,7 @@ namespace SDCWebApp.Services
                     throw new InvalidOperationException($"Cannot found element with id '{discount.Id}' for update. Any element does not match to the one to be updated.");
 
                 _logger.LogDebug($"Starting update discount with id '{discount.Id}'.");
+                discount.UpdatedAt = DateTime.UtcNow;
                 var updatedDiscount = _context.Discounts.Update(discount).Entity;
                 await _context.TrySaveChangesAsync();
                 _logger.LogDebug($"Update data succeeded.");

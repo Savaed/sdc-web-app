@@ -13,16 +13,22 @@ namespace SDCWebApp.Services
     /// <summary>
     /// Provides methods for get, add, update and delete operations for <see cref="SightseeingTariff"/> entities in the database.
     /// </summary>
-    public class SightseeingTariffDbService : ISightseeingTariffDbService
+    public class SightseeingTariffDbService : ServiceBase, ISightseeingTariffDbService
     {
         private readonly ILogger<SightseeingTariffDbService> _logger;
         private readonly ApplicationDbContext _context;
 
 
-        public SightseeingTariffDbService(ApplicationDbContext context, ILogger<SightseeingTariffDbService> logger)
+        public SightseeingTariffDbService(ApplicationDbContext context, ILogger<SightseeingTariffDbService> logger) : base(context, logger)
         {
             _logger = logger;
             _context = context;
+        }
+
+
+        protected override BasicEntity CustomUpdate(BasicEntity originalEntity, BasicEntity entityToBeUpdated)
+        {
+            return base.CustomUpdate(originalEntity as SightseeingTariff, entityToBeUpdated as SightseeingTariff);
         }
 
 
@@ -296,11 +302,12 @@ namespace SDCWebApp.Services
                     throw new InvalidOperationException($"Cannot found element with id '{tariff.Id}' for update. Any element does not match to the one to be updated.");
 
                 _logger.LogDebug($"Starting update tariff with id '{tariff.Id}'.");
-                var updatedTariff = _context.SightseeingTariffs.Update(tariff).Entity;
+                var originalTariff = await _context.SightseeingTariffs.SingleAsync(x => x.Id.Equals(tariff.Id));
+                var updatedTariff = CustomUpdate(originalTariff ,tariff);
                 await _context.TrySaveChangesAsync();
                 _logger.LogDebug($"Update data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(UpdateAsync)}'.");
-                return updatedTariff;
+                return updatedTariff as SightseeingTariff;
             }
             catch (InvalidOperationException ex)
             {
@@ -321,8 +328,10 @@ namespace SDCWebApp.Services
         private async Task EnsureDatabaseCreatedAsync()
         {
             if (await _context.Database.EnsureCreatedAsync() == false)
-                _logger.LogWarning($"Database with provider '{_context.Database.ProviderName}' does not exist. It Will be created but not using migrations so it cannot be updating using migrations later.");
+                _logger.LogWarning($"Database with provider '{_context.Database.ProviderName}' does not exist. It will be created but not using migrations so it cannot be updating using migrations later.");
         }
+
+       
 
         #endregion
 

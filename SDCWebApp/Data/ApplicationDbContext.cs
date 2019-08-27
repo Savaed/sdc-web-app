@@ -32,19 +32,16 @@ namespace SDCWebApp.Data
         {
             base.OnModelCreating(builder);
 
-            //builder.Entity<Customer>(entity =>
-            //{
-            //    // Watch out for PropertyAccessMode. If is set to Field,  data in db and fatched from it may be inconsistent
-            //    entity.Property(c => c.IsChild).HasField("_isChild").UsePropertyAccessMode(PropertyAccessMode.FieldDuringConstruction);
-            //});
-
             builder.Entity<SightseeingGroup>(entity =>
             {
                 entity.Property(s => s.CurrentGroupSize).HasField("_currentGroupSize").UsePropertyAccessMode(PropertyAccessMode.FieldDuringConstruction);
                 entity.Property(c => c.IsAvailablePlace).HasField("_isAvailablePlace").UsePropertyAccessMode(PropertyAccessMode.FieldDuringConstruction);
             });
 
-            builder.Entity<Ticket>().Property(t => t.Price).HasField("_price").UsePropertyAccessMode(PropertyAccessMode.FieldDuringConstruction);
+            builder.Entity<Ticket>(entity =>
+            {              
+                entity.Property(t => t.Price).HasField("_price").UsePropertyAccessMode(PropertyAccessMode.FieldDuringConstruction);
+            });                            
 
             builder.Entity<ActivityLog>().Property(a => a.Type).HasConversion<string>();
             builder.Entity<Discount>().Property(d => d.Type).HasConversion<string>();
@@ -64,6 +61,7 @@ namespace SDCWebApp.Data
                     User = "hektorb",
                     Description = "Revolting on a black pearl"
                 });
+
 
             builder.Entity<Article>().HasData(
                 new Article
@@ -146,7 +144,14 @@ namespace SDCWebApp.Data
                     DefaultPrice = 10
                 });
 
-            builder.Entity<SightseeingTariff>().HasData(new SightseeingTariff { Id = Guid.NewGuid().ToString(), Name = "BasicTickets" });
+            builder.Entity<SightseeingTariff>(entity =>
+            {
+                entity.HasMany(s => s.TicketTariffs)
+                      .WithOne(t => t.SightseeingTariff)
+                      .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasData(new SightseeingTariff { Id = Guid.NewGuid().ToString(), Name = "BasicTickets" });
+            });                   
 
             builder.Entity<SightseeingGroup>().HasData(
                 new SightseeingGroup

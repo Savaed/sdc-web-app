@@ -614,6 +614,52 @@ namespace UnitTests.Services
             }
         }
 
+        [Test]
+        public async Task UpdateAsync__Update_successful_first_time__Updated_element_should_have_updated_at_not_set_to_MaxValue()
+        {
+            Discount discountBeforUpdate;
+            Discount discount;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    discount = await context.Discounts.FirstAsync();
+                    discountBeforUpdate = discount.Clone() as Discount;
+                    discountBeforUpdate.UpdatedAt = DateTime.MinValue;
+                    discount.Description = "Changed description.";
+                    var service = new DiscountDbService(context, _logger);
+
+                    var result = await service.UpdateAsync(discount);
+
+                    ((DateTime)result.UpdatedAt).Should().NotBeSameDateAs(DateTime.MinValue);
+                }
+            }
+        }
+
+        [Test]
+        public async Task UpdateAsync__Update_successful_not_first_time__Updated_element_should_have_new_updated_at_date_after_previous_one()
+        {
+            Discount discountBeforUpdate;
+            Discount discount;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    discount = await context.Discounts.FirstAsync();
+                    discountBeforUpdate = discount.Clone() as Discount;
+                    discountBeforUpdate.UpdatedAt = DateTime.UtcNow.AddMinutes(-30);
+                    discount.Description = "Changed description.";
+                    var service = new DiscountDbService(context, _logger);
+
+                    var result = await service.UpdateAsync(discount);
+
+                    ((DateTime)result.UpdatedAt).Should().BeAfter((DateTime)discountBeforUpdate.UpdatedAt);
+                }
+            }
+        }
+
         #endregion
 
 

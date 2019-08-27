@@ -660,6 +660,53 @@ namespace UnitTests.Services
             }
         }
 
+
+        [Test]
+        public async Task UpdateAsync__Update_successful_first_time__Updated_element_should_have_updated_at_not_set_to_MaxValue()
+        {
+            SightseeingGroup sightseeingGroupBeforUpdate;
+            SightseeingGroup sightseeingGroup;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    sightseeingGroup = await context.Groups.FirstAsync();
+                    sightseeingGroupBeforUpdate = sightseeingGroup.Clone() as SightseeingGroup;
+                    sightseeingGroupBeforUpdate.UpdatedAt = DateTime.MinValue;
+                    sightseeingGroup.MaxGroupSize = -1;
+                    var service = new SightseeingGroupDbService(context, _logger);
+
+                    var result = await service.UpdateAsync(sightseeingGroup);
+
+                    ((DateTime)result.UpdatedAt).Should().NotBeSameDateAs(DateTime.MinValue);
+                }
+            }
+        }
+
+        [Test]
+        public async Task UpdateAsync__Update_successful_not_first_time__Updated_element_should_have_new_updated_at_date_after_previous_one()
+        {
+            SightseeingGroup sightseeingGroupBeforUpdate;
+            SightseeingGroup sightseeingGroup;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    sightseeingGroup = await context.Groups.FirstAsync();
+                    sightseeingGroupBeforUpdate = sightseeingGroup.Clone() as SightseeingGroup;
+                    sightseeingGroupBeforUpdate.UpdatedAt = DateTime.UtcNow.AddMinutes(-30);
+                    sightseeingGroup.MaxGroupSize = -1;
+                    var service = new SightseeingGroupDbService(context, _logger);
+
+                    var result = await service.UpdateAsync(sightseeingGroup);
+
+                    ((DateTime)result.UpdatedAt).Should().BeAfter((DateTime)sightseeingGroupBeforUpdate.UpdatedAt);
+                }
+            }
+        }
+
         #endregion
 
 

@@ -297,6 +297,7 @@ namespace SDCWebApp.Services
                     throw new InvalidOperationException($"Cannot found element with id '{article.Id}' for update. Any element does not match to the one to be updated.");
 
                 _logger.LogDebug($"Starting update tariff with id '{article.Id}'.");
+                article.UpdatedAt = DateTime.UtcNow;
                 var updatedArticle = _context.Articles.Update(article).Entity;
                 await _context.TrySaveChangesAsync();
                 _logger.LogDebug($"Update data succeeded.");

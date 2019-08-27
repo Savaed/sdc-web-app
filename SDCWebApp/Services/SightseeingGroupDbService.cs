@@ -296,6 +296,7 @@ namespace SDCWebApp.Services
                     throw new InvalidOperationException($"Cannot found element with id '{group.Id}' for update. Any element does not match to the one to be updated.");
 
                 _logger.LogDebug($"Starting update discount with id '{group.Id}'.");
+                group.UpdatedAt = DateTime.UtcNow;
                 var updatedGroup = _context.Groups.Update(group).Entity;
                 await _context.TrySaveChangesAsync();
                 _logger.LogDebug($"Update data succeeded.");

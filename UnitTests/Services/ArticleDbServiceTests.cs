@@ -396,6 +396,7 @@ namespace UnitTests.Services
         // update sie udal -> w zasobie istnieje zmodyfikowany bilet
         // update sie udal -> w zasobie nie istnieje poprzednia wersja biletu
         // update sie udal -> zwraca zmodyfikowany bilet
+        // update sie udal -> zmieniona data modyfikacji
 
         [Test]
         public async Task UpdateAsync__Resource_is_null__Should_throw_InternalDbServiceException()
@@ -615,6 +616,52 @@ namespace UnitTests.Services
                 using (var context = await factory.CreateContextAsync())
                 {
                     context.Articles.Count().Should().Be(expectedLength);
+                }
+            }
+        }
+
+        [Test]
+        public async Task UpdateAsync__Update_successful_first_time__Updated_element_should_have_updated_at_not_set_to_MaxValue()
+        {
+            Article articleBeforUpdate;
+            Article article;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    article = await context.Articles.FirstAsync();
+                    articleBeforUpdate = article.Clone() as Article;
+                    articleBeforUpdate.UpdatedAt = DateTime.MinValue;
+                    article.Title = "Changed title.";
+                    var service = new ArticleDbService(context, _logger);
+
+                    var result = await service.UpdateAsync(article);
+
+                    ((DateTime)result.UpdatedAt).Should().NotBeSameDateAs(DateTime.MinValue);
+                }
+            }
+        }
+
+        [Test]
+        public async Task UpdateAsync__Update_successful_not_first_time__Updated_element_should_have_new_updated_at_date_after_previous_one()
+        {
+            Article articleBeforUpdate;
+            Article article;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    article = await context.Articles.FirstAsync();
+                    articleBeforUpdate = article.Clone() as Article;
+                    articleBeforUpdate.UpdatedAt = DateTime.UtcNow.AddMinutes(-30);
+                    article.Title = "Changed title.";
+                    var service = new ArticleDbService(context, _logger);
+
+                    var result = await service.UpdateAsync(article);
+
+                    ((DateTime)result.UpdatedAt).Should().BeAfter((DateTime)articleBeforUpdate.UpdatedAt);
                 }
             }
         }
