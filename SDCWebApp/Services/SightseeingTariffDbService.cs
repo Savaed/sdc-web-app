@@ -20,15 +20,58 @@ namespace SDCWebApp.Services
 
 
         public SightseeingTariffDbService(ApplicationDbContext context, ILogger<SightseeingTariffDbService> logger) : base(context, logger)
-        {
+        {         
             _logger = logger;
             _context = context;
         }
 
 
-        protected override BasicEntity CustomUpdate(BasicEntity originalEntity, BasicEntity entityToBeUpdated)
+        //protected BasicEntity CustomUpdate(BasicEntity originalEntity, BasicEntity entityToBeUpdated)
+        //{
+        //    return base.CustomUpdate(originalEntity as SightseeingTariff, entityToBeUpdated as SightseeingTariff) as SightseeingTariff;
+        //}
+
+
+        protected async Task<BasicEntity> CustomAddAsync(BasicEntity entityToBeAdded)
         {
-            return base.CustomUpdate(originalEntity as SightseeingTariff, entityToBeUpdated as SightseeingTariff);
+            //_logger.LogInformation($"Starting method '{nameof(CustomAddAsync)}'.");
+
+            //var entity = entityToBeAdded as SightseeingTariff;
+            //var newTicketTariffList = new List<TicketTariff>();
+
+            //_logger.LogDebug($"Starting add new '{typeof(SightseeingTariff).Name}' entity with id '{entity.Id}'.");
+
+            //if (entity.TicketTariffs != null)
+            //{
+            //    var ticketTariffs = new List<TicketTariff>(entity.TicketTariffs);
+            //    entity.TicketTariffs.Clear();
+
+            //    foreach (var ticketTariff in ticketTariffs)
+            //    {
+            //        if (await _context.TicketTariffs.ContainsAsync(ticketTariff))
+            //        {
+            //            _logger.LogDebug($"Entity '{ticketTariff.GetType().Name}' with id '{ticketTariff.Id}' at currently processing '{entity.GetType().Name}' exists in the database." +
+            //                $" No additional action will be taken.");
+            //            var existingTicketTariff = _context.TicketTariffs.Single(x => x.Id.Equals(ticketTariff.Id));
+            //            entity.TicketTariffs.Add(existingTicketTariff);
+            //        }
+            //        else
+            //        {
+            //            _logger.LogInformation($"Entity '{ticketTariff.GetType().Name}' with id '{ticketTariff.Id}' at currently processing '{entity.GetType().Name}' does not exist in the database." +
+            //                $"It will be added before '{entity.GetType().Name}' will be added.");
+            //            newTicketTariffList.Add(ticketTariff);
+            //            entity.TicketTariffs.Add(ticketTariff);
+            //        }
+            //    }
+            //}
+
+            //await _context.TicketTariffs.AddRangeAsync(newTicketTariffList);
+            //var addedEntity = _context.SightseeingTariffs.Add(entity);
+            //_logger.LogInformation($"Finished method '{nameof(CustomAddAsync)}'.");
+
+            //return addedEntity.Entity;
+
+            throw new NotImplementedException();
         }
 
 
@@ -302,12 +345,11 @@ namespace SDCWebApp.Services
                     throw new InvalidOperationException($"Cannot found element with id '{tariff.Id}' for update. Any element does not match to the one to be updated.");
 
                 _logger.LogDebug($"Starting update tariff with id '{tariff.Id}'.");
-                var originalTariff = await _context.SightseeingTariffs.SingleAsync(x => x.Id.Equals(tariff.Id));
-                var updatedTariff = CustomUpdate(originalTariff ,tariff);
+                var updatedTariff = CustomUpdate(tariff);
                 await _context.TrySaveChangesAsync();
                 _logger.LogDebug($"Update data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(UpdateAsync)}'.");
-                return updatedTariff as SightseeingTariff;
+                return updatedTariff;
             }
             catch (InvalidOperationException ex)
             {
@@ -331,7 +373,11 @@ namespace SDCWebApp.Services
                 _logger.LogWarning($"Database with provider '{_context.Database.ProviderName}' does not exist. It will be created but not using migrations so it cannot be updating using migrations later.");
         }
 
-       
+        private SightseeingTariff CustomUpdate(SightseeingTariff tariff)
+        {
+            var originalTariff = _context.SightseeingTariffs.Single(x => x.Id.Equals(tariff.Id));
+            return BasicCustomUpdate(originalTariff as SightseeingTariff, tariff as SightseeingTariff) as SightseeingTariff;
+        }       
 
         #endregion
 

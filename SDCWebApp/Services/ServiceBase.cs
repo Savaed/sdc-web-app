@@ -18,11 +18,11 @@ namespace SDCWebApp.Services
             _context = context;
             _logger = logger;
         }
+       
 
-
-        protected virtual BasicEntity CustomUpdate(BasicEntity originalEntity, BasicEntity entityToBeUpdated)
+        protected virtual BasicEntity BasicCustomUpdate(BasicEntity originalEntity, BasicEntity entityToBeUpdated)
         {
-            _logger.LogDebug($"Starting method '{nameof(CustomUpdate)}'.");
+            _logger.LogInformation($"Starting method '{nameof(BasicCustomUpdate)}'.");
 
             _context.Attach(originalEntity);
             var properties = originalEntity.GetType().GetProperties();
@@ -37,7 +37,7 @@ namespace SDCWebApp.Services
             }
 
             originalEntity.UpdatedAt = DateTime.UtcNow;
-            _logger.LogDebug($"Finished method '{nameof(CustomUpdate)}'.");
+            _logger.LogInformation($"Finished method '{nameof(BasicCustomUpdate)}'.");
 
             return originalEntity;
         }

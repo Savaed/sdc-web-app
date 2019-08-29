@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace SDCWebApp.ApiErrors
 {
-    public class InvalidArgumentError : ApiError
+    public class InvalidParameterError : ApiError
     {
-        public InvalidArgumentError() : base(400, "InvalidArgumentError") { }
+        public InvalidParameterError() : base(400, "InvalidArgumentError") { }
 
-        public InvalidArgumentError(string message) : base(400, "InvalidArgumentError", message) { }
+        public InvalidParameterError(string message) : base(400, "InvalidArgumentError", message) { }
     }
 }

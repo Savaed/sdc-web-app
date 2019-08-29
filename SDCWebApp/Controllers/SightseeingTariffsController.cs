@@ -11,19 +11,24 @@ using SDCWebApp.ApiErrors;
 using SDCWebApp.Models.Dtos;
 using SDCWebApp.Services;
 using Microsoft.AspNetCore.Authorization;
+using System.Net;
 
 namespace SDCWebApp.Controllers
 {
+    /// <summary>
+    /// Provides methods to Http verbs proccessing on <see cref="SightseeingTariff"/> entities.
+    /// </summary>
     [Route("api/sightseeing-tariffs")]
     [ApiController]
-    public class SightseeingTariffsController : ControllerBase, ISightseeingTariffsController
+    public class SightseeingTariffsController : CustomApiController, ISightseeingTariffsController
     {
+        private const string ControllerPrefix = "sightseeing-tariffs";
         private readonly ILogger<SightseeingTariffsController> _logger;
         private readonly ISightseeingTariffDbService _tariffDbService;
         private readonly IMapper _mapper;
 
 
-        public SightseeingTariffsController(ISightseeingTariffDbService tariffDbService, ILogger<SightseeingTariffsController> logger, IMapper mapper)
+        public SightseeingTariffsController(ISightseeingTariffDbService tariffDbService, ILogger<SightseeingTariffsController> logger, IMapper mapper) : base(logger)
         {
             _mapper = mapper;
             _logger = logger;
@@ -31,6 +36,12 @@ namespace SDCWebApp.Controllers
         }
 
 
+        /// <summary>
+        /// Asynchronously gets <see cref="IEnumerable{SightseeingTariff}"/> wrapped in <see cref="ResponseWrapper"/>.
+        /// Returns <see cref="HttpStatusCode.OK"/> response regardless if returned set is empty or not.
+        /// Throws an <see cref="InternalS ServiceException"/> or <see cref="Exception"/> if any internal problem with processing data.
+        /// </summary>
+        /// <returns><see cref="IEnumerable{SightseeingTariff}"/>.</returns>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllTariffsAsync()
@@ -40,27 +51,32 @@ namespace SDCWebApp.Controllers
             try
             {
                 var tariffs = await _tariffDbService.GetAllAsync();
-                var tariffsDto = _mapper.Map<IEnumerable<SightseeingTariffDto>>(tariffs);
+                var tariffsDto = MapToDtoEnumerable(tariffs);
                 var okResponse = new ResponseWrapper(tariffsDto);
                 _logger.LogInformation($"Finished method '{nameof(GetAllTariffsAsync)}'.");
                 return Ok(okResponse);
             }
             catch (InternalDbServiceException ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} Error at '{_tariffDbService.GetType().Name}' occurred while database operation was proccessing. {ex.Message}");
+                LogInternalDbServiceException(_tariffDbService.GetType(), ex);
                 throw;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} Unexpected error occured. {ex.Message}");
+                LogUnexpectedException(ex);
                 throw;
             }
         }
 
-
+        /// <summary>
+        /// Asynchronously gets the most current <see cref="SightseeingTariff"/> wrapped in <see cref="ResponseWrapper"/>.
+        /// Returns <see cref="HttpStatusCode.OK"/> response if the most current <see cref="SightseeingTariff"/> found or 
+        /// <see cref="HttpStatusCode.NotFound"/> response if none <see cref="SightseeingTariff"/> exist. 
+        /// Throws an <see cref="InternalDbServiceException"/> or <see cref="Exception"/> if any internal problem with processing data.
+        /// </summary>
+        /// <returns>The most current <see cref="SightseeingTariff"/>.</returns>
         [HttpGet("current")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetCurrentTariffAsync()
         {
@@ -69,39 +85,39 @@ namespace SDCWebApp.Controllers
             try
             {
                 var tariffs = await _tariffDbService.GetAllAsync();
+
                 var currentTariff = tariffs.OrderByDescending(x => x.UpdatedAt == DateTime.MinValue ? x.CreatedAt : x.UpdatedAt).First();
-                var currentTariffDto = _mapper.Map<SightseeingTariffDto>(currentTariff);
+
+                var currentTariffDto = MapToDto(currentTariff);
                 var okResponse = new ResponseWrapper(currentTariffDto);
                 _logger.LogInformation($"Finished method '{nameof(GetCurrentTariffAsync)}'.");
                 return Ok(okResponse);
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogWarning(ex, $"{ex.GetType().Name} Cannot found element {typeof(SightseeingTariff).Name}.");
-                var error = new NotFoundError($"Specified '{typeof(SightseeingTariff).Name}' cannot be found.");
-                var notFoundResponse = new ResponseWrapper(error);
-                _logger.LogInformation($"Finished method '{nameof(GetCurrentTariffAsync)}'.");
-                return NotFound(notFoundResponse);
+                return OnNotFoundError($"Cannot found element {typeof(SightseeingTariff).Name}.", ex);
             }
             catch (InternalDbServiceException ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} Error at '{_tariffDbService.GetType().Name}' occurred while database operation was proccessing. {ex.Message}");
+                LogInternalDbServiceException(_tariffDbService.GetType(), ex);
                 throw;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} Unexpected error occured. {ex.Message}");
+                LogUnexpectedException(ex);
                 throw;
             }
         }
 
         /// <summary>
-        /// Asynchronously retrieves specified <see cref="SightseeingTariff"/>.
-        /// Returns <see cref="OkObjectResult"/> with data if searching tariff was found, <see cref="NotFoundObjectResult"/> if cannot found tariff or
-        /// <see cref="BadRequestObjectResult"/> if request is malformed.
+        /// Asynchronously gets specified <see cref="SightseeingTariff"/> by <paramref name="id"/>.
+        /// Returns <see cref="HttpStatusCode.OK"/> response if the specified <see cref="SightseeingTariff"/> found, 
+        /// <see cref="HttpStatusCode.BadRequest"/> response if the request is malformed or
+        /// <see cref="HttpStatusCode.NotFound"/> response if specified <see cref="SightseeingTariff"/> does not exist.
+        /// Throws an <see cref="InternalDbServiceException"/> or <see cref="Exception"/> if any internal problem with processing data.
         /// </summary>
-        /// <param name="id">The id of searching element.</param>
-        /// <returns>Specified <see cref="JsonResult"/> response.</returns>
+        /// <param name="id">The id of searching <see cref="SightseeingTariff"/>. Cannot be null or empty.</param>
+        /// <returns>An specified <see cref="SightseeingTariff"/>.</returns>
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -110,40 +126,41 @@ namespace SDCWebApp.Controllers
         {
             _logger.LogInformation($"Starting method '{nameof(GetTariffAsync)}'.");
 
-            var errorResponse = CreateInvalidArgumentErrorResponse(id, nameof(id));
-            if (errorResponse != null)
-                return BadRequest(errorResponse);
+            if (string.IsNullOrEmpty(id))
+                return OnInvalidParameterError($"Parameter '{nameof(id)}' cannot be null or empty.");
 
             try
             {
-                _logger.LogDebug($"Starting retrieve data of type '{typeof(SightseeingTariff).Name}' with id '{id}'.");
                 var tariff = await _tariffDbService.GetAsync(id);
-                var tariffDto = _mapper.Map<SightseeingTariffDto>(tariff);
+                var tariffDto = MapToDto(tariff);
                 var okResponse = new ResponseWrapper(tariffDto);
-                _logger.LogDebug($"Retrieve data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(GetTariffAsync)}'.");
                 return Ok(okResponse);
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogWarning(ex, $"{ex.GetType().Name} Cannot found element {typeof(SightseeingTariff).Name} with specified id: '{id}'.");
-                var error = new NotFoundError($"Specified '{typeof(SightseeingTariff).Name}' with id: '{id}' cannot be found.");
-                var notFoundResponse = new ResponseWrapper(error);
-                _logger.LogInformation($"Finished method '{nameof(GetTariffAsync)}'.");
-                return NotFound(notFoundResponse);
+                return OnNotFoundError($"Cannot found element '{typeof(SightseeingTariff).Name}' with specified id: '{id}'.", ex);
             }
             catch (InternalDbServiceException ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} Error at '{_tariffDbService.GetType().Name}' occurred while database operation was proccessing. {ex.Message}");
+                LogInternalDbServiceException(_tariffDbService.GetType(), ex);
                 throw;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} Unexpected error occured. {ex.Message}");
+                LogUnexpectedException(ex);
                 throw;
             }
         }
 
+        /// <summary>
+        /// Asynchronously adds <see cref="SightseeingTariff"/>.
+        /// Returns <see cref="HttpStatusCode.Created"/> response if <see cref="SightseeingTariff"/> created or
+        /// <see cref="HttpStatusCode.BadRequest"/> response if the request is malformed.
+        /// Throws an <see cref="InternalDbServiceException"/> or <see cref="Exception"/> if any internal problem with processing data.
+        /// </summary>
+        /// <param name="tariff">The <see cref="SightseeingTariffDto"/> tariff to be added. This parameter is a body of JSON request. Cannot be null.</param>
+        /// <returns>An added <see cref="SightseeingTariff"/>.</returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -153,37 +170,40 @@ namespace SDCWebApp.Controllers
 
             try
             {
-                var tariffToBeAdded = _mapper.Map<SightseeingTariff>(tariff);
-                _logger.LogDebug($"Starting add data of type '{typeof(SightseeingTariff).Name}' with id '{tariff.Id}'.");
+                var tariffToBeAdded = MapToDomainModel(tariff);
                 var addedTariff = await _tariffDbService.AddAsync(tariffToBeAdded);
-                _logger.LogDebug("Add data succeeded.");
 
                 // Reverse maps from SightseeingTariff to SightseeingTariffDto only for response to the client.
-                var addedTariffDto = _mapper.Map<SightseeingTariffDto>(addedTariff);
+                var addedTariffDto = MapToDto(addedTariff);
                 var response = new ResponseWrapper(addedTariffDto);
-                string addedTariffUrl = $"sightseeing-tariffs/{addedTariff.Id}";
+                string addedTariffUrl = $"{ControllerPrefix}/{addedTariff.Id}";
                 _logger.LogInformation($"Finished method '{nameof(AddTariffAsync)}'.");
                 return Created(addedTariffUrl, response);
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogWarning(ex, $"{ex.GetType().Name} Element {typeof(SightseeingTariff).Name} with specified id: '{tariff.Id}' already exists.");
-                var error = new InvalidArgumentError($"Element {typeof(SightseeingTariff).Name} with specified id: '{tariff.Id}' already exists.");
-                var errorResponse = new ResponseWrapper(error);
-                return BadRequest(errorResponse);
+                return OnInvalidParameterError($"Element '{typeof(SightseeingTariff).Name}' with specified id: '{tariff.Id}' already exists.", ex);  
             }
             catch (InternalDbServiceException ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} Error at '{_tariffDbService.GetType().Name}' occurred while database operation was proccessing. {ex.Message}");
+                LogInternalDbServiceException(_tariffDbService.GetType(), ex);
                 throw;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} Unexpected error occured. {ex.Message}");
+                LogUnexpectedException(ex);
                 throw;
             }
         }
 
+        /// <summary>
+        /// Asynchronously deletes specified <see cref="SightseeingTariff"/> by <paramref name="id"/>.
+        /// Returns <see cref="HttpStatusCode.OK"/> response if <see cref="SightseeingTariff"/> deleted,
+        /// <see cref="HttpStatusCode.BadRequest"/> response if the request is malformed or
+        /// <see cref="HttpStatusCode.NotFound"/> if specified <see cref="SightseeingTariff"/> not found.
+        /// Throws an <see cref="InternalDbServiceException"/> or <see cref="Exception"/> if any internal problem with processing data.
+        /// </summary>
+        /// <param name="id">The id of <see cref="SightseeingTariff"/> to be deleted. Cannot be null or empty.</param>
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -192,89 +212,77 @@ namespace SDCWebApp.Controllers
         {
             _logger.LogInformation($"Starting method '{nameof(DeleteTariffAsync)}'.");
 
-            var errorResponse = CreateInvalidArgumentErrorResponse(id, nameof(id));
-            if (errorResponse != null)
-                return BadRequest(errorResponse);
+            if (string.IsNullOrEmpty(id))
+                return OnInvalidParameterError($"Parameter '{nameof(id)}' cannot be null or empty.");
 
             try
             {
-                _logger.LogDebug($"Starting delete data of type '{typeof(SightseeingTariff).Name}' with id '{id}'.");
                 await _tariffDbService.DeleteAsync(id);
-                _logger.LogDebug("Delete data succeeded.");
                 var okResponse = new ResponseWrapper(null as object);
                 _logger.LogInformation($"Finished method '{nameof(DeleteTariffAsync)}'.");
                 return Ok(okResponse);
             }
             catch (InvalidOperationException ex)
             {
-                var notFoundResponse = CreateNotFoundErrorResponse(ex, id);
-                _logger.LogInformation($"Finished method '{nameof(GetTariffAsync)}'.");
-                return notFoundResponse;
+                return OnNotFoundError($"Cannot found element {typeof(SightseeingTariff).Name} with specified id: '{id}'.", ex);
             }
             catch (InternalDbServiceException ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} Error at '{_tariffDbService.GetType().Name}' occurred while database operation was proccessing. {ex.Message}");
+                LogInternalDbServiceException(_tariffDbService.GetType(), ex);
                 throw;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} Unexpected error occured. {ex.Message}");
+                LogUnexpectedException(ex);
                 throw;
             }
         }
 
+        /// <summary>
+        /// Asynchronously updates <see cref="SightseeingTariff"/>.
+        /// Returns <see cref="HttpStatusCode.OK"/> response if <see cref="SightseeingTariff"/> updated,
+        /// <see cref="HttpStatusCode.BadRequest"/> response if the request is malformed or
+        /// <see cref="HttpStatusCode.NotFound"/> response if specified <see cref="SightseeingTariff"/> does not exist.
+        /// Throws an <see cref="InternalDbServiceException"/> or <see cref="Exception"/> if any internal problem with processing data.
+        /// </summary>
+        /// <param name="id">The id of <see cref="SightseeingTariff"/> to be updated. Cannot be null or empty. Must matches to <paramref name="tariff"/>.Id property.</param>
+        /// <param name="tariff">The <see cref="SightseeingTariffDto"/> tariff to be added. This parameter is a body of JSON request. Cannot be null.</param>
+        /// <returns>An updated <see cref="SightseeingTariff"/>.</returns>
         [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+
         public async Task<IActionResult> UpdateTariffAsync(string id, [FromBody] SightseeingTariffDto tariff)
         {
-            // nie ma takiego elementu o podanym id -> 404 not found
-            // id w url i id w body sie nie zgadzaja -> 400 bad request, mismatch
-            // update poprawny -> 200 ok
-            // any internal error refferd to the db occurred -> throws internal db service exc
-            // any unexpected internal error occurred -> throws exc
-
             _logger.LogInformation($"Starting method '{nameof(UpdateTariffAsync)}'.");
 
             if (string.IsNullOrEmpty(id))
-            {
-                // wrap this in func eg. CreateInvalidArgumentErrorResponse
-                _logger.LogWarning($"An argument '{nameof(id)}' cannot be null or empty.");
-                var error = new InvalidArgumentError($"An argument '{nameof(id)}' cannot be null or empty.");
-                var errorResponse = new ResponseWrapper(error);
-                _logger.LogInformation($"Finished method '{nameof(DeleteTariffAsync)}'.");
-                return BadRequest(errorResponse);
-            }
+                return OnInvalidParameterError($"An argument '{nameof(id)}' cannot be null or empty.");
 
             if (!id.Equals(tariff.Id))
-            {
-                _logger.LogWarning($"An argument '{nameof(id)}' end property '{nameof(tariff)}.{nameof(tariff.Id)}' mismatches. Value of argument: '{id}'. Value of property: '{tariff.Id}'.");
-                var error = new MismatchParameterError($"An argument '{nameof(id)}' end property '{nameof(tariff)}.{nameof(tariff.Id)}' mismatches. Value of argument: '{id}'. Value of property: '{tariff.Id}'.");
-                var errorResponse = new ResponseWrapper(error);
-                _logger.LogInformation($"Finished method '{nameof(DeleteTariffAsync)}'.");
-                return BadRequest(errorResponse);
-            }
+                return OnMismatchParameter($"An '{nameof(id)}' in URL end field '{nameof(tariff.Id).ToLower()}' in request body mismatches. Value in URL: '{id}'. Value in body: '{tariff.Id}'.");
 
             try
             {
-                var tariffToBeUpdated = _mapper.Map<SightseeingTariff>(tariff);
+                var tariffToBeUpdated = MapToDomainModel(tariff);
                 var updatedTariff = await _tariffDbService.UpdateAsync(tariffToBeUpdated);
-                tariff = _mapper.Map<SightseeingTariffDto>(updatedTariff);
+                tariff = MapToDto(updatedTariff);
                 var response = new ResponseWrapper(tariff);
                 return Ok(response);
             }
             catch (InvalidOperationException ex)
             {
-                var notFoundResponse = CreateNotFoundErrorResponse(ex, id);
-                _logger.LogInformation($"Finished method '{nameof(GetTariffAsync)}'.");
-                return notFoundResponse;
+                return OnNotFoundError($"Cannot found element {typeof(SightseeingTariff).Name} with specified id: '{id}'.", ex);
             }
             catch (InternalDbServiceException ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} Error at '{_tariffDbService.GetType().Name}' occurred while database operation was proccessing. {ex.Message}");
+                LogInternalDbServiceException(_tariffDbService.GetType(), ex);
                 throw;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} Unexpected error occured. {ex.Message}");
+                LogUnexpectedException(ex);
                 throw;
             }
         }
@@ -282,25 +290,12 @@ namespace SDCWebApp.Controllers
 
         #region Privates
 
-        private ResponseWrapper CreateInvalidArgumentErrorResponse(string argument, string argumentName)
-        {
-            if (string.IsNullOrEmpty(argument))
-            {
-                _logger.LogWarning($"An argument '{argumentName}' cannot be null or empty.");
-                var error = new InvalidArgumentError($"An argument '{argumentName}' cannot be null or empty.");
-                return new ResponseWrapper(error);
-            }
-            return null;
-        }
+        private SightseeingTariff MapToDomainModel(SightseeingTariffDto tariffDto) => _mapper.Map<SightseeingTariff>(tariffDto);
+        private SightseeingTariffDto MapToDto(SightseeingTariff tariff) => _mapper.Map<SightseeingTariffDto>(tariff);
+        private IEnumerable<SightseeingTariff> MapToDomainModelEnumerable(IEnumerable<SightseeingTariffDto> tariffDtos) => _mapper.Map<IEnumerable<SightseeingTariff>>(tariffDtos);
+        private IEnumerable<SightseeingTariffDto> MapToDtoEnumerable(IEnumerable<SightseeingTariff> tariff) => _mapper.Map<IEnumerable<SightseeingTariffDto>>(tariff);
 
-
-        private NotFoundObjectResult CreateNotFoundErrorResponse(Exception exception, string id)
-        {
-            _logger.LogWarning(exception, $"{exception.GetType().Name} Cannot found element {typeof(SightseeingTariff).Name} with specified id: '{id}'.");
-            var error = new NotFoundError($"Specified '{typeof(SightseeingTariff).Name}' with id: '{id}' cannot be found.");
-            var notFoundResponse = new ResponseWrapper(error);
-            return NotFound(notFoundResponse);
-        }
         #endregion
+
     }
 }
