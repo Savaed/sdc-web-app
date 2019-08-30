@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using SDCWebApp.Data;
 using SDCWebApp.Helpers;
 using System;
@@ -46,7 +48,10 @@ namespace SDCWebApp
             .AddJsonOptions(options =>
             {
                 // Ignore reference loops in JSON responses.
-                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+                options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                // Convert any enum to its string representation.
+                options.SerializerSettings.Converters.Add(new StringEnumConverter());
+                options.SerializerSettings.Converters.Add(new IsoDateTimeConverter());
             });
 
             // In production, the Angular files will be served from this directory.

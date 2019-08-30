@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using UnitTests.Helpers;
@@ -28,6 +29,12 @@ namespace UnitTests.Services
             Id = "1",
             Name = "Sample sightseeing tariff for unit tests."
         };
+        private static SightseeingTariff[] _tariffForRestrictedUpdateCases = new SightseeingTariff[]
+        {
+            new SightseeingTariff{ ConcurrencyToken = Encoding.ASCII.GetBytes("Updated ConcurrencyToken") },    // Attempt to change 'ConcurrencyToken' which is read-only property.
+            new SightseeingTariff{ UpdatedAt = DateTime.Now.AddYears(100) }                                     // Attempt to change 'UpdatedAt' which is read-only property.
+        };
+
 
         [OneTimeSetUp]
         public void SetUp()
@@ -354,7 +361,7 @@ namespace UnitTests.Services
 
 
         [Test]
-        public async Task AddAsync__In_resource_exists_the_same_SightseeingTariff_as_this_one_to_be_added__Should_throw_InvalidOperationException()
+        public async Task AddAsync__In_resource_exists_sightseeing_tariff_with_the_same_id_as_this_one_to_be_added__Should_throw_InvalidOperationException()
         {
             using (var factory = new DbContextFactory())
             {
@@ -366,12 +373,35 @@ namespace UnitTests.Services
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    // Testing method
+                    _validTariff.Name = "changed name";
                     var service = new SightseeingTariffDbService(context, _logger);
 
                     Func<Task> result = async () => await service.AddAsync(_validTariff);
 
                     await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because in resource exists the same SightseeingTariff as this one to be added.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task AddAsync__Attempt_to_add_entity_with_the_same_properties_value_as_existing_one_but_wit_different_id__Add_should_be_successful()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.SightseeingTariffs.Add(_validTariff);
+                    await context.SaveChangesAsync();
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    _validTariff.Id = null;
+                    var service = new SightseeingTariffDbService(context, _logger);
+
+                    Func<Task> result = async () => await service.AddAsync(_validTariff);
+
+                    await result.Should().NotThrowAsync("Because this method allows to add a new entity with the same properties value but different 'Id'. It is intentional behaviour.");
                 }
             }
         }
@@ -427,6 +457,166 @@ namespace UnitTests.Services
 
         #endregion
 
+
+        #region RestrictedAddAsync(SightseeingTariff SightseeingTariff)
+        // zasob nie istnieje -> exc z msg
+        // zasob jest nullem -> null ref exc
+        // problem z zapisaniem zmian -> inter | Nie mam pojecia jak to przetestowac xD
+        // arg jest nullem -> arg null exc
+        // istnieje w zasobie taki sam element jak ten, ktory chcemy dodac (takie samo id, wartosci ) -> invalid oper exc
+        // dodawanie sie udalo -> zwraca dodany bilet
+        // dodawanie sie udalo -> zasob jest wiekszy o jeden
+        // dodawanie sie udalo -> istnieje w zasobie dodany bilet
+        // proba doda
+
+        [Test]
+        public async Task RestrictedAddAsync__Resource_is_null__Should_throw_InternalDbServiceException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.SightseeingTariffs = null as DbSet<SightseeingTariff>;
+                    var service = new SightseeingTariffDbService(context, _logger);
+
+                    Func<Task> action = async () => await service.RestrictedAddAsync(_validTariff);
+
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource reference is set to null");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedAddAsync__Resource_doesnt_exist__Should_throw_InternalDbServiceException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    // Drop SightseeingTariffs table.
+                    context.Database.ExecuteSqlCommand("DROP TABLE [SightseeingTariffs]");
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new SightseeingTariffDbService(context, _logger);
+
+                    Func<Task> action = async () => await service.RestrictedAddAsync(_validTariff);
+
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of SightseeingTariff. " +
+                        "NOTE Excaption actually is type of 'SqLiteError' only if database provider is SQLite.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedAddAsync__Argument_is_null__Should_throw_ArgumentNullException()
+        {
+            var service = new SightseeingTariffDbService(_dbContextMock.Object, _logger);
+
+            Func<Task> result = async () => await service.RestrictedAddAsync(null as SightseeingTariff);
+
+            await result.Should().ThrowExactlyAsync<ArgumentNullException>("Because argument 'SightseeingTariff' is null.");
+        }
+
+
+        [Test]
+        public async Task RestrictedAddAsync__In_resource_exists_sightseeing_tariff_with_the_same_id_as_this_one_to_be_added__Should_throw_InvalidOperationException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.SightseeingTariffs.Add(_validTariff);
+                    await context.SaveChangesAsync();
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    _validTariff.Name = "changed name";
+                    var service = new SightseeingTariffDbService(context, _logger);
+
+                    Func<Task> result = async () => await service.RestrictedAddAsync(_validTariff);
+
+                    await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because in resource exists the same SightseeingTariff as this one to be added.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedAddAsync__Attempt_to_add_entity_with_the_same_description_as_existing_one_but_wit_different_id__Should_throw_InvalidOperationException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.SightseeingTariffs.Add(_validTariff);
+                    await context.SaveChangesAsync();
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    _validTariff.Id += "_changed_id";
+                    var service = new SightseeingTariffDbService(context, _logger);
+
+                    Func<Task> result = async () => await service.RestrictedAddAsync(_validTariff);
+
+                    await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because this method DOES NOT allow to add a new entity with the same properties value (Description) " +
+                        "but different 'Id'. It is intentional behaviour.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedAddAsync__Add_successful__Should_return_added_sightseeing_tariff()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new SightseeingTariffDbService(context, _logger);
+
+                    var result = await service.RestrictedAddAsync(_validTariff);
+
+                    result.Should().BeEquivalentTo(_validTariff);
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedAddAsync__Add_successful__Resource_length_should_be_greater_by_1()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    int expectedLength = context.SightseeingTariffs.Count() + 1;
+                    var service = new SightseeingTariffDbService(context, _logger);
+
+                    await service.RestrictedAddAsync(_validTariff);
+
+                    context.SightseeingTariffs.Count().Should().Be(expectedLength);
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedAddAsync__Add_successful__Resource_contains_added_sightseeing_tariff()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new SightseeingTariffDbService(context, _logger);
+
+                    await service.RestrictedAddAsync(_validTariff);
+
+                    context.SightseeingTariffs.Contains(_validTariff).Should().BeTrue();
+                }
+            }
+        }
+
+        #endregion
 
         #region UpdateAsync(SightseeingTariff tariff)
         // arg jest nullem -> arg null exc
@@ -662,7 +852,7 @@ namespace UnitTests.Services
         }
 
         [Test]
-        public async Task UpdateAsync__Update_successful_first_time__Updated_element_should_have_updated_at_not_set_to_MaxValue()
+        public async Task UpdateAsync__Update_successful_first_time__Updated_element_should_have_updated_at_not_set_to_MinValue()
         {
             SightseeingTariff sightseeingTariffBeforUpdate;
             SightseeingTariff sightseeingTariff;
@@ -707,6 +897,301 @@ namespace UnitTests.Services
             }
         }
 
+        #endregion
+
+        #region RestrictedUpdateAsync(SightseeingTariff tariff)
+        // wszystko co w normalnym update
+        // proba zmian readonly properties -> metoda niczego nie zmieni i zaloguje warny
+
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Resource_is_null__Should_throw_InternalDbServiceException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.SightseeingTariffs = null as DbSet<SightseeingTariff>;
+                    var service = new SightseeingTariffDbService(context, _logger);
+
+                    Func<Task> action = async () => await service.RestrictedUpdateAsync(_validTariff);
+
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource reference is set to null");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Resource_doesnt_exist__Should_throw_InternalDbServiceException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    // Drop SightseeingTariffs table.
+                    context.Database.ExecuteSqlCommand("DROP TABLE [SightseeingTariffs]");
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new SightseeingTariffDbService(context, _logger);
+
+                    Func<Task> action = async () => await service.RestrictedUpdateAsync(_validTariff);
+
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of SightseeingTariff. " +
+                        "NOTE Excaption actually is type of 'SqLiteError' only if database provider is SQLite.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Argument_is_null__Should_throw_ArgumentNullException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new SightseeingTariffDbService(context, _logger);
+
+                    Func<Task> result = async () => await service.RestrictedUpdateAsync(null as SightseeingTariff);
+
+                    await result.Should().ThrowExactlyAsync<ArgumentNullException>("Because argument 'SightseeingTariff' cannot be null.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Argument_has_null_or_empty_id__Should_throw_ArgumentException([Values(null, "")] string id)
+        {
+            var invalidSightseeingTariff = new SightseeingTariff { Id = id };
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new SightseeingTariffDbService(context, _logger);
+
+                    Func<Task> result = async () => await service.RestrictedUpdateAsync(invalidSightseeingTariff);
+
+                    await result.Should().ThrowExactlyAsync<ArgumentException>("Because argument 'SightseeingTariff' has null or empty id which is invalid.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Resource_is_empty__Should_throw_InvalidOperationException()
+        {
+            SightseeingTariff sightseeingTariffBeforUpdate;
+            SightseeingTariff sightseeingTariff;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    sightseeingTariffBeforUpdate = await context.SightseeingTariffs.FirstAsync();
+                    sightseeingTariff = sightseeingTariffBeforUpdate.Clone() as SightseeingTariff;
+                    context.SightseeingTariffs.RemoveRange(await context.SightseeingTariffs.ToArrayAsync());
+                    await context.SaveChangesAsync();
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    sightseeingTariff.Name = "Changed name.";
+                    var service = new SightseeingTariffDbService(context, _logger);
+
+                    Func<Task> result = async () => await service.RestrictedUpdateAsync(sightseeingTariff);
+
+                    await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because esource is empty.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Matching_SightseeingTariff_not_found__Should_throw_InvalidOperationException()
+        {
+            SightseeingTariff sightseeingTariff = new SightseeingTariff
+            {
+                Id = "0",
+                Name = "Sample name for only this test.",
+                UpdatedAt = DateTime.Now.AddHours(-3)
+            };
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new SightseeingTariffDbService(context, _logger);
+
+                    // In db does not matching SightseeingTariff to belowe disount.
+                    Func<Task> result = async () => await service.RestrictedUpdateAsync(sightseeingTariff);
+
+                    await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because matching SightseeingTariff not found.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Update_successful__Should_return_updated_sightseeing_tariff()
+        {
+            SightseeingTariff sightseeingTariffBeforUpdate;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    sightseeingTariffBeforUpdate = await context.SightseeingTariffs.FirstAsync();
+                    SightseeingTariff sightseeingTariff = sightseeingTariffBeforUpdate;
+                    sightseeingTariff.Name = "Changed name.";
+                    var service = new SightseeingTariffDbService(context, _logger);
+
+                    var result = await service.RestrictedUpdateAsync(sightseeingTariff);
+
+                    result.Should().BeEquivalentTo(sightseeingTariff);
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Update_successful__Resource_should_contains_updated_sightseeing_tariff()
+        {
+            SightseeingTariff sightseeingTariff;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    sightseeingTariff = await context.SightseeingTariffs.FirstAsync();
+                    sightseeingTariff.Name = "Changed name.";
+                    var service = new SightseeingTariffDbService(context, _logger);
+
+                    var result = await service.RestrictedUpdateAsync(sightseeingTariff);
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.SightseeingTariffs.Contains(sightseeingTariff).Should().BeTrue();
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Update_successful__Resource_should_doesnt_contain_previous_version_of_sightseeing_tariff()
+        {
+            SightseeingTariff sightseeingTariffBeforUpdate;
+            SightseeingTariff sightseeingTariff;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    sightseeingTariff = await context.SightseeingTariffs.FirstAsync();
+                    sightseeingTariffBeforUpdate = sightseeingTariff.Clone() as SightseeingTariff;
+                    sightseeingTariff.Name = "Changed name.";
+                    var service = new SightseeingTariffDbService(context, _logger);
+
+                    var result = await service.RestrictedUpdateAsync(sightseeingTariff);
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.SightseeingTariffs.Single(x => x == sightseeingTariff).Should().NotBeSameAs(sightseeingTariffBeforUpdate);
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Update_successful__Resource_length_should_be_unchanged()
+        {
+            SightseeingTariff sightseeingTariffBeforUpdate;
+            SightseeingTariff sightseeingTariff;
+            int expectedLength;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    sightseeingTariffBeforUpdate = await context.SightseeingTariffs.FirstAsync();
+                    sightseeingTariff = sightseeingTariffBeforUpdate;
+                    sightseeingTariff.Name = "Changed name.";
+                    var service = new SightseeingTariffDbService(context, _logger);
+                    expectedLength = await context.SightseeingTariffs.CountAsync();
+
+                    await service.RestrictedUpdateAsync(sightseeingTariff);
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.SightseeingTariffs.Count().Should().Be(expectedLength);
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Update_successful_first_time__Updated_element_should_have_updated_at_not_set_to_MaxValue()
+        {
+            SightseeingTariff sightseeingTariffBeforUpdate;
+            SightseeingTariff sightseeingTariff;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    sightseeingTariff = await context.SightseeingTariffs.FirstAsync();
+                    sightseeingTariffBeforUpdate = sightseeingTariff.Clone() as SightseeingTariff;
+                    sightseeingTariffBeforUpdate.UpdatedAt = DateTime.MinValue;
+                    sightseeingTariff.Name = "Changed name";
+                    var service = new SightseeingTariffDbService(context, _logger);
+
+                    var result = await service.RestrictedUpdateAsync(sightseeingTariff);
+
+                    ((DateTime)result.UpdatedAt).Should().NotBeSameDateAs(DateTime.MinValue);
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Update_successful_not_first_time__Updated_element_should_have_new_updated_at_date_after_previous_one()
+        {
+            SightseeingTariff sightseeingTariffBeforUpdate;
+            SightseeingTariff sightseeingTariff;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    sightseeingTariff = await context.SightseeingTariffs.FirstAsync();
+                    sightseeingTariffBeforUpdate = sightseeingTariff.Clone() as SightseeingTariff;
+                    sightseeingTariffBeforUpdate.UpdatedAt = DateTime.UtcNow.AddMinutes(-30);
+                    sightseeingTariff.Name = "Changed name";
+                    var service = new SightseeingTariffDbService(context, _logger);
+
+                    var result = await service.RestrictedUpdateAsync(sightseeingTariff);
+
+                    ((DateTime)result.UpdatedAt).Should().BeAfter((DateTime)sightseeingTariffBeforUpdate.UpdatedAt);
+                }
+            }
+        }
+
+        [TestCaseSource(nameof(_tariffForRestrictedUpdateCases))]
+        public async Task RestrictedUpdateAsync__Attempt_to_update_readonly_properties__These_changes_will_be_ignored(SightseeingTariff updatedTariffCase)
+        {
+            // In fact, any read-only property changes will be ignored and no exception will be thrown, but the method will log any of these changes as warning.
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var tariffBeforeUpdate = await context.SightseeingTariffs.FirstAsync();
+                    updatedTariffCase.Id = tariffBeforeUpdate.Id;
+                    var service = new SightseeingTariffDbService(context, _logger);
+
+                    var result = await service.RestrictedUpdateAsync(updatedTariffCase);
+
+                    // Those properties should be unchanged since they are readonly.
+                    result.CreatedAt.Should().BeSameDateAs(tariffBeforeUpdate.CreatedAt);
+                    result.ConcurrencyToken.Should().BeSameAs(tariffBeforeUpdate.ConcurrencyToken);
+                }
+            }
+        }
         #endregion
 
 
@@ -1011,7 +1496,7 @@ namespace UnitTests.Services
         public async Task GetWithPaginationAsync__Found_any_sightseeing_tariff__Should_return_these_elements_with_not_null_ticket_tariffs()
         {
             using (var factory = new DbContextFactory())
-            {              
+            {
                 using (var context = await factory.CreateContextAsync())
                 {
                     var service = new SightseeingTariffDbService(context, _logger);

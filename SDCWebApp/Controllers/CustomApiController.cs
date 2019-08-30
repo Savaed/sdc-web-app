@@ -67,7 +67,7 @@ namespace SDCWebApp.Controllers
         /// <param name="exception">An exception that caused <see cref="HttpStatusCode.BadRequest"/>.</param>
         /// <param name="notFoundObject">An object that processing caused <see cref="HttpStatusCode.BadRequest"/>.</param>
         /// <returns>A <see cref="BadRequestObjectResult"/> described en <see cref="HttpStatusCode.BadRequest"/>.</returns>
-        protected virtual BadRequestObjectResult OnMismatchParameter(string errorMessage, InvalidOperationException exception = null)
+        protected virtual BadRequestObjectResult OnMismatchParameterError(string errorMessage, InvalidOperationException exception = null)
         {
             if (exception is null)
                 _logger.LogWarning($"{errorMessage}");

@@ -21,7 +21,7 @@ namespace UnitTests.Controllers
         private Mock<ISightseeingTariffDbService> _tariffDbServiceMock;
         private Mock<IMapper> _mapperMock;
         private ILogger<SightseeingTariffsController> _logger;
-        private SightseeingTariff _validTriff;
+        private SightseeingTariff _validTariff;
         private SightseeingTariff[] _tariffs;
         private SightseeingTariffDto[] _tariffDtos;
 
@@ -32,7 +32,7 @@ namespace UnitTests.Controllers
             _tariffDbServiceMock = new Mock<ISightseeingTariffDbService>();
             _mapperMock = new Mock<IMapper>();
             _logger = Mock.Of<ILogger<SightseeingTariffsController>>();
-            _validTriff = new SightseeingTariff
+            _validTariff = new SightseeingTariff
             {
                 Id = "15891fb0-faec-43c6-9e83-04a4a17c3660",
                 Name = "Sample sightseeing tariff name for test",
@@ -121,7 +121,7 @@ namespace UnitTests.Controllers
         public async Task GetTariffAsync__Data_retrieve_succeeded__Should_return_200Ok_response_with_data()
         {
             string id = "15891fb0-faec-43c6-9e83-04a4a17c3660";
-            _tariffDbServiceMock.Setup(x => x.GetAsync(It.IsNotNull<string>())).ReturnsAsync(_validTriff);
+            _tariffDbServiceMock.Setup(x => x.GetAsync(It.IsNotNull<string>())).ReturnsAsync(_validTariff);
             _mapperMock.Setup(x => x.Map<SightseeingTariffDto>(It.IsNotNull<SightseeingTariff>())).Returns(new SightseeingTariffDto { Id = id, Name = "new mapped sightseeing tariff" });
             var controller = new SightseeingTariffsController(_tariffDbServiceMock.Object, _logger, _mapperMock.Object);
 
@@ -288,6 +288,8 @@ namespace UnitTests.Controllers
             // Example of these errors: database does not exist, table does not exist etc.
 
             _tariffDbServiceMock.Setup(x => x.AddAsync(It.IsAny<SightseeingTariff>())).ThrowsAsync(new InternalDbServiceException());
+            _tariffDbServiceMock.Setup(x => x.RestrictedAddAsync(It.IsAny<SightseeingTariff>())).ThrowsAsync(new InternalDbServiceException());
+
             var controller = new SightseeingTariffsController(_tariffDbServiceMock.Object, _logger, _mapperMock.Object);
 
             Func<Task> result = async () => await controller.AddTariffAsync(_tariffDtos[0]);
@@ -299,6 +301,7 @@ namespace UnitTests.Controllers
         public async Task AddTariffAsync__An_unexpected_internal_error_occurred__Should_throw_Exception()
         {
             _tariffDbServiceMock.Setup(x => x.AddAsync(It.IsAny<SightseeingTariff>())).ThrowsAsync(new Exception());
+            _tariffDbServiceMock.Setup(x => x.RestrictedAddAsync(It.IsAny<SightseeingTariff>())).ThrowsAsync(new Exception());
             var controller = new SightseeingTariffsController(_tariffDbServiceMock.Object, _logger, _mapperMock.Object);
 
             Func<Task> result = async () => await controller.AddTariffAsync(_tariffDtos[0]);
@@ -313,6 +316,7 @@ namespace UnitTests.Controllers
             _mapperMock.Setup(x => x.Map<SightseeingTariff>(tariffDto)).Returns(_tariffs[0]);
             _tariffDbServiceMock.Setup(x => x.AddAsync(It.IsNotNull<SightseeingTariff>())).ThrowsAsync(new InvalidOperationException());
             var controller = new SightseeingTariffsController(_tariffDbServiceMock.Object, _logger, _mapperMock.Object);
+            _tariffDbServiceMock.Setup(x => x.RestrictedAddAsync(It.IsNotNull<SightseeingTariff>())).ThrowsAsync(new InvalidOperationException());
 
             var result = await controller.AddTariffAsync(tariffDto);
 
@@ -354,6 +358,7 @@ namespace UnitTests.Controllers
             _mapperMock.Setup(x => x.Map<SightseeingTariff>(It.IsNotNull<SightseeingTariffDto>())).Returns(validTariff);
             _mapperMock.Setup(x => x.Map<SightseeingTariffDto>(It.IsNotNull<SightseeingTariff>())).Returns(validTariffDto);
             _tariffDbServiceMock.Setup(x => x.AddAsync(validTariff)).ReturnsAsync(validTariff);
+            _tariffDbServiceMock.Setup(x => x.RestrictedAddAsync(validTariff)).ReturnsAsync(validTariff);
             var controller = new SightseeingTariffsController(_tariffDbServiceMock.Object, _logger, _mapperMock.Object);
 
             var result = await controller.AddTariffAsync(validTariffDto);
@@ -381,6 +386,7 @@ namespace UnitTests.Controllers
             _mapperMock.Setup(x => x.Map<SightseeingTariff>(It.IsNotNull<SightseeingTariffDto>())).Returns(validTariff);
             _mapperMock.Setup(x => x.Map<SightseeingTariffDto>(It.IsNotNull<SightseeingTariff>())).Returns(validTariffDto);
             _tariffDbServiceMock.Setup(x => x.UpdateAsync(It.IsNotNull<SightseeingTariff>())).ThrowsAsync(new InvalidOperationException());
+            _tariffDbServiceMock.Setup(x => x.RestrictedUpdateAsync(It.IsNotNull<SightseeingTariff>())).ThrowsAsync(new InvalidOperationException());
             var controller = new SightseeingTariffsController(_tariffDbServiceMock.Object, _logger, _mapperMock.Object);
 
             var result = await controller.UpdateTariffAsync(validTariffDto.Id, validTariffDto);
@@ -395,6 +401,7 @@ namespace UnitTests.Controllers
             // Example of these errors: database does not exist, table does not exist etc.
 
             _tariffDbServiceMock.Setup(x => x.UpdateAsync(It.IsAny<SightseeingTariff>())).ThrowsAsync(new InternalDbServiceException());
+            _tariffDbServiceMock.Setup(x => x.RestrictedUpdateAsync(It.IsAny<SightseeingTariff>())).ThrowsAsync(new InternalDbServiceException());
             var controller = new SightseeingTariffsController(_tariffDbServiceMock.Object, _logger, _mapperMock.Object);
 
             Func<Task> result = async () => await controller.UpdateTariffAsync(_tariffDtos[0].Id, _tariffDtos[0]);
@@ -406,6 +413,7 @@ namespace UnitTests.Controllers
         public async Task UpdateTariffAsync__An_unexpected_internal_error_occurred__Should_throw_Exception()
         {
             _tariffDbServiceMock.Setup(x => x.UpdateAsync(It.IsAny<SightseeingTariff>())).ThrowsAsync(new Exception());
+            _tariffDbServiceMock.Setup(x => x.RestrictedUpdateAsync(It.IsAny<SightseeingTariff>())).ThrowsAsync(new Exception());
             var controller = new SightseeingTariffsController(_tariffDbServiceMock.Object, _logger, _mapperMock.Object);
 
             Func<Task> result = async () => await controller.UpdateTariffAsync(_tariffDtos[0].Id, _tariffDtos[0]);
@@ -448,6 +456,7 @@ namespace UnitTests.Controllers
             _mapperMock.Setup(x => x.Map<SightseeingTariffDto>(It.IsNotNull<SightseeingTariff>())).Returns(validTariffDto);
             _tariffDbServiceMock.Setup(x => x.UpdateAsync(validTariff)).ReturnsAsync(validTariff);
             var controller = new SightseeingTariffsController(_tariffDbServiceMock.Object, _logger, _mapperMock.Object);
+            _tariffDbServiceMock.Setup(x => x.RestrictedUpdateAsync(validTariff)).ReturnsAsync(validTariff);
 
             var result = await controller.UpdateTariffAsync(validTariffDto.Id, validTariffDto);
 
@@ -516,15 +525,16 @@ namespace UnitTests.Controllers
         }
 
         [Test]
-        public async Task DeleteTariffAsync__Delete_succeeded__Should_return_200OK_response()
+        public async Task DeleteTariffAsync__Delete_succeeded__Should_return_200OK_empty_response()
         {
+            var emptyResponse = new ResponseWrapper();
             _tariffDbServiceMock.Setup(x => x.DeleteAsync(It.IsNotNull<string>()));
             var controller = new SightseeingTariffsController(_tariffDbServiceMock.Object, _logger, _mapperMock.Object);
 
             var result = await controller.DeleteTariffAsync("123");
 
             (result as ObjectResult).StatusCode.Should().Be(200);
-            ((result as ObjectResult).Value as ResponseWrapper).Error.Should().BeNull();
+            ((result as ObjectResult).Value as ResponseWrapper).Should().BeEquivalentTo(emptyResponse);
         }
 
         #endregion

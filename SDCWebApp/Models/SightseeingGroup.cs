@@ -19,8 +19,6 @@ namespace SDCWebApp.Models
         public int MaxGroupSize { get; set; } = 30;
         public int CurrentGroupSize => _currentGroupSize = Tickets != null ? Tickets.Count : _currentGroupSize;
         public bool IsAvailablePlace => _isAvailablePlace = CurrentGroupSize < MaxGroupSize;
-
-        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public virtual ICollection<Ticket> Tickets { get; set; }
 
         public object Clone()

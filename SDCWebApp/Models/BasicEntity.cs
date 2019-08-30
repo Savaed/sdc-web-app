@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace SDCWebApp.Models
 {
@@ -18,11 +19,7 @@ namespace SDCWebApp.Models
         public DateTime? UpdatedAt { get; set; } = DateTime.MinValue;
 
 
-        public BasicEntity() { }
 
-        public BasicEntity(DateTime createdAt)
-        {
-            CreatedAt = createdAt;
-        }
+      
     }
 }

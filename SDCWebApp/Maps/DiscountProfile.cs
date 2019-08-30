@@ -14,7 +14,10 @@ namespace SDCWebApp.Maps
         public DiscountProfile()
         {
             CreateMap<Discount, DiscountDto>()
-                .ForMember(x => x.CreatedAt, options => options.AddTransform(d => d.Truncate(TimeSpan.FromSeconds(1))));
+                .ForMember(x => x.Tickets, options => options.Ignore())     // It's only navigation property so you can hide its from client
+                .ForMember(x => x.CreatedAt, options => options.AddTransform(d => d.Truncate(TimeSpan.FromSeconds(1))))
+                .ForMember(x => x.UpdatedAt, options => options.AddTransform(d => d != null ? d.Truncate(TimeSpan.FromSeconds(1)) : null))
+                .ForMember(x => x.UpdatedAt, options => options.AddTransform(d => d.Equals(DateTime.MinValue) ? null : d));
 
             CreateMap<DiscountDto, Discount>()
                 .ForMember(x => x.ConcurrencyToken, options => options.Ignore())

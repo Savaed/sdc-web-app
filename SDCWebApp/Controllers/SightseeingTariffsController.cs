@@ -166,12 +166,14 @@ namespace SDCWebApp.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> AddTariffAsync([FromBody] SightseeingTariffDto tariff)
         {
+            //throw new NotImplementedException();
+
             _logger.LogInformation($"Starting method '{nameof(AddTariffAsync)}'.");
 
             try
             {
                 var tariffToBeAdded = MapToDomainModel(tariff);
-                var addedTariff = await _tariffDbService.AddAsync(tariffToBeAdded);
+                var addedTariff = await _tariffDbService.RestrictedAddAsync(tariffToBeAdded);
 
                 // Reverse maps from SightseeingTariff to SightseeingTariffDto only for response to the client.
                 var addedTariffDto = MapToDto(addedTariff);
@@ -182,7 +184,7 @@ namespace SDCWebApp.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                return OnInvalidParameterError($"Element '{typeof(SightseeingTariff).Name}' with specified id: '{tariff.Id}' already exists.", ex);  
+                return OnInvalidParameterError($"Element '{typeof(SightseeingTariff).Name}' already exists. Value of '{nameof(tariff.Name)}' must be unique, but this one is not.", ex);
             }
             catch (InternalDbServiceException ex)
             {
@@ -218,13 +220,13 @@ namespace SDCWebApp.Controllers
             try
             {
                 await _tariffDbService.DeleteAsync(id);
-                var okResponse = new ResponseWrapper(null as object);
+                var okResponse = new ResponseWrapper();
                 _logger.LogInformation($"Finished method '{nameof(DeleteTariffAsync)}'.");
                 return Ok(okResponse);
             }
             catch (InvalidOperationException ex)
             {
-                return OnNotFoundError($"Cannot found element {typeof(SightseeingTariff).Name} with specified id: '{id}'.", ex);
+                return OnNotFoundError($"Cannot found element '{typeof(SightseeingTariff).Name}' with specified id: '{id}'.", ex);
             }
             catch (InternalDbServiceException ex)
             {
@@ -255,20 +257,24 @@ namespace SDCWebApp.Controllers
 
         public async Task<IActionResult> UpdateTariffAsync(string id, [FromBody] SightseeingTariffDto tariff)
         {
+            //throw new NotImplementedException();
+
             _logger.LogInformation($"Starting method '{nameof(UpdateTariffAsync)}'.");
 
             if (string.IsNullOrEmpty(id))
                 return OnInvalidParameterError($"An argument '{nameof(id)}' cannot be null or empty.");
 
             if (!id.Equals(tariff.Id))
-                return OnMismatchParameter($"An '{nameof(id)}' in URL end field '{nameof(tariff.Id).ToLower()}' in request body mismatches. Value in URL: '{id}'. Value in body: '{tariff.Id}'.");
+                return OnMismatchParameterError($"An '{nameof(id)}' in URL end field '{nameof(tariff.Id).ToLower()}' in request body mismatches. Value in URL: '{id}'. Value in body: '{tariff.Id}'.");
 
             try
             {
                 var tariffToBeUpdated = MapToDomainModel(tariff);
-                var updatedTariff = await _tariffDbService.UpdateAsync(tariffToBeUpdated);
+                var updatedTariff = await _tariffDbService.RestrictedUpdateAsync(tariffToBeUpdated);
                 tariff = MapToDto(updatedTariff);
+                _logger.LogInformation($"Finished method '{nameof(UpdateTariffAsync)}'.");
                 var response = new ResponseWrapper(tariff);
+
                 return Ok(response);
             }
             catch (InvalidOperationException ex)

@@ -11,10 +11,7 @@ namespace SDCWebApp.Models
         public bool IsPerPerson { get; set; } = true;
         // Ticket price without any discount
         public float DefaultPrice { get; set; }
-
-        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public virtual ICollection<Ticket> Tickets { get; set; }
-        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public virtual SightseeingTariff SightseeingTariff { get; set; }
 
         public object Clone()
