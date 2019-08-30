@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using UnitTests.Helpers;
@@ -21,6 +22,11 @@ namespace UnitTests.Services
     [TestFixture]
     public class DiscountDbServiceTests
     {
+        private static Discount[] _discountForRestrictedUpdateCases = new Discount[]
+        {
+            new Discount{ ConcurrencyToken = Encoding.ASCII.GetBytes("Updated ConcurrencyToken") },    // Attempt to change 'ConcurrencyToken' which is read-only property.
+            new Discount{ UpdatedAt = DateTime.Now.AddYears(100) }                                     // Attempt to change 'UpdatedAt' which is read-only property.
+        };
         private Mock<ApplicationDbContext> _dbContextMock;
         private ILogger<DiscountDbService> _logger;
         Discount _validDiscount = new Discount { Id = "1", Description = "Sample", DiscountValueInPercentage = 12, Type = Discount.DiscountType.ForGroup, GroupSizeForDiscount = 23 };
@@ -149,6 +155,170 @@ namespace UnitTests.Services
                     var result = await service.GetAsync(expectedDiscount.Id);
 
                     result.Should().BeEquivalentTo(expectedDiscount);
+                }
+            }
+        }
+
+        #endregion
+
+
+        #region RestrictedAddAsync(Discount Discount)
+        // zasob nie istnieje -> exc z msg
+        // zasob jest nullem -> null ref exc
+        // problem z zapisaniem zmian -> inter | Nie mam pojecia jak to przetestowac xD
+        // arg jest nullem -> arg null exc
+        // istnieje w zasobie taki sam element jak ten, ktory chcemy dodac (takie samo id, wartosci ) -> invalid oper exc
+        // dodawanie sie udalo -> zwraca dodany bilet
+        // dodawanie sie udalo -> zasob jest wiekszy o jeden
+        // dodawanie sie udalo -> istnieje w zasobie dodany bilet
+        // proba doda
+
+        [Test]
+        public async Task RestrictedAddAsync__Resource_is_null__Should_throw_InternalDbServiceException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.Discounts = null as DbSet<Discount>;
+                    var service = new DiscountDbService(context, _logger);
+
+                    Func<Task> action = async () => await service.RestrictedAddAsync(_validDiscount);
+
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource reference is set to null");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedAddAsync__Resource_doesnt_exist__Should_throw_InternalDbServiceException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    // Drop Discounts table.
+                    context.Database.ExecuteSqlCommand("DROP TABLE [Discounts]");
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new DiscountDbService(context, _logger);
+
+                    Func<Task> action = async () => await service.RestrictedAddAsync(_validDiscount);
+
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of Discount. " +
+                        "NOTE Excaption actually is type of 'SqLiteError' only if database provider is SQLite.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedAddAsync__Argument_is_null__Should_throw_ArgumentNullException()
+        {
+            var service = new DiscountDbService(_dbContextMock.Object, _logger);
+
+            Func<Task> result = async () => await service.RestrictedAddAsync(null as Discount);
+
+            await result.Should().ThrowExactlyAsync<ArgumentNullException>("Because argument 'Discount' is null.");
+        }
+
+
+        [Test]
+        public async Task RestrictedAddAsync__In_resource_exists_sightseeing_tariff_with_the_same_id_as_this_one_to_be_added__Should_throw_InvalidOperationException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.Discounts.Add(_validDiscount);
+                    await context.SaveChangesAsync();
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    _validDiscount.Description = "changed description";
+                    _validDiscount.DiscountValueInPercentage += 1;
+                    _validDiscount.GroupSizeForDiscount += 1;
+                    _validDiscount.Type = Discount.DiscountType.ForPensioner;
+                    var service = new DiscountDbService(context, _logger);
+
+                    Func<Task> result = async () => await service.RestrictedAddAsync(_validDiscount);
+
+                    await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because in resource exists the same Discount as this one to be added.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedAddAsync__Attempt_to_add_entity_with_the_same_values_as_existing_one_but_with_different_id__Should_throw_InvalidOperationException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.Discounts.Add(_validDiscount);
+                    await context.SaveChangesAsync();
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    _validDiscount.Id += "_changed_id";
+                    var service = new DiscountDbService(context, _logger);
+
+                    Func<Task> result = async () => await service.RestrictedAddAsync(_validDiscount);
+
+                    await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because this method DOES NOT allow to add a new entity with the same properties value (Description) " +
+                        "but different 'Id'. It is intentional behaviour.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedAddAsync__Add_successful__Should_return_added_sightseeing_tariff()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new DiscountDbService(context, _logger);
+
+                    var result = await service.RestrictedAddAsync(_validDiscount);
+
+                    result.Should().BeEquivalentTo(_validDiscount);
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedAddAsync__Add_successful__Resource_length_should_be_greater_by_1()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    int expectedLength = context.Discounts.Count() + 1;
+                    var service = new DiscountDbService(context, _logger);
+
+                    await service.RestrictedAddAsync(_validDiscount);
+
+                    context.Discounts.Count().Should().Be(expectedLength);
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedAddAsync__Add_successful__Resource_contains_added_sightseeing_tariff()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new DiscountDbService(context, _logger);
+
+                    await service.RestrictedAddAsync(_validDiscount);
+
+                    context.Discounts.Contains(_validDiscount).Should().BeTrue();
                 }
             }
         }
@@ -664,6 +834,302 @@ namespace UnitTests.Services
         #endregion
 
 
+        #region RestrictedUpdateAsync(Discount discount)
+        // wszystko co w normalnym update
+        // proba zmian readonly properties -> metoda niczego nie zmieni i zaloguje warny
+
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Resource_is_null__Should_throw_InternalDbServiceException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.Discounts = null as DbSet<Discount>;
+                    var service = new DiscountDbService(context, _logger);
+
+                    Func<Task> action = async () => await service.RestrictedUpdateAsync(_validDiscount);
+
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource reference is set to null");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Resource_doesnt_exist__Should_throw_InternalDbServiceException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    // Drop Discounts table.
+                    context.Database.ExecuteSqlCommand("DROP TABLE [Discounts]");
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new DiscountDbService(context, _logger);
+
+                    Func<Task> action = async () => await service.RestrictedUpdateAsync(_validDiscount);
+
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of Discount. " +
+                        "NOTE Excaption actually is type of 'SqLiteError' only if database provider is SQLite.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Argument_is_null__Should_throw_ArgumentNullException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new DiscountDbService(context, _logger);
+
+                    Func<Task> result = async () => await service.RestrictedUpdateAsync(null as Discount);
+
+                    await result.Should().ThrowExactlyAsync<ArgumentNullException>("Because argument 'Discount' cannot be null.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Argument_has_null_or_empty_id__Should_throw_ArgumentException([Values(null, "")] string id)
+        {
+            var invalidDiscount = new Discount { Id = id };
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new DiscountDbService(context, _logger);
+
+                    Func<Task> result = async () => await service.RestrictedUpdateAsync(invalidDiscount);
+
+                    await result.Should().ThrowExactlyAsync<ArgumentException>("Because argument 'Discount' has null or empty id which is invalid.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Resource_is_empty__Should_throw_InvalidOperationException()
+        {
+            Discount DiscountBeforUpdate;
+            Discount Discount;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    DiscountBeforUpdate = await context.Discounts.FirstAsync();
+                    Discount = DiscountBeforUpdate.Clone() as Discount;
+                    context.Discounts.RemoveRange(await context.Discounts.ToArrayAsync());
+                    await context.SaveChangesAsync();
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    Discount.Description = "Changed description.";
+                    var service = new DiscountDbService(context, _logger);
+
+                    Func<Task> result = async () => await service.RestrictedUpdateAsync(Discount);
+
+                    await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because esource is empty.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Matching_Discount_not_found__Should_throw_InvalidOperationException()
+        {
+            Discount Discount = new Discount
+            {
+                Id = "0",
+                Description = "description.",
+                UpdatedAt = DateTime.Now.AddHours(-3)
+            };
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new DiscountDbService(context, _logger);
+
+                    // In db does not matching Discount to belowe disount.
+                    Func<Task> result = async () => await service.RestrictedUpdateAsync(Discount);
+
+                    await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because matching Discount not found.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Update_successful__Should_return_updated_sightseeing_tariff()
+        {
+            Discount discountBeforUpdate;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    discountBeforUpdate = await context.Discounts.FirstAsync();
+                    Discount discount = discountBeforUpdate;
+                    discount.Description = "Changed description.";
+                    var service = new DiscountDbService(context, _logger);
+
+                    var result = await service.RestrictedUpdateAsync(discount);
+
+                    result.Should().BeEquivalentTo(discount);
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Update_successful__Resource_should_contains_updated_sightseeing_tariff()
+        {
+            Discount discount;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    discount = await context.Discounts.FirstAsync();
+                    discount.Description = "Changed description.";
+                    var service = new DiscountDbService(context, _logger);
+
+                    var result = await service.RestrictedUpdateAsync(discount);
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.Discounts.Contains(discount).Should().BeTrue();
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Update_successful__Resource_should_doesnt_contain_previous_version_of_sightseeing_tariff()
+        {
+            Discount discountBeforUpdate;
+            Discount discount;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    discount = await context.Discounts.FirstAsync();
+                    discountBeforUpdate = discount.Clone() as Discount;
+                    discount.Description = "Changed description.";
+                    var service = new DiscountDbService(context, _logger);
+
+                    var result = await service.RestrictedUpdateAsync(discount);
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.Discounts.Single(x => x == discount).Should().NotBeSameAs(discountBeforUpdate);
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Update_successful__Resource_length_should_be_unchanged()
+        {
+            Discount discountBeforUpdate;
+            Discount discount;
+            int expectedLength;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    discountBeforUpdate = await context.Discounts.FirstAsync();
+                    discount = discountBeforUpdate;
+                    discount.Description = "Changed description.";
+                    var service = new DiscountDbService(context, _logger);
+                    expectedLength = await context.Discounts.CountAsync();
+
+                    await service.RestrictedUpdateAsync(discount);
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.Discounts.Count().Should().Be(expectedLength);
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Update_successful_first_time__Updated_element_should_have_updated_at_not_set_to_MaxValue()
+        {
+            Discount discountBeforUpdate;
+            Discount discount;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    discount = await context.Discounts.FirstAsync();
+                    discountBeforUpdate = discount.Clone() as Discount;
+                    discountBeforUpdate.UpdatedAt = DateTime.MinValue;
+                    discount.Description = "Changed description.";
+                    var service = new DiscountDbService(context, _logger);
+
+                    var result = await service.RestrictedUpdateAsync(discount);
+
+                    ((DateTime)result.UpdatedAt).Should().NotBeSameDateAs(DateTime.MinValue);
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Update_successful_not_first_time__Updated_element_should_have_new_updated_at_date_after_previous_one()
+        {
+            Discount discountBeforUpdate;
+            Discount discount;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    discount = await context.Discounts.FirstAsync();
+                    discountBeforUpdate = discount.Clone() as Discount;
+                    discountBeforUpdate.UpdatedAt = DateTime.UtcNow.AddMinutes(-30);
+                    discount.Description = "Changed description.";
+                    var service = new DiscountDbService(context, _logger);
+
+                    var result = await service.RestrictedUpdateAsync(discount);
+
+                    ((DateTime)result.UpdatedAt).Should().BeAfter((DateTime)discountBeforUpdate.UpdatedAt);
+                }
+            }
+        }
+
+        [TestCaseSource(nameof(_discountForRestrictedUpdateCases))]
+        public async Task RestrictedUpdateAsync__Attempt_to_update_readonly_properties__These_changes_will_be_ignored(Discount updatedTariffCase)
+        {
+            // In fact, any read-only property changes will be ignored and no exception will be thrown, but the method will log any of these changes as warning.
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var tariffBeforeUpdate = await context.Discounts.FirstAsync();
+                    updatedTariffCase.Id = tariffBeforeUpdate.Id;
+                    var service = new DiscountDbService(context, _logger);
+
+                    var result = await service.RestrictedUpdateAsync(updatedTariffCase);
+
+                    // Those properties should be unchanged since they are readonly.
+                    result.CreatedAt.Should().BeSameDateAs(tariffBeforeUpdate.CreatedAt);
+                    result.ConcurrencyToken.Should().BeSameAs(tariffBeforeUpdate.ConcurrencyToken);
+                }
+            }
+        }
+        #endregion
+
+
         #region DeleteAsync(string id)
         // zasob jest nullem -> internal
         // zasob nie istnieje -> intern
@@ -858,7 +1324,7 @@ namespace UnitTests.Services
                         "NOTE Excaption actually is type of 'SqLiteError' only if database provider is SQLite.");
                 }
             }
-        }       
+        }
 
         [Test]
         public async Task GetWithPaginationAsync__Page_number_is_less_than_1__Should_throw_ArgumentOutOfRangeException()
@@ -893,7 +1359,7 @@ namespace UnitTests.Services
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    for(int i=0; i<10; i++)
+                    for (int i = 0; i < 10; i++)
                     {
                         await context.Discounts.AddAsync(new Discount { Id = i.ToString() });
                     }

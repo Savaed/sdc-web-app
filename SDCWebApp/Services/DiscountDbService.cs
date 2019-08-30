@@ -20,13 +20,13 @@ namespace SDCWebApp.Services
     /// <summary>
     /// Provides methods for get, add, update and delete operations for <see cref="Discount"/> entities in the database.
     /// </summary>
-    public class DiscountDbService : IDiscountDbService
+    public class DiscountDbService : ServiceBase, IDiscountDbService
     {
         private readonly ILogger<DiscountDbService> _logger;
         private readonly ApplicationDbContext _context;
 
 
-        public DiscountDbService(ApplicationDbContext context, ILogger<DiscountDbService> logger)
+        public DiscountDbService(ApplicationDbContext context, ILogger<DiscountDbService> logger) : base(context, logger)
         {
             _logger = logger;
             _context = context;
@@ -323,6 +323,90 @@ namespace SDCWebApp.Services
             }
         }
 
+        public async Task<Discount> RestrictedUpdateAsync(Discount discount)
+        {
+            _logger.LogInformation($"Starting method '{nameof(UpdateAsync)}'.");
+
+            _ = discount ?? throw new ArgumentNullException(nameof(discount), $"Argument '{nameof(discount)}' cannot be null.");
+
+            if (string.IsNullOrEmpty(discount.Id))
+                throw new ArgumentException($"Argument '{nameof(discount.Id)}' cannot be null or empty.");
+
+            await EnsureDatabaseCreatedAsync();
+            _ = _context?.Discounts ?? throw new InternalDbServiceException($"Table of type '{typeof(Discount).Name}' is null.");
+
+            try
+            {
+               if (_context.Discounts.Count() == 0)
+                    throw new InvalidOperationException($"Cannot found element with id '{discount.Id}' for update. Resource {_context.Discounts.GetType().Name} does not contain any element.");
+
+                if (await _context.Discounts.ContainsAsync(discount) == false)
+                    throw new InvalidOperationException($"Cannot found element with id '{discount.Id}' for update. Any element does not match to the one to be updated.");
+
+                _logger.LogDebug($"Starting update discount with id '{discount.Id}'.");
+                discount.UpdatedAt = DateTime.UtcNow;
+                var originalDiscount = await _context.Discounts.SingleAsync(x => x.Id.Equals(discount.Id));
+                var updatedDiscount = RestrictedUpdate(originalDiscount, discount) as Discount;
+                await _context.TrySaveChangesAsync();
+                _logger.LogDebug($"Update data succeeded.");
+                _logger.LogInformation($"Finished method '{nameof(UpdateAsync)}'.");
+                return updatedDiscount;
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogError(ex, $"{ex.GetType().Name} Cannot found element for update. See exception for more details. Operation failed.");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
+                var internalException = new InternalDbServiceException($"Encountered problem when updating disount with id '{discount.Id}'. See inner excpetion for more details.", ex);
+                throw internalException;
+            }
+        }
+
+        public async Task<Discount> RestrictedAddAsync(Discount discount)
+        {
+            _logger.LogInformation($"Starting method '{nameof(AddAsync)}'.");
+
+            if (discount is null)
+                throw new ArgumentNullException($"Argument '{nameof(discount)}' cannot be null.");
+
+            await EnsureDatabaseCreatedAsync();
+            _ = _context?.Discounts ?? throw new InternalDbServiceException($"Table of type '{typeof(Discount).Name}' is null.");
+
+            try
+            {
+                // Check if exist in db tariff with the same props as adding.
+                if (await IsEntityAlreadyExistsAsync(discount))
+                    throw new InvalidOperationException($"There is already the same element in the database as the one to be added. " +
+                        $"The value of '{nameof(discount.Description)}', '{nameof(discount.DiscountValueInPercentage)}' etc. , are not unique.");
+
+                _logger.LogDebug($"Starting add discount with id '{discount.Id}'.");
+                var addedDiscount = _context.Discounts.Add(discount).Entity;
+                await _context.TrySaveChangesAsync();
+                _logger.LogDebug("Add data succeeded.");
+                _logger.LogInformation($"Finished method '{nameof(AddAsync)}'.");
+                return addedDiscount;
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError($"{ex.GetType().Name} Changes made by add operations cannot be saved properly. See inner exception. Operation failed.", ex);
+                var internalException = new InternalDbServiceException("Changes made by add operations cannot be saved properly. See inner exception for more details.", ex);
+                throw internalException;
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogError($"{ex.GetType().Name} There is already the same element in the database as the one to be added. Id of this element: '{discount.Id}'.", ex);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
+                var internalException = new InternalDbServiceException($"Encountered problem when adding disount with id '{discount?.Id}' to database. See inner excpetion for more details.", ex);
+                throw internalException;
+            }
+        }
 
         #region Privates      
 
@@ -330,6 +414,12 @@ namespace SDCWebApp.Services
         {
             if (await _context.Database.EnsureCreatedAsync() == false)
                 _logger.LogWarning($"Database with provider '{_context.Database.ProviderName}' does not exist. It Will be created but not using migrations so it cannot be updating using migrations later.");
+        }
+
+        protected override async Task<bool> IsEntityAlreadyExistsAsync(BasicEntity entity)
+        {
+            var allDiscounts = await _context.Discounts.ToArrayAsync();
+            return allDiscounts.Any(x => x.Equals(entity as Discount));
         }
 
         #endregion

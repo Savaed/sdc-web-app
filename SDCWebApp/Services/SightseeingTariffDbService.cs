@@ -322,8 +322,6 @@ namespace SDCWebApp.Services
         /// other problems with retrieving data from database occurred.</exception>
         public async Task<SightseeingTariff> RestrictedUpdateAsync(SightseeingTariff tariff)
         {
-            //throw new NotImplementedException();
-
             _logger.LogInformation($"Starting method '{nameof(UpdateAsync)}'.");
 
             _ = tariff ?? throw new ArgumentNullException(nameof(tariff), $"Argument '{nameof(tariff)}' cannot be null.");

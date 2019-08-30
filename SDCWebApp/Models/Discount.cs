@@ -53,8 +53,9 @@ namespace SDCWebApp.Models
         // override object.GetHashCode
         public override int GetHashCode()
         {
-            return base.GetHashCode();
-            //return Type.GetHashCode() + Description?.GetHashCode() + DiscountValueInPercentage.GetHashCode() + (GroupSizeForDiscount.HasValue ? GroupSizeForDiscount.Value.GetHashCode() : 0);
+            if (Description is null | GroupSizeForDiscount is null)
+                return base.GetHashCode();
+            return Type.GetHashCode() + Description.GetHashCode() + DiscountValueInPercentage.GetHashCode() + GroupSizeForDiscount.Value.GetHashCode();
         }
     }   
 }

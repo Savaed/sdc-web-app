@@ -76,5 +76,9 @@ namespace SDCWebApp.Services
         /// <exception cref="InternalDbServiceException">The table with <see cref="Discount"/> entities does not exist or it is null or 
         /// cannot save properly any changes made by add operation.</exception>
         Task<Discount> AddAsync(Discount discount);
+
+        Task<Discount> RestrictedUpdateAsync(Discount discount);
+
+        Task<Discount> RestrictedAddAsync(Discount discount);
     }
 }
