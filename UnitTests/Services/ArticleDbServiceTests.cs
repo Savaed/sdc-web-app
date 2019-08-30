@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using UnitTests.Helpers;
@@ -21,6 +22,11 @@ namespace UnitTests.Services
     [TestFixture]
     public class ArticleDbServiceTests
     {
+        private static Article[] _articleForRestrictedUpdateCases = new Article[]
+        {
+            new Article{ ConcurrencyToken = Encoding.ASCII.GetBytes("Updated ConcurrencyToken") },    // Attempt to change 'ConcurrencyToken' which is read-only property.
+            new Article{ UpdatedAt = DateTime.Now.AddYears(100) }                                     // Attempt to change 'UpdatedAt' which is read-only property.
+        };
         private Mock<ApplicationDbContext> _dbContextMock;
         private ILogger<ArticleDbService> _logger;
         private readonly Article _validArticle = new Article
@@ -384,6 +390,166 @@ namespace UnitTests.Services
 
         #endregion
 
+        #region RestrictedAddAsync(Article Article)
+        // zasob nie istnieje -> exc z msg
+        // zasob jest nullem -> null ref exc
+        // problem z zapisaniem zmian -> inter | Nie mam pojecia jak to przetestowac xD
+        // arg jest nullem -> arg null exc
+        // istnieje w zasobie taki sam element jak ten, ktory chcemy dodac (takie samo id, wartosci ) -> invalid oper exc
+        // dodawanie sie udalo -> zwraca dodany bilet
+        // dodawanie sie udalo -> zasob jest wiekszy o jeden
+        // dodawanie sie udalo -> istnieje w zasobie dodany bilet
+        // proba doda
+
+        [Test]
+        public async Task RestrictedAddAsync__Resource_is_null__Should_throw_InternalDbServiceException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.Articles = null as DbSet<Article>;
+                    var service = new ArticleDbService(context, _logger);
+
+                    Func<Task> action = async () => await service.RestrictedAddAsync(_validArticle);
+
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource reference is set to null.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedAddAsync__Resource_doesnt_exist__Should_throw_InternalDbServiceException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    // Drop Articles table.
+                    context.Database.ExecuteSqlCommand("DROP TABLE [Articles]");
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new ArticleDbService(context, _logger);
+
+                    Func<Task> action = async () => await service.RestrictedAddAsync(_validArticle);
+
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of Article. " +
+                        "NOTE Excaption actually is type of 'SqLiteError' only if database provider is SQLite.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedAddAsync__Argument_is_null__Should_throw_ArgumentNullException()
+        {
+            var service = new ArticleDbService(_dbContextMock.Object, _logger);
+
+            Func<Task> result = async () => await service.RestrictedAddAsync(null as Article);
+
+            await result.Should().ThrowExactlyAsync<ArgumentNullException>("Because argument 'article' is null.");
+        }
+
+
+        [Test]
+        public async Task RestrictedAddAsync__In_resource_exists_article_with_the_same_id_as_this_one_to_be_added__Should_throw_InvalidOperationException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.Articles.Add(_validArticle);
+                    await context.SaveChangesAsync();
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    _validArticle.Title = "changed title";
+                    var service = new ArticleDbService(context, _logger);
+
+                    Func<Task> result = async () => await service.RestrictedAddAsync(_validArticle);
+
+                    await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because in resource exists the same Article as this one to be added.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedAddAsync__Attempt_to_add_entity_with_the_same_values_as_existing_one_but_with_different_id__Should_throw_InvalidOperationException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.Articles.Add(_validArticle);
+                    await context.SaveChangesAsync();
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    _validArticle.Id += "_changed_id";
+                    var service = new ArticleDbService(context, _logger);
+
+                    Func<Task> result = async () => await service.RestrictedAddAsync(_validArticle);
+
+                    await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because this method DOES NOT allow to add a new entity with the same properties value (Title, Text, Author) " +
+                        "but different 'Id'. It is intentional behaviour.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedAddAsync__Add_successful__Should_return_added_article()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new ArticleDbService(context, _logger);
+
+                    var result = await service.RestrictedAddAsync(_validArticle);
+
+                    result.Should().BeEquivalentTo(_validArticle);
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedAddAsync__Add_successful__Resource_length_should_be_greater_by_1()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    int expectedLength = context.Articles.Count() + 1;
+                    var service = new ArticleDbService(context, _logger);
+
+                    await service.RestrictedAddAsync(_validArticle);
+
+                    context.Articles.Count().Should().Be(expectedLength);
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedAddAsync__Add_successful__Resource_contains_added_article()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new ArticleDbService(context, _logger);
+
+                    await service.RestrictedAddAsync(_validArticle);
+
+                    context.Articles.Contains(_validArticle).Should().BeTrue();
+                }
+            }
+        }
+
+        #endregion
+
 
         #region UpdateAsync(Article tariff)
         // arg jest nullem -> arg null exc
@@ -666,6 +832,302 @@ namespace UnitTests.Services
             }
         }
 
+        #endregion
+
+
+        #region RestrictedUpdateAsync(Article article)
+        // wszystko co w normalnym update
+        // proba zmian readonly properties -> metoda niczego nie zmieni i zaloguje warny
+
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Resource_is_null__Should_throw_InternalDbServiceException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.Articles = null as DbSet<Article>;
+                    var service = new ArticleDbService(context, _logger);
+
+                    Func<Task> action = async () => await service.RestrictedUpdateAsync(_validArticle);
+
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource reference is set to null");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Resource_doesnt_exist__Should_throw_InternalDbServiceException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    // Drop Articles table.
+                    context.Database.ExecuteSqlCommand("DROP TABLE [Articles]");
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new ArticleDbService(context, _logger);
+
+                    Func<Task> action = async () => await service.RestrictedUpdateAsync(_validArticle);
+
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of Article. " +
+                        "NOTE Excaption actually is type of 'SqLiteError' only if database provider is SQLite.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Argument_is_null__Should_throw_ArgumentNullException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new ArticleDbService(context, _logger);
+
+                    Func<Task> result = async () => await service.RestrictedUpdateAsync(null as Article);
+
+                    await result.Should().ThrowExactlyAsync<ArgumentNullException>("Because argument 'Article' cannot be null.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Argument_has_null_or_empty_id__Should_throw_ArgumentException([Values(null, "")] string id)
+        {
+            var invalidArticle = new Article { Id = id };
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new ArticleDbService(context, _logger);
+
+                    Func<Task> result = async () => await service.RestrictedUpdateAsync(invalidArticle);
+
+                    await result.Should().ThrowExactlyAsync<ArgumentException>("Because argument 'Article' has null or empty id which is invalid.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Resource_is_empty__Should_throw_InvalidOperationException()
+        {
+            Article ArticleBeforUpdate;
+            Article Article;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    ArticleBeforUpdate = await context.Articles.FirstAsync();
+                    Article = ArticleBeforUpdate.Clone() as Article;
+                    context.Articles.RemoveRange(await context.Articles.ToArrayAsync());
+                    await context.SaveChangesAsync();
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    Article.Title = "Changed title.";
+                    var service = new ArticleDbService(context, _logger);
+
+                    Func<Task> result = async () => await service.RestrictedUpdateAsync(Article);
+
+                    await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because esource is empty.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Matching_Article_not_found__Should_throw_InvalidOperationException()
+        {
+            Article Article = new Article
+            {
+                Id = "0",
+                Title = "Sample title for only this test.",
+                UpdatedAt = DateTime.Now.AddHours(-3)
+            };
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new ArticleDbService(context, _logger);
+
+                    // In db does not matching Article to belowe disount.
+                    Func<Task> result = async () => await service.RestrictedUpdateAsync(Article);
+
+                    await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because matching Article not found.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Update_successful__Should_return_updated_sightseeing_tariff()
+        {
+            Article articleBeforUpdate;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    articleBeforUpdate = await context.Articles.FirstAsync();
+                    Article article = articleBeforUpdate;
+                    article.Title = "Changed name.";
+                    var service = new ArticleDbService(context, _logger);
+
+                    var result = await service.RestrictedUpdateAsync(article);
+
+                    result.Should().BeEquivalentTo(article);
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Update_successful__Resource_should_contains_updated_sightseeing_tariff()
+        {
+            Article article;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    article = await context.Articles.FirstAsync();
+                    article.Title = "Changed title.";
+                    var service = new ArticleDbService(context, _logger);
+
+                    var result = await service.RestrictedUpdateAsync(article);
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.Articles.Contains(article).Should().BeTrue();
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Update_successful__Resource_should_doesnt_contain_previous_version_of_sightseeing_tariff()
+        {
+            Article articleBeforUpdate;
+            Article article;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    article = await context.Articles.FirstAsync();
+                    articleBeforUpdate = article.Clone() as Article;
+                    article.Title = "Changed title.";
+                    var service = new ArticleDbService(context, _logger);
+
+                    var result = await service.RestrictedUpdateAsync(article);
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.Articles.Single(x => x == article).Should().NotBeSameAs(articleBeforUpdate);
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Update_successful__Resource_length_should_be_unchanged()
+        {
+            Article articleBeforUpdate;
+            Article article;
+            int expectedLength;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    articleBeforUpdate = await context.Articles.FirstAsync();
+                    article = articleBeforUpdate;
+                    article.Title = "Changed title.";
+                    var service = new ArticleDbService(context, _logger);
+                    expectedLength = await context.Articles.CountAsync();
+
+                    await service.RestrictedUpdateAsync(article);
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.Articles.Count().Should().Be(expectedLength);
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Update_successful_first_time__Updated_element_should_have_updated_at_not_set_to_MaxValue()
+        {
+            Article articleBeforUpdate;
+            Article article;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    article = await context.Articles.FirstAsync();
+                    articleBeforUpdate = article.Clone() as Article;
+                    articleBeforUpdate.UpdatedAt = DateTime.MinValue;
+                    article.Title = "Changed title";
+                    var service = new ArticleDbService(context, _logger);
+
+                    var result = await service.RestrictedUpdateAsync(article);
+
+                    ((DateTime)result.UpdatedAt).Should().NotBeSameDateAs(DateTime.MinValue);
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Update_successful_not_first_time__Updated_element_should_have_new_updated_at_date_after_previous_one()
+        {
+            Article articleBeforUpdate;
+            Article article;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    article = await context.Articles.FirstAsync();
+                    articleBeforUpdate = article.Clone() as Article;
+                    articleBeforUpdate.UpdatedAt = DateTime.UtcNow.AddMinutes(-30);
+                    article.Title = "Changed title";
+                    var service = new ArticleDbService(context, _logger);
+
+                    var result = await service.RestrictedUpdateAsync(article);
+
+                    ((DateTime)result.UpdatedAt).Should().BeAfter((DateTime)articleBeforUpdate.UpdatedAt);
+                }
+            }
+        }
+
+        [TestCaseSource(nameof(_articleForRestrictedUpdateCases))]
+        public async Task RestrictedUpdateAsync__Attempt_to_update_readonly_properties__These_changes_will_be_ignored(Article updatedArticleCase)
+        {
+            // In fact, any read-only property changes will be ignored and no exception will be thrown, but the method will log any of these changes as warning.
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var articleBeforeUpdate = await context.Articles.FirstAsync();
+                    updatedArticleCase.Id = articleBeforeUpdate.Id;
+                    var service = new ArticleDbService(context, _logger);
+
+                    var result = await service.RestrictedUpdateAsync(updatedArticleCase);
+
+                    // Those properties should be unchanged since they are readonly.
+                    result.CreatedAt.Should().BeSameDateAs(articleBeforeUpdate.CreatedAt);
+                    result.ConcurrencyToken.Should().BeSameAs(articleBeforeUpdate.ConcurrencyToken);
+                }
+            }
+        }
         #endregion
 
 

@@ -131,7 +131,7 @@ namespace UnitTests.Services
         }
 
         [Test]
-        public async Task GetAsync__Discount_found__Should_return_this_Discount()
+        public async Task GetAsync__Discount_found__Should_return_this_discount()
         {
             Discount expectedDiscount;
 
@@ -147,6 +147,7 @@ namespace UnitTests.Services
                     var service = new DiscountDbService(context, _logger);
 
                     var result = await service.GetAsync(expectedDiscount.Id);
+
                     result.Should().BeEquivalentTo(expectedDiscount);
                 }
             }

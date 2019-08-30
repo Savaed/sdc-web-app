@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace SDCWebApp.Models
 {
-    public class Discount : BasicEntity, ICloneable
+    public class Discount : BasicEntity, ICloneable, IEquatable<Discount>
     {
         public enum DiscountType
         {
@@ -31,30 +31,30 @@ namespace SDCWebApp.Models
             return MemberwiseClone();
         }
 
-        public override bool Equals(object obj)
+        public bool Equals(Discount discount)
         {
-            if (obj == null || GetType() != obj.GetType())
+            if (discount is null || GetType() != discount.GetType())
             {
                 return false;
             }
 
-            string[] uniqueProperties = new string[] { "Description" };
-            var properties = GetType().GetProperties();
+            if (ReferenceEquals(this, discount))
+                return true;
 
-            foreach (var property in properties)
-            {
-                if (uniqueProperties.Any(x => x.Equals(property.Name)))
-                {
-                    return property.GetValue(this) == property.GetValue(obj);
-                }
-            }
-
-            return base.Equals(obj);
+            return Type == discount.Type && Description == discount.Description && DiscountValueInPercentage == discount.DiscountValueInPercentage && 
+                   (GroupSizeForDiscount is null ? false : GroupSizeForDiscount == discount.GroupSizeForDiscount);
         }
 
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as Discount);
+        }
+
+        // override object.GetHashCode
         public override int GetHashCode()
         {
-            return Description.GetHashCode();
+            return base.GetHashCode();
+            //return Type.GetHashCode() + Description?.GetHashCode() + DiscountValueInPercentage.GetHashCode() + (GroupSizeForDiscount.HasValue ? GroupSizeForDiscount.Value.GetHashCode() : 0);
         }
     }   
 }

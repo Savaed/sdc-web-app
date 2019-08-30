@@ -9,12 +9,16 @@ namespace SDCWebApp.Models
         public string Name { get; set; }
         public virtual ICollection<TicketTariff> TicketTariffs { get; set; }
 
+
         public object Clone()
         {
             return MemberwiseClone();
+        }                      
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as SightseeingTariff);
         }
-
-
 
         public bool Equals(SightseeingTariff tariff)
         {
@@ -37,11 +41,6 @@ namespace SDCWebApp.Models
             }
 
             return Name == tariff.Name;
-        }
-
-        public override bool Equals(object obj)
-        {
-            return Equals(obj as SightseeingTariff);
         }
 
         public override int GetHashCode()
