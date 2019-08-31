@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using UnitTests.Helpers;
@@ -21,6 +22,11 @@ namespace UnitTests.Services
     [TestFixture]
     public class TicketTariffDbServiceTest
     {
+        private static TicketTariff[] _tariffForRestrictedUpdateCases = new TicketTariff[]
+        {
+            new TicketTariff { ConcurrencyToken = Encoding.ASCII.GetBytes("Updated ConcurrencyToken") },    // Attempt to change 'ConcurrencyToken' which is read-only property.
+            new TicketTariff { UpdatedAt = DateTime.Now.AddYears(100) }                                     // Attempt to change 'UpdatedAt' which is read-only property.
+        };
         private Mock<ApplicationDbContext> _dbContextMock;
         private ILogger<TicketTariffDbService> _logger;
         private readonly TicketTariff _validTariff = new TicketTariff
@@ -384,6 +390,167 @@ namespace UnitTests.Services
         #endregion
 
 
+        #region RestrictedAddAsync(TicketTariff TicketTariff)
+        // zasob nie istnieje -> exc z msg
+        // zasob jest nullem -> null ref exc
+        // problem z zapisaniem zmian -> inter | Nie mam pojecia jak to przetestowac xD
+        // arg jest nullem -> arg null exc
+        // istnieje w zasobie taki sam element jak ten, ktory chcemy dodac (takie samo id, wartosci ) -> invalid oper exc
+        // dodawanie sie udalo -> zwraca dodany bilet
+        // dodawanie sie udalo -> zasob jest wiekszy o jeden
+        // dodawanie sie udalo -> istnieje w zasobie dodany bilet
+        // proba doda
+
+        [Test]
+        public async Task RestrictedAddAsync__Resource_is_null__Should_throw_InternalDbServiceException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.TicketTariffs = null as DbSet<TicketTariff>;
+                    var service = new TicketTariffDbService(context, _logger);
+
+                    Func<Task> action = async () => await service.RestrictedAddAsync(_validTariff);
+
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource reference is set to null");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedAddAsync__Resource_doesnt_exist__Should_throw_InternalDbServiceException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    // Drop TicketTariffs table.
+                    context.Database.ExecuteSqlCommand("DROP TABLE [TicketTariffs]");
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new TicketTariffDbService(context, _logger);
+
+                    Func<Task> action = async () => await service.RestrictedAddAsync(_validTariff);
+
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of TicketTariff. " +
+                        "NOTE Excaption actually is type of 'SqLiteError' only if database provider is SQLite.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedAddAsync__Argument_is_null__Should_throw_ArgumentNullException()
+        {
+            var service = new TicketTariffDbService(_dbContextMock.Object, _logger);
+
+            Func<Task> result = async () => await service.RestrictedAddAsync(null as TicketTariff);
+
+            await result.Should().ThrowExactlyAsync<ArgumentNullException>("Because argument 'TicketTariff' is null.");
+        }
+
+
+        [Test]
+        public async Task RestrictedAddAsync__In_resource_exists_sightseeing_tariff_with_the_same_id_as_this_one_to_be_added__Should_throw_InvalidOperationException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.TicketTariffs.Add(_validTariff);
+                    await context.SaveChangesAsync();
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    _validTariff.Description = "changed description";
+                    var service = new TicketTariffDbService(context, _logger);
+
+                    Func<Task> result = async () => await service.RestrictedAddAsync(_validTariff);
+
+                    await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because in resource exists the same TicketTariff as this one to be added.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedAddAsync__Attempt_to_add_entity_with_the_same_description_as_existing_one_but_wit_different_id__Should_throw_InvalidOperationException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.TicketTariffs.Add(_validTariff);
+                    await context.SaveChangesAsync();
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    _validTariff.Id += "_changed_id";
+                    var service = new TicketTariffDbService(context, _logger);
+
+                    Func<Task> result = async () => await service.RestrictedAddAsync(_validTariff);
+
+                    await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because this method DOES NOT allow to add a new entity with the same properties value (Description) " +
+                        "but different 'Id'. It is intentional behaviour.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedAddAsync__Add_successful__Should_return_added_sightseeing_tariff()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new TicketTariffDbService(context, _logger);
+
+                    var result = await service.RestrictedAddAsync(_validTariff);
+
+                    result.Should().BeEquivalentTo(_validTariff);
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedAddAsync__Add_successful__Resource_length_should_be_greater_by_1()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    int expectedLength = context.TicketTariffs.Count() + 1;
+                    var service = new TicketTariffDbService(context, _logger);
+
+                    await service.RestrictedAddAsync(_validTariff);
+
+                    context.TicketTariffs.Count().Should().Be(expectedLength);
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedAddAsync__Add_successful__Resource_contains_added_sightseeing_tariff()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new TicketTariffDbService(context, _logger);
+
+                    await service.RestrictedAddAsync(_validTariff);
+
+                    context.TicketTariffs.Contains(_validTariff).Should().BeTrue();
+                }
+            }
+        }
+
+        #endregion
+
+
         #region UpdateAsync(TicketTariff tariff)
         // arg jest nullem -> arg null exc
         // arg ma id ktore jest nullem albo pusty -> arg exc   
@@ -664,6 +831,302 @@ namespace UnitTests.Services
             }
         }
 
+        #endregion
+
+
+        #region RestrictedUpdateAsync(TicketTariff tariff)
+        // wszystko co w normalnym update
+        // proba zmian readonly properties -> metoda niczego nie zmieni i zaloguje warny
+
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Resource_is_null__Should_throw_InternalDbServiceException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.TicketTariffs = null as DbSet<TicketTariff>;
+                    var service = new TicketTariffDbService(context, _logger);
+
+                    Func<Task> action = async () => await service.RestrictedUpdateAsync(_validTariff);
+
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource reference is set to null");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Resource_doesnt_exist__Should_throw_InternalDbServiceException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    // Drop TicketTariffs table.
+                    context.Database.ExecuteSqlCommand("DROP TABLE [TicketTariffs]");
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new TicketTariffDbService(context, _logger);
+
+                    Func<Task> action = async () => await service.RestrictedUpdateAsync(_validTariff);
+
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of TicketTariff. " +
+                        "NOTE Excaption actually is type of 'SqLiteError' only if database provider is SQLite.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Argument_is_null__Should_throw_ArgumentNullException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new TicketTariffDbService(context, _logger);
+
+                    Func<Task> result = async () => await service.RestrictedUpdateAsync(null as TicketTariff);
+
+                    await result.Should().ThrowExactlyAsync<ArgumentNullException>("Because argument 'TicketTariff' cannot be null.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Argument_has_null_or_empty_id__Should_throw_ArgumentException([Values(null, "")] string id)
+        {
+            var invalidTicketTariff = new TicketTariff { Id = id };
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new TicketTariffDbService(context, _logger);
+
+                    Func<Task> result = async () => await service.RestrictedUpdateAsync(invalidTicketTariff);
+
+                    await result.Should().ThrowExactlyAsync<ArgumentException>("Because argument 'TicketTariff' has null or empty id which is invalid.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Resource_is_empty__Should_throw_InvalidOperationException()
+        {
+            TicketTariff ticketTariffBeforUpdate;
+            TicketTariff ticketTariff;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    ticketTariffBeforUpdate = await context.TicketTariffs.FirstAsync();
+                    ticketTariff = ticketTariffBeforUpdate.Clone() as TicketTariff;
+                    context.TicketTariffs.RemoveRange(await context.TicketTariffs.ToArrayAsync());
+                    await context.SaveChangesAsync();
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    ticketTariff.Description = "Changed description.";
+                    var service = new TicketTariffDbService(context, _logger);
+
+                    Func<Task> result = async () => await service.RestrictedUpdateAsync(ticketTariff);
+
+                    await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because esource is empty.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Matching_TicketTariff_not_found__Should_throw_InvalidOperationException()
+        {
+            TicketTariff TicketTariff = new TicketTariff
+            {
+                Id = "0",
+                Description = "description.",
+                UpdatedAt = DateTime.Now.AddHours(-3)
+            };
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new TicketTariffDbService(context, _logger);
+
+                    // In db does not matching TicketTariff to belowe disount.
+                    Func<Task> result = async () => await service.RestrictedUpdateAsync(TicketTariff);
+
+                    await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because matching TicketTariff not found.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Update_successful__Should_return_updated_sightseeing_tariff()
+        {
+            TicketTariff ticketTariffBeforUpdate;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    ticketTariffBeforUpdate = await context.TicketTariffs.FirstAsync();
+                    TicketTariff ticketTariff = ticketTariffBeforUpdate;
+                    ticketTariff.Description = "Changed description.";
+                    var service = new TicketTariffDbService(context, _logger);
+
+                    var result = await service.RestrictedUpdateAsync(ticketTariff);
+
+                    result.Should().BeEquivalentTo(ticketTariff);
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Update_successful__Resource_should_contains_updated_sightseeing_tariff()
+        {
+            TicketTariff ticketTariff;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    ticketTariff = await context.TicketTariffs.FirstAsync();
+                    ticketTariff.Description = "Changed description.";
+                    var service = new TicketTariffDbService(context, _logger);
+
+                    var result = await service.RestrictedUpdateAsync(ticketTariff);
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.TicketTariffs.Contains(ticketTariff).Should().BeTrue();
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Update_successful__Resource_should_doesnt_contain_previous_version_of_sightseeing_tariff()
+        {
+            TicketTariff ticketTariffBeforUpdate;
+            TicketTariff ticketTariff;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    ticketTariff = await context.TicketTariffs.FirstAsync();
+                    ticketTariffBeforUpdate = ticketTariff.Clone() as TicketTariff;
+                    ticketTariff.Description = "Changed description.";
+                    var service = new TicketTariffDbService(context, _logger);
+
+                    var result = await service.RestrictedUpdateAsync(ticketTariff);
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.TicketTariffs.Single(x => x == ticketTariff).Should().NotBeSameAs(ticketTariffBeforUpdate);
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Update_successful__Resource_length_should_be_unchanged()
+        {
+            TicketTariff ticketTariffBeforUpdate;
+            TicketTariff ticketTariff;
+            int expectedLength;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    ticketTariffBeforUpdate = await context.TicketTariffs.FirstAsync();
+                    ticketTariff = ticketTariffBeforUpdate;
+                    ticketTariff.Description = "Changed description.";
+                    var service = new TicketTariffDbService(context, _logger);
+                    expectedLength = await context.TicketTariffs.CountAsync();
+
+                    await service.RestrictedUpdateAsync(ticketTariff);
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.TicketTariffs.Count().Should().Be(expectedLength);
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Update_successful_first_time__Updated_element_should_have_updated_at_not_set_to_MaxValue()
+        {
+            TicketTariff ticketTariffBeforUpdate;
+            TicketTariff ticketTariff;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    ticketTariff = await context.TicketTariffs.FirstAsync();
+                    ticketTariffBeforUpdate = ticketTariff.Clone() as TicketTariff;
+                    ticketTariffBeforUpdate.UpdatedAt = DateTime.MinValue;
+                    ticketTariff.Description = "Changed description.";
+                    var service = new TicketTariffDbService(context, _logger);
+
+                    var result = await service.RestrictedUpdateAsync(ticketTariff);
+
+                    ((DateTime)result.UpdatedAt).Should().NotBeSameDateAs(DateTime.MinValue);
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Update_successful_not_first_time__Updated_element_should_have_new_updated_at_date_after_previous_one()
+        {
+            TicketTariff ticketTariffBeforUpdate;
+            TicketTariff ticketTariff;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    ticketTariff = await context.TicketTariffs.FirstAsync();
+                    ticketTariffBeforUpdate = ticketTariff.Clone() as TicketTariff;
+                    ticketTariffBeforUpdate.UpdatedAt = DateTime.UtcNow.AddMinutes(-30);
+                    ticketTariff.Description = "Changed description.";
+                    var service = new TicketTariffDbService(context, _logger);
+
+                    var result = await service.RestrictedUpdateAsync(ticketTariff);
+
+                    ((DateTime)result.UpdatedAt).Should().BeAfter((DateTime)ticketTariffBeforUpdate.UpdatedAt);
+                }
+            }
+        }
+
+        [TestCaseSource(nameof(_tariffForRestrictedUpdateCases))]
+        public async Task RestrictedUpdateAsync__Attempt_to_update_readonly_properties__These_changes_will_be_ignored(TicketTariff updatedTariffCase)
+        {
+            // In fact, any read-only property changes will be ignored and no exception will be thrown, but the method will log any of these changes as warning.
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var tariffBeforeUpdate = await context.TicketTariffs.FirstAsync();
+                    updatedTariffCase.Id = tariffBeforeUpdate.Id;
+                    var service = new TicketTariffDbService(context, _logger);
+
+                    var result = await service.RestrictedUpdateAsync(updatedTariffCase);
+
+                    // Those properties should be unchanged since they are readonly.
+                    result.CreatedAt.Should().BeSameDateAs(tariffBeforeUpdate.CreatedAt);
+                    result.ConcurrencyToken.Should().BeSameAs(tariffBeforeUpdate.ConcurrencyToken);
+                }
+            }
+        }
         #endregion
 
 

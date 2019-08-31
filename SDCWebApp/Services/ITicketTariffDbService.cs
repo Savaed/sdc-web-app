@@ -76,5 +76,12 @@ namespace SDCWebApp.Services
         /// <exception cref="InternalDbServiceException">The table with <see cref="TicketTariff"/> entities does not exist or it is null or 
         /// cannot save properly any changes made by add operation.</exception>
         Task<TicketTariff> AddAsync(TicketTariff tariff);
+
+
+        Task<TicketTariff> RestrictedAddAsync(TicketTariff tariff);
+
+
+        Task<TicketTariff> RestrictedUpdateAsync(TicketTariff tariff);
+
     }
 }

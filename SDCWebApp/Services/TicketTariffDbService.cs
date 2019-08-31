@@ -13,13 +13,13 @@ namespace SDCWebApp.Services
     /// <summary>
     /// Provides methods for get, add, update and delete operations for <see cref="TicketTariff"/> entities in the database.
     /// </summary>
-    public class TicketTariffDbService : ITicketTariffDbService
+    public class TicketTariffDbService : ServiceBase, ITicketTariffDbService
     {
         private readonly ILogger<TicketTariffDbService> _logger;
         private readonly ApplicationDbContext _context;
 
 
-        public TicketTariffDbService(ApplicationDbContext context, ILogger<TicketTariffDbService> logger)
+        public TicketTariffDbService(ApplicationDbContext context, ILogger<TicketTariffDbService> logger) : base(context, logger)
         {
             _logger = logger;
             _context = context;
@@ -318,12 +318,107 @@ namespace SDCWebApp.Services
         }
 
 
+
+        public async Task<TicketTariff> RestrictedAddAsync(TicketTariff tariff)
+        {
+            _logger.LogInformation($"Starting method '{nameof(RestrictedAddAsync)}'.");
+
+            if (tariff is null)
+                throw new ArgumentNullException($"Argument '{nameof(tariff)}' cannot be null.");
+
+            await EnsureDatabaseCreatedAsync();
+            _ = _context?.TicketTariffs ?? throw new InternalDbServiceException($"Table of type '{typeof(TicketTariff).Name}' is null.");
+
+            try
+            {
+                // Check if exist in db tariff with the same 'Name' as adding.
+                if (await IsEntityAlreadyExistsAsync(tariff))
+                    throw new InvalidOperationException($"There is already the same element in the database as the one to be added. The value of '{nameof(tariff)}' is not unique.");
+
+                _logger.LogDebug($"Starting add tariff with id '{tariff.Id}'.");
+                var addedTariff = _context.TicketTariffs.Add(tariff).Entity;
+                await _context.TrySaveChangesAsync();
+                _logger.LogDebug("Add data succeeded.");
+                _logger.LogInformation($"Finished method '{nameof(AddAsync)}'.");
+                return addedTariff;
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError($"{ex.GetType().Name} Changes made by add operations cannot be saved properly. See inner exception. Operation failed.", ex);
+                var internalException = new InternalDbServiceException("Changes made by add operations cannot be saved properly. See inner exception for more details.", ex);
+                throw internalException;
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogError($"{ex.GetType().Name} There is already the same element in the database as the one to be added. The value of '{nameof(tariff)}' is not unique.", ex);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
+                var internalException = new InternalDbServiceException($"Encountered problem when adding sighseeing tarifff with id '{tariff?.Id}' to the database. See inner excpetion for more details.", ex);
+                throw internalException;
+            }
+        }
+
+
+
+        public async Task<TicketTariff> RestrictedUpdateAsync(TicketTariff tariff)
+        {
+
+            _logger.LogInformation($"Starting method '{nameof(UpdateAsync)}'.");
+
+            _ = tariff ?? throw new ArgumentNullException(nameof(tariff), $"Argument '{nameof(tariff)}' cannot be null.");
+
+            if (string.IsNullOrEmpty(tariff.Id))
+                throw new ArgumentException($"Argument '{nameof(tariff.Id)}' cannot be null or empty.");
+
+            await EnsureDatabaseCreatedAsync();
+            _ = _context?.TicketTariffs ?? throw new InternalDbServiceException($"Table of type '{typeof(TicketTariff).Name}' is null.");
+
+            try
+            {
+                if (_context.TicketTariffs.Count() == 0)
+                    throw new InvalidOperationException($"Cannot found element with id '{tariff.Id}' for update. Resource {_context.Groups.GetType().Name} does not contain any element.");
+
+                if (await _context.TicketTariffs.ContainsAsync(tariff) == false)
+                    throw new InvalidOperationException($"Cannot found element with id '{tariff.Id}' for update. Any element does not match to the one to be updated.");
+
+                _logger.LogDebug($"Starting update tariff with id '{tariff.Id}'.");
+                var originalTariff = await _context.TicketTariffs.SingleAsync(x => x.Id.Equals(tariff.Id));
+                var updatedTariff = RestrictedUpdate(originalTariff, tariff) as TicketTariff;
+                await _context.TrySaveChangesAsync();
+                _logger.LogDebug($"Update data succeeded.");
+                _logger.LogInformation($"Finished method '{nameof(UpdateAsync)}'.");
+                return updatedTariff;
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogError(ex, $"{ex.GetType().Name} Cannot found element for update. See exception for more details. Operation failed.");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
+                var internalException = new InternalDbServiceException($"Encountered problem when updating sighseeing tariff with id '{tariff.Id}'. See inner excpetion for more details.", ex);
+                throw internalException;
+            }
+        }
+
+
         #region Privates      
 
         private async Task EnsureDatabaseCreatedAsync()
         {
             if (await _context.Database.EnsureCreatedAsync() == false)
                 _logger.LogWarning($"Database with provider '{_context.Database.ProviderName}' does not exist. It Will be created but not using migrations so it cannot be updating using migrations later.");
+        }
+
+        protected override async Task<bool> IsEntityAlreadyExistsAsync(BasicEntity entity)
+        {
+            var allTariffs = await _context.TicketTariffs.ToArrayAsync();
+            return allTariffs.Any(x => x.Equals(entity as TicketTariff));
+
         }
 
         #endregion
