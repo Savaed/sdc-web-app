@@ -900,6 +900,7 @@ namespace UnitTests.Services
 
         #endregion
 
+
         #region RestrictedUpdateAsync(SightseeingTariff tariff)
         // wszystko co w normalnym update
         // proba zmian readonly properties -> metoda niczego nie zmieni i zaloguje warny

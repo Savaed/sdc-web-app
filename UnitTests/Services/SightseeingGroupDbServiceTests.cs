@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using UnitTests.Helpers;
@@ -21,6 +22,11 @@ namespace UnitTests.Services
     [TestFixture]
     public class SightseeingGroupDbServiceTest
     {
+        private static SightseeingGroup[] _groupForRestrictedUpdateCases = new SightseeingGroup[]
+        {
+            new SightseeingGroup { ConcurrencyToken = Encoding.ASCII.GetBytes("Updated ConcurrencyToken") },    // Attempt to change 'ConcurrencyToken' which is read-only property.
+            new SightseeingGroup { UpdatedAt = DateTime.Now.AddYears(100) }                                     // Attempt to change 'UpdatedAt' which is read-only property.
+        };
         private Mock<ApplicationDbContext> _dbContextMock;
         private ILogger<SightseeingGroupDbService> _logger;
         SightseeingGroup _validGroup = new SightseeingGroup
@@ -426,7 +432,7 @@ namespace UnitTests.Services
         #endregion
 
 
-        #region UpdateSightseeingGroupAsync(SightseeingGroup group)
+        #region UpdateAsync(SightseeingGroup group)
         // arg jest nullem -> arg null exc
         // arg ma id ktore jest nullem albo pusty -> arg exc   
         // zasob jest nullem -> inter exc
@@ -703,6 +709,463 @@ namespace UnitTests.Services
                     var result = await service.UpdateAsync(sightseeingGroup);
 
                     ((DateTime)result.UpdatedAt).Should().BeAfter((DateTime)sightseeingGroupBeforUpdate.UpdatedAt);
+                }
+            }
+        }
+
+        #endregion
+
+
+        #region RestrictedUpdateAsync(SightseeingGroup tariff)
+        // wszystko co w normalnym update
+        // proba zmian readonly properties -> metoda niczego nie zmieni i zaloguje warny
+
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Resource_is_null__Should_throw_InternalDbServiceException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.Groups = null as DbSet<SightseeingGroup>;
+                    var service = new SightseeingGroupDbService(context, _logger);
+
+                    Func<Task> action = async () => await service.RestrictedUpdateAsync(_validGroup);
+
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource reference is set to null");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Resource_doesnt_exist__Should_throw_InternalDbServiceException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    // Drop Groups table.
+                    context.Database.ExecuteSqlCommand("DROP TABLE [Groups]");
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new SightseeingGroupDbService(context, _logger);
+
+                    Func<Task> action = async () => await service.RestrictedUpdateAsync(_validGroup);
+
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of SightseeingGroup. " +
+                        "NOTE Excaption actually is type of 'SqLiteError' only if database provider is SQLite.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Argument_is_null__Should_throw_ArgumentNullException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new SightseeingGroupDbService(context, _logger);
+
+                    Func<Task> result = async () => await service.RestrictedUpdateAsync(null as SightseeingGroup);
+
+                    await result.Should().ThrowExactlyAsync<ArgumentNullException>("Because argument 'SightseeingGroup' cannot be null.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Argument_has_null_or_empty_id__Should_throw_ArgumentException([Values(null, "")] string id)
+        {
+            var invalidSightseeingGroup = new SightseeingGroup { Id = id };
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new SightseeingGroupDbService(context, _logger);
+
+                    Func<Task> result = async () => await service.RestrictedUpdateAsync(invalidSightseeingGroup);
+
+                    await result.Should().ThrowExactlyAsync<ArgumentException>("Because argument 'SightseeingGroup' has null or empty id which is invalid.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Resource_is_empty__Should_throw_InvalidOperationException()
+        {
+            SightseeingGroup sightseeingGroupBeforUpdate;
+            SightseeingGroup sightseeingGroup;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    sightseeingGroupBeforUpdate = await context.Groups.FirstAsync();
+                    sightseeingGroup = sightseeingGroupBeforUpdate.Clone() as SightseeingGroup;
+                    context.Groups.RemoveRange(await context.Groups.ToArrayAsync());
+                    await context.SaveChangesAsync();
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    sightseeingGroup.MaxGroupSize += 1;
+                    var service = new SightseeingGroupDbService(context, _logger);
+
+                    Func<Task> result = async () => await service.RestrictedUpdateAsync(sightseeingGroup);
+
+                    await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because esource is empty.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Matching_SightseeingGroup_not_found__Should_throw_InvalidOperationException()
+        {
+            SightseeingGroup SightseeingGroup = new SightseeingGroup
+            {
+                Id = "0",
+                MaxGroupSize = 30,
+                UpdatedAt = DateTime.Now.AddHours(-3)
+            };
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new SightseeingGroupDbService(context, _logger);
+
+                    // In db does not matching SightseeingGroup to belowe disount.
+                    Func<Task> result = async () => await service.RestrictedUpdateAsync(SightseeingGroup);
+
+                    await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because matching SightseeingGroup not found.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Update_successful__Should_return_updated_sightseeing_tariff()
+        {
+            SightseeingGroup sightseeingGroupBeforUpdate;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    sightseeingGroupBeforUpdate = await context.Groups.FirstAsync();
+                    SightseeingGroup sightseeingGroup = sightseeingGroupBeforUpdate;
+                    sightseeingGroup.MaxGroupSize += 1;
+                    var service = new SightseeingGroupDbService(context, _logger);
+
+                    var result = await service.RestrictedUpdateAsync(sightseeingGroup);
+
+                    result.Should().BeEquivalentTo(sightseeingGroup);
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Update_successful__Resource_should_contains_updated_sightseeing_tariff()
+        {
+            SightseeingGroup sightseeingGroup;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    sightseeingGroup = await context.Groups.FirstAsync();
+                    sightseeingGroup.MaxGroupSize += 1;
+                    var service = new SightseeingGroupDbService(context, _logger);
+
+                    var result = await service.RestrictedUpdateAsync(sightseeingGroup);
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.Groups.Contains(sightseeingGroup).Should().BeTrue();
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Update_successful__Resource_should_doesnt_contain_previous_version_of_sightseeing_tariff()
+        {
+            SightseeingGroup sightseeingGroupBeforUpdate;
+            SightseeingGroup sightseeingGroup;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    sightseeingGroup = await context.Groups.FirstAsync();
+                    sightseeingGroupBeforUpdate = sightseeingGroup.Clone() as SightseeingGroup;
+                    sightseeingGroup.MaxGroupSize += 1;
+                    var service = new SightseeingGroupDbService(context, _logger);
+
+                    var result = await service.RestrictedUpdateAsync(sightseeingGroup);
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.Groups.Single(x => x == sightseeingGroup).Should().NotBeSameAs(sightseeingGroupBeforUpdate);
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Update_successful__Resource_length_should_be_unchanged()
+        {
+            SightseeingGroup sightseeingGroupBeforUpdate;
+            SightseeingGroup sightseeingGroup;
+            int expectedLength;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    sightseeingGroupBeforUpdate = await context.Groups.FirstAsync();
+                    sightseeingGroup = sightseeingGroupBeforUpdate;
+                    sightseeingGroup.MaxGroupSize += 1;
+                    var service = new SightseeingGroupDbService(context, _logger);
+                    expectedLength = await context.Groups.CountAsync();
+
+                    await service.RestrictedUpdateAsync(sightseeingGroup);
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.Groups.Count().Should().Be(expectedLength);
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Update_successful_first_time__Updated_element_should_have_updated_at_not_set_to_MaxValue()
+        {
+            SightseeingGroup sightseeingGroupBeforUpdate;
+            SightseeingGroup sightseeingGroup;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    sightseeingGroup = await context.Groups.FirstAsync();
+                    sightseeingGroupBeforUpdate = sightseeingGroup.Clone() as SightseeingGroup;
+                    sightseeingGroupBeforUpdate.UpdatedAt = DateTime.MinValue;
+                    sightseeingGroup.MaxGroupSize += 1;
+                    var service = new SightseeingGroupDbService(context, _logger);
+
+                    var result = await service.RestrictedUpdateAsync(sightseeingGroup);
+
+                    ((DateTime)result.UpdatedAt).Should().NotBeSameDateAs(DateTime.MinValue);
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Update_successful_not_first_time__Updated_element_should_have_new_updated_at_date_after_previous_one()
+        {
+            SightseeingGroup sightseeingGroupBeforUpdate;
+            SightseeingGroup sightseeingGroup;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    sightseeingGroup = await context.Groups.FirstAsync();
+                    sightseeingGroupBeforUpdate = sightseeingGroup.Clone() as SightseeingGroup;
+                    sightseeingGroupBeforUpdate.UpdatedAt = DateTime.UtcNow.AddMinutes(-30);
+                    sightseeingGroup.MaxGroupSize += 1;
+                    var service = new SightseeingGroupDbService(context, _logger);
+
+                    var result = await service.RestrictedUpdateAsync(sightseeingGroup);
+
+                    ((DateTime)result.UpdatedAt).Should().BeAfter((DateTime)sightseeingGroupBeforUpdate.UpdatedAt);
+                }
+            }
+        }
+
+        [TestCaseSource(nameof(_groupForRestrictedUpdateCases))]
+        public async Task RestrictedUpdateAsync__Attempt_to_update_readonly_properties__These_changes_will_be_ignored(SightseeingGroup updatedTariffCase)
+        {
+            // In fact, any read-only property changes will be ignored and no exception will be thrown, but the method will log any of these changes as warning.
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var tariffBeforeUpdate = await context.Groups.FirstAsync();
+                    updatedTariffCase.Id = tariffBeforeUpdate.Id;
+                    var service = new SightseeingGroupDbService(context, _logger);
+
+                    var result = await service.RestrictedUpdateAsync(updatedTariffCase);
+
+                    // Those properties should be unchanged since they are readonly.
+                    result.CreatedAt.Should().BeSameDateAs(tariffBeforeUpdate.CreatedAt);
+                    result.ConcurrencyToken.Should().BeSameAs(tariffBeforeUpdate.ConcurrencyToken);
+                }
+            }
+        }
+        #endregion
+
+
+  #region RestrictedAddAsync(SightseeingGroup SightseeingGroup)
+        // zasob nie istnieje -> exc z msg
+        // zasob jest nullem -> null ref exc
+        // problem z zapisaniem zmian -> inter | Nie mam pojecia jak to przetestowac xD
+        // arg jest nullem -> arg null exc
+        // istnieje w zasobie taki sam element jak ten, ktory chcemy dodac (takie samo id, wartosci ) -> invalid oper exc
+        // dodawanie sie udalo -> zwraca dodany bilet
+        // dodawanie sie udalo -> zasob jest wiekszy o jeden
+        // dodawanie sie udalo -> istnieje w zasobie dodany bilet
+        // proba doda
+
+        [Test]
+        public async Task RestrictedAddAsync__Resource_is_null__Should_throw_InternalDbServiceException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.Groups = null as DbSet<SightseeingGroup>;
+                    var service = new SightseeingGroupDbService(context, _logger);
+
+                    Func<Task> action = async () => await service.RestrictedAddAsync(_validGroup);
+
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource reference is set to null");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedAddAsync__Resource_doesnt_exist__Should_throw_InternalDbServiceException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    // Drop SightseeingGroups table.
+                    context.Database.ExecuteSqlCommand("DROP TABLE [Groups]");
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new SightseeingGroupDbService(context, _logger);
+
+                    Func<Task> action = async () => await service.RestrictedAddAsync(_validGroup);
+
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of SightseeingGroup. " +
+                        "NOTE Excaption actually is type of 'SqLiteError' only if database provider is SQLite.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedAddAsync__Argument_is_null__Should_throw_ArgumentNullException()
+        {
+            var service = new SightseeingGroupDbService(_dbContextMock.Object, _logger);
+
+            Func<Task> result = async () => await service.RestrictedAddAsync(null as SightseeingGroup);
+
+            await result.Should().ThrowExactlyAsync<ArgumentNullException>("Because argument 'SightseeingGroup' is null.");
+        }
+
+
+        [Test]
+        public async Task RestrictedAddAsync__In_resource_exists_sightseeing_tariff_with_the_same_id_as_this_one_to_be_added__Should_throw_InvalidOperationException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.Groups.Add(_validGroup);
+                    await context.SaveChangesAsync();
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    _validGroup.MaxGroupSize += 1;
+                    var service = new SightseeingGroupDbService(context, _logger);
+
+                    Func<Task> result = async () => await service.RestrictedAddAsync(_validGroup);
+
+                    await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because in resource exists the same SightseeingGroup as this one to be added.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedAddAsync__Attempt_to_add_entity_with_the_same_description_as_existing_one_but_wit_different_id__Should_throw_InvalidOperationException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.Groups.Add(_validGroup);
+                    await context.SaveChangesAsync();
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    _validGroup.Id += "_changed_id";
+                    var service = new SightseeingGroupDbService(context, _logger);
+
+                    Func<Task> result = async () => await service.RestrictedAddAsync(_validGroup);
+
+                    await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because this method DOES NOT allow to add a new entity with the same properties value (Description) " +
+                        "but different 'Id'. It is intentional behaviour.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedAddAsync__Add_successful__Should_return_added_sightseeing_tariff()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new SightseeingGroupDbService(context, _logger);
+
+                    var result = await service.RestrictedAddAsync(_validGroup);
+
+                    result.Should().BeEquivalentTo(_validGroup);
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedAddAsync__Add_successful__Resource_length_should_be_greater_by_1()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    int expectedLength = context.Groups.Count() + 1;
+                    var service = new SightseeingGroupDbService(context, _logger);
+
+                    await service.RestrictedAddAsync(_validGroup);
+
+                    context.Groups.Count().Should().Be(expectedLength);
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedAddAsync__Add_successful__Resource_contains_added_sightseeing_tariff()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new SightseeingGroupDbService(context, _logger);
+
+                    await service.RestrictedAddAsync(_validGroup);
+
+                    context.Groups.Contains(_validGroup).Should().BeTrue();
                 }
             }
         }

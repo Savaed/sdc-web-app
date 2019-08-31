@@ -13,13 +13,13 @@ namespace SDCWebApp.Services
     /// <summary>
     /// Provides methods for get, add, update and delete operations for <see cref="SightseeingGroup"/> entities in the database.
     /// </summary>
-    public class SightseeingGroupDbService : ISightseeingGroupDbService
+    public class SightseeingGroupDbService : ServiceBase, ISightseeingGroupDbService
     {
         private readonly ILogger<SightseeingGroupDbService> _logger;
         private readonly ApplicationDbContext _context;
 
 
-        public SightseeingGroupDbService(ApplicationDbContext context, ILogger<SightseeingGroupDbService> logger)
+        public SightseeingGroupDbService(ApplicationDbContext context, ILogger<SightseeingGroupDbService> logger) : base(context, logger)
         {
             _logger = logger;
             _context = context;
@@ -257,6 +257,8 @@ namespace SDCWebApp.Services
             }
         }
 
+     
+
         /// <summary>
         /// Asynchronously updates <see cref="SightseeingGroup"/> entity. 
         /// Throws an exception if cannot found entity or any problem with updating occurred.
@@ -317,12 +319,105 @@ namespace SDCWebApp.Services
         }
 
 
+
+
+        public async Task<SightseeingGroup> RestrictedAddAsync(SightseeingGroup group)
+        {
+            _logger.LogInformation($"Starting method '{nameof(RestrictedAddAsync)}'.");
+
+            if (group is null)
+                throw new ArgumentNullException($"Argument '{nameof(group)}' cannot be null.");
+
+            await EnsureDatabaseCreatedAsync();
+            _ = _context?.Groups ?? throw new InternalDbServiceException($"Table of type '{typeof(SightseeingGroup).Name}' is null.");
+
+            try
+            {
+                // Check if exist in db tariff with the same 'Name' as adding.
+                if (await IsEntityAlreadyExistsAsync(group))
+                    throw new InvalidOperationException($"There is already the same element in the database as the one to be added. The value of '{nameof(group)}' is not unique.");
+
+                _logger.LogDebug($"Starting add tariff with id '{group.Id}'.");
+                var addedGroup = _context.Groups.Add(group).Entity;
+                await _context.TrySaveChangesAsync();
+                _logger.LogDebug("Add data succeeded.");
+                _logger.LogInformation($"Finished method '{nameof(RestrictedAddAsync)}'.");
+                return addedGroup;
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError($"{ex.GetType().Name} Changes made by add operations cannot be saved properly. See inner exception. Operation failed.", ex);
+                var internalException = new InternalDbServiceException("Changes made by add operations cannot be saved properly. See inner exception for more details.", ex);
+                throw internalException;
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogError($"{ex.GetType().Name} There is already the same element in the database as the one to be added. The value of '{nameof(group)}' is not unique.", ex);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
+                var internalException = new InternalDbServiceException($"Encountered problem when adding sighseeing tarifff with id '{group?.Id}' to the database. See inner excpetion for more details.", ex);
+                throw internalException;
+            }
+        }
+
+        public async Task<SightseeingGroup> RestrictedUpdateAsync(SightseeingGroup group)
+        {
+            _logger.LogInformation($"Starting method '{nameof(RestrictedUpdateAsync)}'.");
+
+            _ = group ?? throw new ArgumentNullException(nameof(group), $"Argument '{nameof(group)}' cannot be null.");
+
+            if (string.IsNullOrEmpty(group.Id))
+                throw new ArgumentException($"Argument '{nameof(group.Id)}' cannot be null or empty.");
+
+            await EnsureDatabaseCreatedAsync();
+            _ = _context?.Groups ?? throw new InternalDbServiceException($"Table of type '{typeof(SightseeingGroup).Name}' is null.");
+
+            try
+            {
+                if (_context.Groups.Count() == 0)
+                    throw new InvalidOperationException($"Cannot found element with id '{group.Id}' for update. Resource {_context.Groups.GetType().Name} does not contain any element.");
+
+                if (await _context.Groups.ContainsAsync(group) == false)
+                    throw new InvalidOperationException($"Cannot found element with id '{group.Id}' for update. Any element does not match to the one to be updated.");
+
+                _logger.LogDebug($"Starting update sightseeing groupwith id '{group.Id}'.");
+                var originalGroup = await _context.Groups.SingleAsync(x => x.Id.Equals(group.Id));
+                var updatedGroup = RestrictedUpdate(originalGroup, group) as SightseeingGroup;
+                await _context.TrySaveChangesAsync();
+                _logger.LogDebug($"Update data succeeded.");
+                _logger.LogInformation($"Finished method '{nameof(RestrictedUpdateAsync)}'.");
+                return updatedGroup;
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogError(ex, $"{ex.GetType().Name} Cannot found element for update. See exception for more details. Operation failed.");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
+                var internalException = new InternalDbServiceException($"Encountered problem when updating sighseeing group with id '{group.Id}'. See inner excpetion for more details.", ex);
+                throw internalException;
+            }
+        }
+
+
+
         #region Privates      
 
         private async Task EnsureDatabaseCreatedAsync()
         {
             if (await _context.Database.EnsureCreatedAsync() == false)
                 _logger.LogWarning($"Database with provider '{_context.Database.ProviderName}' does not exist. It Will be created but not using migrations so it cannot be updating using migrations later.");
+        }
+
+        protected override async Task<bool> IsEntityAlreadyExistsAsync(BasicEntity entity)
+        {
+            var allGroups = await _context.Groups.ToArrayAsync();
+            return allGroups.Any(x => x.Equals(entity as SightseeingGroup));
         }
 
         #endregion
