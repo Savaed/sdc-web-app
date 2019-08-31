@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using UnitTests.Helpers;
@@ -21,13 +22,18 @@ namespace UnitTests.Services
     [TestFixture]
     public class CustomerDbServiceTests
     {
+        private static Customer[] _CustomerForRestrictedUpdateCases = new Customer[]
+       {
+            new Customer { ConcurrencyToken = Encoding.ASCII.GetBytes("Updated ConcurrencyToken") },    // Attempt to change 'ConcurrencyToken' which is read-only property.
+            new Customer { UpdatedAt = DateTime.Now.AddYears(100) }                                     // Attempt to change 'UpdatedAt' which is read-only property.
+       };
         private Mock<ApplicationDbContext> _dbContextMock;
         private ILogger<CustomerDbService> _logger;
-        private readonly Customer _validTariff = new Customer
+        private readonly Customer _validCustomer = new Customer
         {
             Id = "1",
             DateOfBirth = DateTime.Now.AddYears(-20),
-            EmailAddres = "sample@mail.com",
+            EmailAddress = "sample@mail.com",
             HasFamilyCard = true,
             IsChild = false,
             IsDisabled = false,
@@ -317,7 +323,7 @@ namespace UnitTests.Services
                     context.Customers = null as DbSet<Customer>;
                     var service = new CustomerDbService(context, _logger);
 
-                    Func<Task> action = async () => await service.AddAsync(_validTariff);
+                    Func<Task> action = async () => await service.AddAsync(_validCustomer);
 
                     await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource reference is set to null");
                 }
@@ -339,7 +345,7 @@ namespace UnitTests.Services
                 {
                     var service = new CustomerDbService(context, _logger);
 
-                    Func<Task> action = async () => await service.AddAsync(_validTariff);
+                    Func<Task> action = async () => await service.AddAsync(_validCustomer);
 
                     await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of Customer. " +
                         "NOTE Excaption actually is type of 'SqLiteError' only if database provider is SQLite.");
@@ -365,7 +371,7 @@ namespace UnitTests.Services
             {
                 using (var context = await factory.CreateContextAsync())
                 {
-                    context.Customers.Add(_validTariff);
+                    context.Customers.Add(_validCustomer);
                     await context.SaveChangesAsync();
                 }
 
@@ -374,7 +380,7 @@ namespace UnitTests.Services
                     // Testing method
                     var service = new CustomerDbService(context, _logger);
 
-                    Func<Task> result = async () => await service.AddAsync(_validTariff);
+                    Func<Task> result = async () => await service.AddAsync(_validCustomer);
 
                     await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because in resource exists the same Customer as this one to be added.");
                 }
@@ -390,9 +396,9 @@ namespace UnitTests.Services
                 {
                     var service = new CustomerDbService(context, _logger);
 
-                    var result = await service.AddAsync(_validTariff);
+                    var result = await service.AddAsync(_validCustomer);
 
-                    result.Should().BeEquivalentTo(_validTariff);
+                    result.Should().BeEquivalentTo(_validCustomer);
                 }
             }
         }
@@ -407,7 +413,7 @@ namespace UnitTests.Services
                     int expectedLength = context.Customers.Count() + 1;
                     var service = new CustomerDbService(context, _logger);
 
-                    await service.AddAsync(_validTariff);
+                    await service.AddAsync(_validCustomer);
 
                     context.Customers.Count().Should().Be(expectedLength);
                 }
@@ -423,9 +429,170 @@ namespace UnitTests.Services
                 {
                     var service = new CustomerDbService(context, _logger);
 
-                    await service.AddAsync(_validTariff);
+                    await service.AddAsync(_validCustomer);
 
-                    context.Customers.Contains(_validTariff).Should().BeTrue();
+                    context.Customers.Contains(_validCustomer).Should().BeTrue();
+                }
+            }
+        }
+
+        #endregion
+
+
+        #region RestrictedAddAsync(Customer customer)
+        // zasob nie istnieje -> exc z msg
+        // zasob jest nullem -> null ref exc
+        // problem z zapisaniem zmian -> inter | Nie mam pojecia jak to przetestowac xD
+        // arg jest nullem -> arg null exc
+        // istnieje w zasobie taki sam element jak ten, ktory chcemy dodac (takie samo id, wartosci ) -> invalid oper exc
+        // dodawanie sie udalo -> zwraca dodany bilet
+        // dodawanie sie udalo -> zasob jest wiekszy o jeden
+        // dodawanie sie udalo -> istnieje w zasobie dodany bilet
+        // proba doda
+
+        [Test]
+        public async Task RestrictedAddAsync__Resource_is_null__Should_throw_InternalDbServiceException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.Customers = null as DbSet<Customer>;
+                    var service = new CustomerDbService(context, _logger);
+
+                    Func<Task> action = async () => await service.RestrictedAddAsync(_validCustomer);
+
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource reference is set to null.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedAddAsync__Resource_doesnt_exist__Should_throw_InternalDbServiceException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    // Drop Customers table.
+                    context.Database.ExecuteSqlCommand("DROP TABLE [Customers]");
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new CustomerDbService(context, _logger);
+
+                    Func<Task> action = async () => await service.RestrictedAddAsync(_validCustomer);
+
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of Customer. " +
+                        "NOTE Excaption actually is type of 'SqLiteError' only if database provider is SQLite.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedAddAsync__Argument_is_null__Should_throw_ArgumentNullException()
+        {
+            var service = new CustomerDbService(_dbContextMock.Object, _logger);
+
+            Func<Task> result = async () => await service.RestrictedAddAsync(null as Customer);
+
+            await result.Should().ThrowExactlyAsync<ArgumentNullException>("Because argument 'Customer' is null.");
+        }
+
+
+        [Test]
+        public async Task RestrictedAddAsync__In_resource_exists_customer_with_the_same_id_as_this_one_to_be_added__Should_throw_InvalidOperationException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.Customers.Add(_validCustomer);
+                    await context.SaveChangesAsync();
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    _validCustomer.EmailAddress = "Changed email";
+                    var service = new CustomerDbService(context, _logger);
+
+                    Func<Task> result = async () => await service.RestrictedAddAsync(_validCustomer);
+
+                    await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because in resource exists the same Customer as this one to be added.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedAddAsync__Attempt_to_add_entity_with_the_same_values_as_existing_one_but_with_different_id__Should_throw_InvalidOperationException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.Customers.Add(_validCustomer);
+                    await context.SaveChangesAsync();
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    _validCustomer.Id += "_changed_id";
+                    var service = new CustomerDbService(context, _logger);
+
+                    Func<Task> result = async () => await service.RestrictedAddAsync(_validCustomer);
+
+                    await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because this method DOES NOT allow to add a new entity with the same properties value (Title, Text, Author) " +
+                        "but different 'Id'. It is intentional behaviour.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedAddAsync__Add_successful__Should_return_added_Customer()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new CustomerDbService(context, _logger);
+
+                    var result = await service.RestrictedAddAsync(_validCustomer);
+
+                    result.Should().BeEquivalentTo(_validCustomer);
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedAddAsync__Add_successful__Resource_length_should_be_greater_by_1()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    int expectedLength = context.Customers.Count() + 1;
+                    var service = new CustomerDbService(context, _logger);
+
+                    await service.RestrictedAddAsync(_validCustomer);
+
+                    context.Customers.Count().Should().Be(expectedLength);
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedAddAsync__Add_successful__Resource_contains_added_customer()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new CustomerDbService(context, _logger);
+
+                    await service.RestrictedAddAsync(_validCustomer);
+
+                    context.Customers.Contains(_validCustomer).Should().BeTrue();
                 }
             }
         }
@@ -455,7 +622,7 @@ namespace UnitTests.Services
                     context.Customers = null as DbSet<Customer>;
                     var service = new CustomerDbService(context, _logger);
 
-                    Func<Task> action = async () => await service.UpdateAsync(_validTariff);
+                    Func<Task> action = async () => await service.UpdateAsync(_validCustomer);
 
                     await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource reference is set to null");
                 }
@@ -477,7 +644,7 @@ namespace UnitTests.Services
                 {
                     var service = new CustomerDbService(context, _logger);
 
-                    Func<Task> action = async () => await service.UpdateAsync(_validTariff);
+                    Func<Task> action = async () => await service.UpdateAsync(_validCustomer);
 
                     await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of Customer. " +
                         "NOTE Excaption actually is type of 'SqLiteError' only if database provider is SQLite.");
@@ -536,7 +703,7 @@ namespace UnitTests.Services
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    customer.EmailAddres = "othermail@mail.com";
+                    customer.EmailAddress = "othermail@mail.com";
                     var service = new CustomerDbService(context, _logger);
 
                     Func<Task> result = async () => await service.UpdateAsync(customer);
@@ -552,7 +719,7 @@ namespace UnitTests.Services
             Customer customer = new Customer
             {
                 Id = "0",
-                EmailAddres = "othermail@mail.com",
+                EmailAddress = "othermail@mail.com",
                 UpdatedAt = DateTime.Now.AddHours(-3),
                 DateOfBirth = DateTime.Now.AddYears(-43)
             };
@@ -582,7 +749,7 @@ namespace UnitTests.Services
                 {
                     customerBeforUpdate = await context.Customers.Include(x => x.Tickets).FirstAsync();
                     Customer customer = customerBeforUpdate;
-                    customer.EmailAddres = "othermail@mail.com";
+                    customer.EmailAddress = "othermail@mail.com";
                     var service = new CustomerDbService(context, _logger);
 
                     var result = await service.UpdateAsync(customer);
@@ -602,7 +769,7 @@ namespace UnitTests.Services
                 using (var context = await factory.CreateContextAsync())
                 {
                     customer = await context.Customers.Include(x => x.Tickets).FirstAsync();
-                    customer.EmailAddres = "othermail@mail.com";
+                    customer.EmailAddress = "othermail@mail.com";
                     var service = new CustomerDbService(context, _logger);
 
                     var result = await service.UpdateAsync(customer);
@@ -627,7 +794,7 @@ namespace UnitTests.Services
                 {
                     customer = await context.Customers.Include(x => x.Tickets).FirstAsync();
                     customerBeforUpdate = customer.Clone() as Customer;
-                    customer.EmailAddres = "othermail@mail.com";
+                    customer.EmailAddress = "othermail@mail.com";
                     var service = new CustomerDbService(context, _logger);
 
                     var result = await service.UpdateAsync(customer);
@@ -653,7 +820,7 @@ namespace UnitTests.Services
                 {
                     customer = await context.Customers.Include(x => x.Tickets).FirstAsync();
                     customerBeforUpdate = customer.Clone() as Customer;
-                    customer.EmailAddres = "othermail@mail.com";
+                    customer.EmailAddress = "othermail@mail.com";
                     var service = new CustomerDbService(context, _logger);
                     expectedLength = await context.Customers.CountAsync();
 
@@ -680,7 +847,7 @@ namespace UnitTests.Services
                     customer = await context.Customers.FirstAsync();
                     customerBeforUpdate = customer.Clone() as Customer;
                     customerBeforUpdate.UpdatedAt = DateTime.MinValue;
-                    customer.EmailAddres = "Changed mail.";
+                    customer.EmailAddress = "Changed mail.";
                     var service = new CustomerDbService(context, _logger);
 
                     var result = await service.UpdateAsync(customer);
@@ -703,7 +870,7 @@ namespace UnitTests.Services
                     customer = await context.Customers.FirstAsync();
                     customerBeforUpdate = customer.Clone() as Customer;
                     customerBeforUpdate.UpdatedAt = DateTime.UtcNow.AddMinutes(-30);
-                    customer.EmailAddres = "Changed mail.";
+                    customer.EmailAddress = "Changed mail.";
                     var service = new CustomerDbService(context, _logger);
 
                     var result = await service.UpdateAsync(customer);
@@ -713,6 +880,301 @@ namespace UnitTests.Services
             }
         }
 
+        #endregion
+
+
+        #region RestrictedUpdateAsync(Customer Customer)
+        // wszystko co w normalnym update
+        // proba zmian readonly properties -> metoda niczego nie zmieni i zaloguje warny
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Resource_is_null__Should_throw_InternalDbServiceException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.Customers = null as DbSet<Customer>;
+                    var service = new CustomerDbService(context, _logger);
+
+                    Func<Task> action = async () => await service.RestrictedUpdateAsync(_validCustomer);
+
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource reference is set to null");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Resource_doesnt_exist__Should_throw_InternalDbServiceException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    // Drop Customers table.
+                    context.Database.ExecuteSqlCommand("DROP TABLE [Customers]");
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new CustomerDbService(context, _logger);
+
+                    Func<Task> action = async () => await service.RestrictedUpdateAsync(_validCustomer);
+
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of Customer. " +
+                        "NOTE Excaption actually is type of 'SqLiteError' only if database provider is SQLite.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Argument_is_null__Should_throw_ArgumentNullException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new CustomerDbService(context, _logger);
+
+                    Func<Task> result = async () => await service.RestrictedUpdateAsync(null as Customer);
+
+                    await result.Should().ThrowExactlyAsync<ArgumentNullException>("Because argument 'Customer' cannot be null.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Argument_has_null_or_empty_id__Should_throw_ArgumentException([Values(null, "")] string id)
+        {
+            var invalidCustomer = new Customer { Id = id };
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new CustomerDbService(context, _logger);
+
+                    Func<Task> result = async () => await service.RestrictedUpdateAsync(invalidCustomer);
+
+                    await result.Should().ThrowExactlyAsync<ArgumentException>("Because argument 'Customer' has null or empty id which is invalid.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Resource_is_empty__Should_throw_InvalidOperationException()
+        {
+            Customer customerBeforUpdate;
+            Customer customer;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    customerBeforUpdate = await context.Customers.FirstAsync();
+                    customer = customerBeforUpdate.Clone() as Customer;
+                    context.Customers.RemoveRange(await context.Customers.ToArrayAsync());
+                    await context.SaveChangesAsync();
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    customer.EmailAddress = "Changed email.";
+                    var service = new CustomerDbService(context, _logger);
+
+                    Func<Task> result = async () => await service.RestrictedUpdateAsync(customer);
+
+                    await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because esource is empty.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Matching_Customer_not_found__Should_throw_InvalidOperationException()
+        {
+            Customer customer = new Customer
+            {
+                Id = "0",
+                EmailAddress = "email.",
+                UpdatedAt = DateTime.Now.AddHours(-3)
+            };
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new CustomerDbService(context, _logger);
+
+                    // In db does not matching Customer to belowe disount.
+                    Func<Task> result = async () => await service.RestrictedUpdateAsync(customer);
+
+                    await result.Should().ThrowExactlyAsync<InvalidOperationException>("Because matching Customer not found.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Update_successful__Should_return_updated_sightseeing_tariff()
+        {
+            Customer customerBeforUpdate;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    customerBeforUpdate = await context.Customers.FirstAsync();
+                    Customer customer = customerBeforUpdate;
+                    customer.EmailAddress = "Changed email.";
+                    var service = new CustomerDbService(context, _logger);
+
+                    var result = await service.RestrictedUpdateAsync(customer);
+
+                    result.Should().BeEquivalentTo(customer);
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Update_successful__Resource_should_contains_updated_sightseeing_tariff()
+        {
+            Customer customer;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    customer = await context.Customers.FirstAsync();
+                    customer.EmailAddress = "Changed email.";
+                    var service = new CustomerDbService(context, _logger);
+
+                    var result = await service.RestrictedUpdateAsync(customer);
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.Customers.Contains(customer).Should().BeTrue();
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Update_successful__Resource_should_doesnt_contain_previous_version_of_sightseeing_tariff()
+        {
+            Customer customerBeforUpdate;
+            Customer customer;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    customer = await context.Customers.FirstAsync();
+                    customerBeforUpdate = customer.Clone() as Customer;
+                    customer.EmailAddress = "Changed email.";
+                    var service = new CustomerDbService(context, _logger);
+
+                    var result = await service.RestrictedUpdateAsync(customer);
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.Customers.Single(x => x == customer).Should().NotBeSameAs(customerBeforUpdate);
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Update_successful__Resource_length_should_be_unchanged()
+        {
+            Customer customerBeforUpdate;
+            Customer customer;
+            int expectedLength;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    customerBeforUpdate = await context.Customers.FirstAsync();
+                    customer = customerBeforUpdate;
+                    customer.EmailAddress = "Changed email.";
+                    var service = new CustomerDbService(context, _logger);
+                    expectedLength = await context.Customers.CountAsync();
+
+                    await service.RestrictedUpdateAsync(customer);
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.Customers.Count().Should().Be(expectedLength);
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Update_successful_first_time__Updated_element_should_have_updated_at_not_set_to_MaxValue()
+        {
+            Customer customerBeforUpdate;
+            Customer customer;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    customer = await context.Customers.FirstAsync();
+                    customerBeforUpdate = customer.Clone() as Customer;
+                    customerBeforUpdate.UpdatedAt = DateTime.MinValue;
+                    customer.EmailAddress = "Changed email.";
+                    var service = new CustomerDbService(context, _logger);
+
+                    var result = await service.RestrictedUpdateAsync(customer);
+
+                    ((DateTime)result.UpdatedAt).Should().NotBeSameDateAs(DateTime.MinValue);
+                }
+            }
+        }
+
+        [Test]
+        public async Task RestrictedUpdateAsync__Update_successful_not_first_time__Updated_element_should_have_new_updated_at_date_after_previous_one()
+        {
+            Customer customerBeforUpdate;
+            Customer customer;
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    customer = await context.Customers.FirstAsync();
+                    customerBeforUpdate = customer.Clone() as Customer;
+                    customerBeforUpdate.UpdatedAt = DateTime.UtcNow.AddMinutes(-30);
+                    customer.EmailAddress = "Changed email";
+                    var service = new CustomerDbService(context, _logger);
+
+                    var result = await service.RestrictedUpdateAsync(customer);
+
+                    ((DateTime)result.UpdatedAt).Should().BeAfter((DateTime)customerBeforUpdate.UpdatedAt);
+                }
+            }
+        }
+
+        [TestCaseSource(nameof(_CustomerForRestrictedUpdateCases))]
+        public async Task RestrictedUpdateAsync__Attempt_to_update_readonly_properties__These_changes_will_be_ignored(Customer updatedCustomerCase)
+        {
+            // In fact, any read-only property changes will be ignored and no exception will be thrown, but the method will log any of these changes as warning.
+
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var customerBeforeUpdate = await context.Customers.FirstAsync();
+                    updatedCustomerCase.Id = customerBeforeUpdate.Id;
+                    var service = new CustomerDbService(context, _logger);
+
+                    var result = await service.RestrictedUpdateAsync(updatedCustomerCase);
+
+                    // Those properties should be unchanged since they are readonly.
+                    result.CreatedAt.Should().BeSameDateAs(customerBeforeUpdate.CreatedAt);
+                    result.ConcurrencyToken.Should().BeSameAs(customerBeforeUpdate.ConcurrencyToken);
+                }
+            }
+        }
         #endregion
 
 
@@ -1014,7 +1476,7 @@ namespace UnitTests.Services
         }
 
         [Test]
-        public async Task GetWithPaginationAsync__Found_any_customer__Should_return_these_elements_with_not_null_tickets_list()
+        public async Task GetWithPaginationAsync__Found_any_customer__Should_return_these_elements()
         {
             using (var factory = new DbContextFactory())
             {

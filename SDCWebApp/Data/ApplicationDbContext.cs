@@ -182,7 +182,7 @@ namespace SDCWebApp.Data
                 {
                     Id = Guid.NewGuid().ToString(),
                     DateOfBirth = DateTime.Now.AddYears(-23),
-                    EmailAddres = "example@mail.com",
+                    EmailAddress = "example@mail.com",
                     HasFamilyCard = false
                 },
                 new Customer
@@ -190,7 +190,7 @@ namespace SDCWebApp.Data
                     Id = Guid.NewGuid().ToString(),
                     DateOfBirth = DateTime.Now.AddYears(-4),
                     HasFamilyCard = true,
-                    EmailAddres = " example2@mail.uk"
+                    EmailAddress = " example2@mail.uk"
                 });
         }
     }

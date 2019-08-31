@@ -317,6 +317,17 @@ namespace SDCWebApp.Services
             }
         }
 
+        /// <summary>
+        /// Asynchronously updates <see cref="Article"/> entity ignoring read-only properties like as Id, CreatedAt, UpdatedAt, ConcurrencyToken. 
+        /// Throws an exception if cannot found entity or any problem with updating occurred.
+        /// </summary>
+        /// <param name="article">The article to be updated. Cannot be null or has Id property set to null or empty string.</param>
+        /// <returns>Updated entity.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="article"/> is null.</exception>
+        /// <exception cref="ArgumentException"><paramref name="article"/> has Id property set to null or empty string.</exception>
+        /// <exception cref="InvalidOperationException">Cannot found entity to be updated.</exception>
+        /// <exception cref="InternalDbServiceException">The resource does not exist or has a null value or any
+        /// other problems with retrieving data from database occurred.</exception>
         public async Task<Article> RestrictedUpdateAsync(Article article)
         {
             _logger.LogInformation($"Starting method '{nameof(UpdateAsync)}'.");
@@ -371,7 +382,7 @@ namespace SDCWebApp.Services
         /// cannot save properly any changes made by add operation.</exception>
         public async Task<Article> RestrictedAddAsync(Article article)
         {
-            _logger.LogInformation($"Starting method '{nameof(AddAsync)}'.");
+            _logger.LogInformation($"Starting method '{nameof(RestrictedAddAsync)}'.");
 
             if (article is null)
                 throw new ArgumentNullException($"Argument '{nameof(article)}' cannot be null.");
@@ -389,7 +400,7 @@ namespace SDCWebApp.Services
                 var addedTariff = _context.Articles.Add(article).Entity;
                 await _context.TrySaveChangesAsync();
                 _logger.LogDebug("Add data succeeded.");
-                _logger.LogInformation($"Finished method '{nameof(AddAsync)}'.");
+                _logger.LogInformation($"Finished method '{nameof(RestrictedAddAsync)}'.");
                 return addedTariff;
             }
             catch (DbUpdateException ex)

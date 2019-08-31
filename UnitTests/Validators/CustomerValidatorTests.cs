@@ -15,9 +15,9 @@ namespace UnitTests.Validators
         [Test]
         public void Validate__EmailAddress_is_null_or_empty__Should_be_invalid([Values(null, "")] string email)
         {
-            var invalidCustomer = new Customer { EmailAddres = email };
+            var invalidCustomer = new Customer { EmailAddress = email };
 
-            _validator.ShouldHaveValidationErrorFor(x => x.EmailAddres, invalidCustomer);
+            _validator.ShouldHaveValidationErrorFor(x => x.EmailAddress, invalidCustomer);
         }
 
         // Invalid email adresses acording https://en.wikipedia.org/wiki/Email_address#Examples
@@ -33,9 +33,9 @@ namespace UnitTests.Validators
         "1234567890123456789012345678901234567890123456789012345678901234+x@example.com")] string email)
         {
 
-            var invalidCustomer = new Customer { EmailAddres = email };
+            var invalidCustomer = new Customer { EmailAddress = email };
 
-            _validator.ShouldHaveValidationErrorFor(x => x.EmailAddres, invalidCustomer);
+            _validator.ShouldHaveValidationErrorFor(x => x.EmailAddress, invalidCustomer);
         }
 
         // Valid email adresses acording https://en.wikipedia.org/wiki/Email_address#Examples
@@ -54,9 +54,9 @@ namespace UnitTests.Validators
             "\" \"@example.org",
             "\"john..doe\"@example.org")] string email)
         {
-            var validCustomer = new Customer { EmailAddres = email };
+            var validCustomer = new Customer { EmailAddress = email };
 
-            _validator.ShouldNotHaveValidationErrorFor(x => x.EmailAddres, validCustomer);
+            _validator.ShouldNotHaveValidationErrorFor(x => x.EmailAddress, validCustomer);
         }
 
         // This case is almost impossible due to the time it takes for the client to send a request to the server to process it.      

@@ -18,7 +18,7 @@ namespace SDCWebApp.Data.Validators
 
             // Info about email adresses acording https://en.wikipedia.org/wiki/Email_address
             // and http://isemail.info
-            RuleFor(x => x.EmailAddres)
+            RuleFor(x => x.EmailAddress)
                     .Cascade(CascadeMode.StopOnFirstFailure)
                     .NotEmpty()
                     .MaximumLength(132)
