@@ -1,11 +1,16 @@
 ﻿using FluentValidation;
 using SDCWebApp.Models;
+using SDCWebApp.Models.Dtos;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SDCWebApp.Data.Validators
 {
-    public class DiscountValidator : AbstractValidator<Discount>, ICustomValidator<Discount>
+    public class DiscountDtoValidator : AbstractValidator<DiscountDto>, ICustomValidator<DiscountDto>
     {
-        public DiscountValidator()
+        public DiscountDtoValidator()
         {
 
             RuleFor(d => d.GroupSizeForDiscount)

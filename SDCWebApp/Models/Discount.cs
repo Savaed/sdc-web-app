@@ -18,7 +18,7 @@ namespace SDCWebApp.Models
             ForFamily
         }
 
-        public DiscountType Type { get; set; }
+        public DiscountType Type { get; set; } = DiscountType.ForGroup;
         public string Description { get; set; }
         public int DiscountValueInPercentage { get; set; }
         public int? GroupSizeForDiscount { get; set; } = null;

@@ -3,13 +3,16 @@ using FluentValidation.TestHelper;
 using NUnit.Framework;
 using SDCWebApp.Data.Validators;
 using SDCWebApp.Models;
+using SDCWebApp.Models.Dtos;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace UnitTests.Validators
 {
-    [TestFixture]
-    public class DiscountValidatorTests
+    public class DiscountDtoValidatorTests
     {
-        private readonly DiscountValidator _validator = new DiscountValidator();
+        private readonly DiscountDtoValidator _validator = new DiscountDtoValidator();
 
 
         [Test]
@@ -21,7 +24,7 @@ namespace UnitTests.Validators
             Discount.DiscountType.ForStudent)]
             Discount.DiscountType type)
         {
-            var invalidDiscount = new Discount { GroupSizeForDiscount = 20, Type = type };
+            var invalidDiscount = new DiscountDto { GroupSizeForDiscount = 20, Type = type };
 
             _validator.ShouldHaveValidationErrorFor(x => x.GroupSizeForDiscount, invalidDiscount);
         }
@@ -29,7 +32,7 @@ namespace UnitTests.Validators
         [Test]
         public void Validate__GroupSizeForDiscount_is_set_while_Type_is_ForGroup__Should_be_valid()
         {
-            var validDiscount = new Discount { GroupSizeForDiscount = 20, Type = Discount.DiscountType.ForGroup };
+            var validDiscount = new DiscountDto { GroupSizeForDiscount = 20, Type = Discount.DiscountType.ForGroup };
 
             _validator.ShouldNotHaveValidationErrorFor(x => x.GroupSizeForDiscount, validDiscount);
         }
@@ -37,7 +40,7 @@ namespace UnitTests.Validators
         [Test]
         public void Validate__Discount_value_is_less_than_0__Should_be_invalid()
         {
-            var invalidDiscount = new Discount { DiscountValueInPercentage = -32 };
+            var invalidDiscount = new DiscountDto { DiscountValueInPercentage = -32 };
 
             _validator.ShouldHaveValidationErrorFor(x => x.DiscountValueInPercentage, invalidDiscount);
         }
@@ -45,7 +48,7 @@ namespace UnitTests.Validators
         [Test]
         public void Validate__Discount_value_is_between_0_and_100__Should_be_valid()
         {
-            var validDiscount = new Discount { DiscountValueInPercentage = 32 };
+            var validDiscount = new DiscountDto { DiscountValueInPercentage = 32 };
 
             _validator.ShouldNotHaveValidationErrorFor(x => x.DiscountValueInPercentage, validDiscount);
         }
@@ -53,15 +56,15 @@ namespace UnitTests.Validators
         [Test]
         public void Validate__Discount_value_is_greater_than_100__Should_be_invalid()
         {
-            var invalidDiscount = new Discount { DiscountValueInPercentage = 101 };
+            var invalidDiscount = new DiscountDto { DiscountValueInPercentage = 101 };
 
             _validator.ShouldHaveValidationErrorFor(x => x.DiscountValueInPercentage, invalidDiscount);
         }
 
         [Test]
-        public void Validate__Discount_value_is_0_or_100__Should_be_valid([Values(0, 100)] int discountValue)
+        public void Validate__Discount_value_is_0_or_100__Should_be_valid([Values(0, 100)] int DiscountValue)
         {
-            var validDiscount = new Discount { DiscountValueInPercentage = discountValue };
+            var validDiscount = new DiscountDto { DiscountValueInPercentage = DiscountValue };
 
             _validator.ShouldNotHaveValidationErrorFor(x => x.DiscountValueInPercentage, validDiscount);
         }
@@ -69,7 +72,7 @@ namespace UnitTests.Validators
         [Test]
         public void Validate__Description_is_null_or_empty__Should_be_invalid([Values(null, "")] string description)
         {
-            var invalidDiscount = new Discount { Description = description };
+            var invalidDiscount = new DiscountDto { Description = description };
 
             _validator.ShouldHaveValidationErrorFor(x => x.Description, invalidDiscount);
         }
@@ -77,7 +80,7 @@ namespace UnitTests.Validators
         [Test]
         public void Validate__Description_has_more_than_256_characters__Should_be_invalid()
         {
-            var invalidDiscount = new Discount
+            var invalidDiscount = new DiscountDto
             {
                 Description = "1234567890123456789012345678901123456789012345678901234567890112345678901234567890123456789011234567890123456789012345678901" +
                 "1234567890123456789012345678901123456789012345678901234567890112345678901234567890123456789011234567890123456789012345678901" +
@@ -91,7 +94,7 @@ namespace UnitTests.Validators
         [Test]
         public void Validate__Description_has_less_than_256_characters__Should_be_valid()
         {
-            var validDiscount = new Discount { Description = "123456789" };
+            var validDiscount = new DiscountDto { Description = "123456789" };
 
             _validator.ShouldNotHaveValidationErrorFor(x => x.Description, validDiscount);
         }
@@ -99,7 +102,7 @@ namespace UnitTests.Validators
         [Test]
         public void Validate__Description_has_exactly_256_characters__Should_be_valid()
         {
-            var validDiscount = new Discount
+            var validDiscount = new DiscountDto
             {
                 Description = "1234567890123456789012345678901123456789012345678901234567890112345678901234567890123456789011234567890123456789012345678901" +
                 "123456789012345678901234567890112345678901234567890123456789011234567890123456789012345678901123456789012345678901234567890123456789"

@@ -40,7 +40,7 @@ namespace UnitTests.Controllers
                 {
                     new TicketTariff
                     {
-                        Id = "123456789",
+                        Id = "84b9aa90-faec-43c6-9e83-15891fb0205a",
                         Description = "Sample ticket tariff for test",
                         DefaultPrice = 23,
                         UpdatedAt = DateTime.Now
@@ -60,6 +60,7 @@ namespace UnitTests.Controllers
                 new SightseeingTariffDto { Id = "2", UpdatedAt = DateTime.Now.AddMinutes(30), Name = "Updated in future. It's the latest tariff and should be retrieved" }
             };
         }
+
 
         #region GetTariffAsync(string id);
         // brak cennika o podanym id/pusty zasob -> 404 not found

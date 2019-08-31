@@ -45,6 +45,14 @@ namespace SDCWebApp
                 //options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
             }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
             .AddFluentValidation()
+            .ConfigureApiBehaviorOptions(config =>
+            {
+                config.InvalidModelStateResponseFactory = context =>
+                {
+                    var validationError = new CustomValidationProblemDetails(context);
+                    return new ObjectResult(validationError);
+                };
+            })
             .AddJsonOptions(options =>
             {
                 // Ignore reference loops in JSON responses.
