@@ -47,7 +47,7 @@ namespace UnitTests.Models
         [Test]
         public void Equals__One_Customer_is_null__Should_not_be_the_same()
         {
-            Discount customer1 = null;
+            Customer customer1 = null;
             var customer2 = new Customer { Id = "1", EmailAddress = "test", DateOfBirth = new DateTime(1990, 1, 1), HasFamilyCard = false };
 
             bool isEqual = customer2.Equals(customer1);

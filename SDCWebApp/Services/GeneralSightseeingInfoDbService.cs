@@ -13,18 +13,18 @@ namespace SDCWebApp.Services
     /// <summary>
     /// Provides methods for get, add, update and delete operations for <see cref="GeneralSightseeingInfo"/> entities in the database.
     /// </summary>
-    public class GeneralSightseeingInfoDbService : IGeneralSightseeingInfoDbService
+    public class GeneralSightseeingInfoDbService : ServiceBase, IGeneralSightseeingInfoDbService
     {
         private readonly ILogger<GeneralSightseeingInfoDbService> _logger;
         private readonly ApplicationDbContext _context;
 
 
-        public GeneralSightseeingInfoDbService(ApplicationDbContext context, ILogger<GeneralSightseeingInfoDbService> logger)
+        public GeneralSightseeingInfoDbService(ApplicationDbContext context, ILogger<GeneralSightseeingInfoDbService> logger) : base(context, logger)
         {
             _logger = logger;
             _context = context;
         }
-        
+
 
         /// <summary>
         /// Asynchronously adds <see cref="GeneralSightseeingInfo"/> entity to the database. Throws an exception if 
@@ -317,8 +317,120 @@ namespace SDCWebApp.Services
             }
         }
 
+        /// <summary>
+        /// Asynchronously adds <see cref="GeneralSightseeingInfo"/> entity to the database. Do not allow to add entity with the same properties value as existing one.
+        /// Throws an exception if already there is the same entity in database or any problem with saving changes occurred.
+        /// </summary>
+        /// <param name="info">The info to be added. Cannot be null.</param>
+        /// <returns>The added entity.</returns>
+        /// <exception cref="ArgumentNullException">The value of <paramref name="info"/> to be added is null.</exception>
+        /// <exception cref="InvalidOperationException">There is the same entity that one to be added in database.</exception>
+        /// <exception cref="InternalDbServiceException">The table with <see cref="GeneralSightseeingInfo"/> entities does not exist or it is null or 
+        /// cannot save properly any changes made by add operation.</exception>
+        public async Task<GeneralSightseeingInfo> RestrictedAddAsync(GeneralSightseeingInfo info)
+        {
+            _logger.LogInformation($"Starting method '{nameof(RestrictedAddAsync)}'.");
+
+            if (info is null)
+                throw new ArgumentNullException($"Argument '{nameof(info)}' cannot be null.");
+
+            await EnsureDatabaseCreatedAsync();
+            _ = _context?.GeneralSightseeingInfo ?? throw new InternalDbServiceException($"Table of type '{typeof(GeneralSightseeingInfo).Name}' is null.");
+
+            try
+            {
+                // Check if exist in db tariff with the same 'Name' as adding.
+                if (await IsEntityAlreadyExistsAsync(info))
+                    throw new InvalidOperationException($"There is already the same element in the database as the one to be added. The value of '{nameof(info)}' is not unique.");
+
+                _logger.LogDebug($"Starting add info with id '{info.Id}'.");
+                var addedInfo = _context.GeneralSightseeingInfo.Add(info).Entity;
+                await _context.TrySaveChangesAsync();
+                _logger.LogDebug("Add data succeeded.");
+                _logger.LogInformation($"Finished method '{nameof(AddAsync)}'.");
+                return addedInfo;
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError($"{ex.GetType().Name} Changes made by add operations cannot be saved properly. See inner exception. Operation failed.", ex);
+                var internalException = new InternalDbServiceException("Changes made by add operations cannot be saved properly. See inner exception for more details.", ex);
+                throw internalException;
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogError($"{ex.GetType().Name} There is already the same element in the database as the one to be added. The value of '{nameof(info)}' is not unique.", ex);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
+                var internalException = new InternalDbServiceException($"Encountered problem when adding sighseeing info with id '{info?.Id}' to the database. See inner excpetion for more details.", ex);
+                throw internalException;
+            }
+        }
+
+        /// <summary>
+        /// Asynchronously updates <see cref="SightseeingTariff"/> entity ignoring read-only properties like Id, CreatedAt, UpdatedAt, ConcurrencyToken. 
+        /// Throws an exception if cannot found entity or any problem with updating occurred.
+        /// </summary>
+        /// <param name="tariff">The tariff to be updated. Cannot be null or has Id property set to null or empty string.</param>
+        /// <returns>Updated entity.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="tariff"/> is null.</exception>
+        /// <exception cref="ArgumentException"><paramref name="tariff"/> has Id property set to null or empty string.</exception>
+        /// <exception cref="InvalidOperationException">Cannot found entity to be updated.</exception>
+        /// <exception cref="InternalDbServiceException">The resource does not exist or has a null value or any
+        /// other problems with retrieving data from database occurred.</exception>
+        public async Task<GeneralSightseeingInfo> RestrictedUpdateAsync(GeneralSightseeingInfo info)
+        {
+            _logger.LogInformation($"Starting method '{nameof(RestrictedUpdateAsync)}'.");
+
+            _ = info ?? throw new ArgumentNullException(nameof(info), $"Argument '{nameof(info)}' cannot be null.");
+
+            if (string.IsNullOrEmpty(info.Id))
+                throw new ArgumentException($"Argument '{nameof(info.Id)}' cannot be null or empty.");
+
+            await EnsureDatabaseCreatedAsync();
+            _ = _context?.GeneralSightseeingInfo ?? throw new InternalDbServiceException($"Table of type '{typeof(GeneralSightseeingInfo).Name}' is null.");
+
+            try
+            {
+                if (_context.GeneralSightseeingInfo.Count() == 0)
+                    throw new InvalidOperationException($"Cannot found element with id '{info.Id}' for update. Resource {_context.Groups.GetType().Name} does not contain any element.");
+
+                if (await _context.GeneralSightseeingInfo.ContainsAsync(info) == false)
+                    throw new InvalidOperationException($"Cannot found element with id '{info.Id}' for update. Any element does not match to the one to be updated.");
+
+                _logger.LogDebug($"Starting update sightseeing info with id '{info.Id}'.");
+                var originalInfo = await _context.GeneralSightseeingInfo.SingleAsync(x => x.Id.Equals(info.Id));
+                var updatedInfo = RestrictedUpdate(originalInfo, info) as GeneralSightseeingInfo;
+                await _context.TrySaveChangesAsync();
+                _logger.LogDebug($"Update data succeeded.");
+                _logger.LogInformation($"Finished method '{nameof(RestrictedUpdateAsync)}'.");
+                return updatedInfo;
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogError(ex, $"{ex.GetType().Name} Cannot found element for update. See exception for more details. Operation failed.");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
+                var internalException = new InternalDbServiceException($"Encountered problem when updating sighseeing info with id '{info.Id}'. See inner excpetion for more details.", ex);
+                throw internalException;
+            }
+
+        }
+
+
 
         #region Privates
+
+        protected override async Task<bool> IsEntityAlreadyExistsAsync(BasicEntity entity)
+        {
+            var allInfo = await _context.GeneralSightseeingInfo.ToArrayAsync();
+            return allInfo.Any(x => x.Equals(entity as GeneralSightseeingInfo));
+        }
 
         private async Task EnsureDatabaseCreatedAsync()
         {

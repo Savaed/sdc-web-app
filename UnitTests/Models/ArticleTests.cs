@@ -47,7 +47,7 @@ namespace UnitTests.Models
         [Test]
         public void Equals__One_article_is_null__Should_not_be_the_same()
         {
-            Discount article1 = null;
+            Article article1 = null;
             var article2 = new Article { Id = "1", Title = "other test", Text = "sample", Author = "joe doe" };
 
             bool isEqual = article2.Equals(article1);

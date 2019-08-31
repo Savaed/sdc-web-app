@@ -76,5 +76,12 @@ namespace SDCWebApp.Services
         /// <exception cref="InternalDbServiceException">The table with <see cref="GeneralSightseeingInfo"/> entities does not exist or it is null or 
         /// cannot save properly any changes made by add operation.</exception>
         Task<GeneralSightseeingInfo> AddAsync(GeneralSightseeingInfo info);
+
+        Task<GeneralSightseeingInfo> RestrictedUpdateAsync(GeneralSightseeingInfo info);
+
+
+        Task<GeneralSightseeingInfo> RestrictedAddAsync(GeneralSightseeingInfo info);
+
+
     }
 }
