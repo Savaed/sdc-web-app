@@ -11,7 +11,9 @@ namespace SDCWebApp.Helpers.Extensions
     public static class DbContextExtension
     {
         /// <summary>
-        /// Asynchronously trying save any changes made in this context to the database and resolving eventually concurrency conflict. 'Database wins' and 'client wins' approach are supported.
+        /// Asynchronously trying save any changes made in this <see cref="DbContext"/> context to the database and resolving eventually concurrency conflict. 
+        /// 'Database wins' and 'client wins' approach are supported.
+        /// Throws a <see cref="NotSupportedException"/> if data cannot be save properly.
         /// </summary>
         /// <param name="maxResolveAttempts">Max attempts for retrying saves data</param>
         /// <param name="clientWins">Conflict resolving strategy. Set to true if want use 'client wins' or false for 'database wins'</param>
@@ -25,7 +27,7 @@ namespace SDCWebApp.Helpers.Extensions
             if (maxResolveAttempts < 0 || maxResolveAttempts > 50)
             {
                 maxResolveAttempts = DefaultResolveAttempts;
-                logger.Warn($"Value of parameter { nameof(maxResolveAttempts) } cannot be negative but { maxResolveAttempts } found. Instead of this value, '{ DefaultResolveAttempts }' will be used.");
+                logger.Warn($"Value of parameter '{ nameof(maxResolveAttempts) }' cannot be negative but '{ maxResolveAttempts }' found. Instead of this value, '{ DefaultResolveAttempts }' will be used.");
             }
 
             do
@@ -41,14 +43,14 @@ namespace SDCWebApp.Helpers.Extensions
                     {
                         if (clientWins)
                         {
-                            logger.Error(e1, $"Concurrency conflict detected while proccessing operation. Remained conflict resolving attempt: { maxResolveAttempts }. Conflict resolving approach: client wins.");
+                            logger.Error(e1, $"Concurrency conflict detected while proccessing operation. Remained conflict resolving attempt: '{ maxResolveAttempts }'. Conflict resolving approach: 'client wins'.");
 
                             var databaseValues = await entry.GetDatabaseValuesAsync();
                             entry.OriginalValues.SetValues(databaseValues);
                         }
                         else if (clientWins == false)
                         {
-                            logger.Error(e1, $"Concurrency conflict detected while proccessing operation. Remained conflict resolving attempt: { maxResolveAttempts }. Conflict resolving approach: database wins.");
+                            logger.Error(e1, $"Concurrency conflict detected while proccessing operation. Remained conflict resolving attempt: '{ maxResolveAttempts }'. Conflict resolving approach: 'database wins'.");
                             entry.Reload();
                         }
 
@@ -65,4 +67,3 @@ namespace SDCWebApp.Helpers.Extensions
         }
     }
 }
-

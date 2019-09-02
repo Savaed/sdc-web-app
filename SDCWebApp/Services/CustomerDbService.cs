@@ -11,7 +11,7 @@ using SDCWebApp.Models;
 namespace SDCWebApp.Services
 {
     /// <summary>
-    /// Provides methods for get, add, update and delete operations for <see cref="Customer"/> entities in the database.
+    /// Provides methods for GET, ADD, UPDATE and DELETE operations for <see cref="Customer"/> entities in the database.
     /// </summary>
     public class CustomerDbService : ServiceBase, ICustomerDbService
     {
@@ -60,8 +60,8 @@ namespace SDCWebApp.Services
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError($"{ex.GetType().Name} Changes made by add operations cannot be saved properly. See inner exception. Operation failed.", ex);
-                var internalException = new InternalDbServiceException("Changes made by add operations cannot be saved properly. See inner exception for more details.", ex);
+                _logger.LogError($"{ex.GetType().Name} Changes made by add operations cannot be saved properly. See the inner exception. Operation failed.", ex);
+                var internalException = new InternalDbServiceException("Changes made by add operations cannot be saved properly. See the inner exception", ex);
                 throw internalException;
             }
             catch (InvalidOperationException ex)
@@ -72,7 +72,7 @@ namespace SDCWebApp.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when adding customer with id '{customer?.Id}' to the database. See inner excpetion for more details.", ex);
+                var internalException = new InternalDbServiceException($"Encountered problem when adding customer with id '{customer?.Id}' to the database. See inner excpetion", ex);
                 throw internalException;
             }
         }
@@ -113,13 +113,13 @@ namespace SDCWebApp.Services
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} Cannot found element. See exception for more details. Operation failed.");
+                _logger.LogError(ex, $"{ex.GetType().Name} Cannot found element. See exception Operation failed.");
                 throw;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when removing customer with id '{id}' from database. See inner excpetion for more details.", ex);
+                var internalException = new InternalDbServiceException($"Encountered problem when removing customer with id '{id}' from database. See inner excpetion", ex);
                 throw internalException;
             }
         }
@@ -149,7 +149,7 @@ namespace SDCWebApp.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when retrieving sightseeing group from database. See inner excpetion for more details.", ex);
+                var internalException = new InternalDbServiceException($"Encountered problem when retrieving sightseeing group from database. See inner excpetion", ex);
                 throw internalException;
             }
         }
@@ -184,15 +184,15 @@ namespace SDCWebApp.Services
             }
             catch (InvalidOperationException ex)
             {
-                string message = _context.Customers.Count() == 0 ? $"Element not found because resource {_context.Customers.GetType().Name} does contain any elements. See inner exception for more details."
-                    : "Element not found. See inner exception for more details.";
+                string message = _context.Customers.Count() == 0 ? $"Element not found because resource {_context.Customers.GetType().Name} does contain any elements. See the inner exception"
+                    : "Element not found. See the inner exception";
                 _logger.LogError(ex, $"{ex.GetType().Name} {message} Operation failed.");
                 throw;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when retriving customer with id '{id}' from database. See inner exception for more details.", ex);
+                var internalException = new InternalDbServiceException($"Encountered problem when retriving customer with id '{id}' from database. See the inner exception", ex);
                 throw internalException;
             }
         }
@@ -252,7 +252,7 @@ namespace SDCWebApp.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when retrieving customers from database. See inner excpetion for more details.", ex);
+                var internalException = new InternalDbServiceException($"Encountered problem when retrieving customers from database. See inner excpetion", ex);
                 throw internalException;
             }
         }
@@ -305,13 +305,13 @@ namespace SDCWebApp.Services
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} Cannot found element for update. See exception for more details. Operation failed.");
+                _logger.LogError(ex, $"{ex.GetType().Name} Cannot found element for update. See exception Operation failed.");
                 throw;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when updating customer with id '{customer.Id}'. See inner excpetion for more details.", ex);
+                var internalException = new InternalDbServiceException($"Encountered problem when updating customer with id '{customer.Id}'. See inner excpetion", ex);
                 throw internalException;
             }
         }
@@ -350,7 +350,7 @@ namespace SDCWebApp.Services
                 _logger.LogDebug($"Starting update customer with id '{customer.Id}'.");
                 customer.UpdatedAt = DateTime.UtcNow;
                 var originalCustomer = await _context.Customers.SingleAsync(x => x.Id.Equals(customer.Id));
-                var updatedCustomer = RestrictedUpdate(originalCustomer, customer) as Customer;
+                var updatedCustomer = BasicRestrictedUpdate(originalCustomer, customer) as Customer;
                 await _context.TrySaveChangesAsync();
                 _logger.LogDebug($"Update data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(RestrictedAddAsync)}'.");
@@ -358,13 +358,13 @@ namespace SDCWebApp.Services
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} Cannot found element for update. See exception for more details. Operation failed.");
+                _logger.LogError(ex, $"{ex.GetType().Name} Cannot found element for update. See exception Operation failed.");
                 throw;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when updating article with id '{customer.Id}'. See inner excpetion for more details.", ex);
+                var internalException = new InternalDbServiceException($"Encountered problem when updating article with id '{customer.Id}'. See inner excpetion", ex);
                 throw internalException;
             }
         }
@@ -404,8 +404,8 @@ namespace SDCWebApp.Services
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError($"{ex.GetType().Name} - Changes made by add operations cannot be saved properly. See inner exception. Operation failed.", ex);
-                var internalException = new InternalDbServiceException("Changes made by add operations cannot be saved properly. See inner exception for more details.", ex);
+                _logger.LogError($"{ex.GetType().Name} - Changes made by add operations cannot be saved properly. See the inner exception. Operation failed.", ex);
+                var internalException = new InternalDbServiceException("Changes made by add operations cannot be saved properly. See the inner exception", ex);
                 throw internalException;
             }
             catch (InvalidOperationException ex)
@@ -417,7 +417,7 @@ namespace SDCWebApp.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} - {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when adding customer with id '{customer?.Id}' to the database. See inner excpetion for more details.", ex);
+                var internalException = new InternalDbServiceException($"Encountered problem when adding customer with id '{customer?.Id}' to the database. See inner excpetion", ex);
                 throw internalException;
             }
         }

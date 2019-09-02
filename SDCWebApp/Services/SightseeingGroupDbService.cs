@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace SDCWebApp.Services
 {
     /// <summary>
-    /// Provides methods for get, add, update and delete operations for <see cref="SightseeingGroup"/> entities in the database.
+    /// Provides methods for GET, ADD, UPDATE and DELETE operations for <see cref="SightseeingGroup"/> entities in the database.
     /// </summary>
     public class SightseeingGroupDbService : ServiceBase, ISightseeingGroupDbService
     {
@@ -60,8 +60,8 @@ namespace SDCWebApp.Services
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError($"{ex.GetType().Name} Changes made by add operations cannot be saved properly. See inner exception. Operation failed.", ex);
-                var internalException = new InternalDbServiceException("Changes made by add operations cannot be saved properly. See inner exception for more details.", ex);
+                _logger.LogError($"{ex.GetType().Name} Changes made by add operations cannot be saved properly. See the inner exception. Operation failed.", ex);
+                var internalException = new InternalDbServiceException("Changes made by add operations cannot be saved properly. See the inner exception", ex);
                 throw internalException;
             }
             catch (InvalidOperationException ex)
@@ -72,7 +72,7 @@ namespace SDCWebApp.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when adding element with id '{group?.Id}' to the database. See inner excpetion for more details.", ex);
+                var internalException = new InternalDbServiceException($"Encountered problem when adding element with id '{group?.Id}' to the database. See inner excpetion", ex);
                 throw internalException;
             }
         }
@@ -113,13 +113,13 @@ namespace SDCWebApp.Services
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} Cannot found element. See exception for more details. Operation failed.");
+                _logger.LogError(ex, $"{ex.GetType().Name} Cannot found element. See exception Operation failed.");
                 throw;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when removing element with id '{id}' from database. See inner excpetion for more details.", ex);
+                var internalException = new InternalDbServiceException($"Encountered problem when removing element with id '{id}' from database. See inner excpetion", ex);
                 throw internalException;
             }
         }
@@ -149,7 +149,7 @@ namespace SDCWebApp.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when retrieving sightseeing group from database. See inner excpetion for more details.", ex);
+                var internalException = new InternalDbServiceException($"Encountered problem when retrieving sightseeing group from database. See inner excpetion", ex);
                 throw internalException;
             }
         }
@@ -184,15 +184,15 @@ namespace SDCWebApp.Services
             }
             catch (InvalidOperationException ex)
             {
-                string message = _context.Groups.Count() == 0 ? $"Element not found because resource {_context.Groups.GetType().Name} is empty. See inner exception for more details."
-                    : "Element not found. See inner exception for more details.";
+                string message = _context.Groups.Count() == 0 ? $"Element not found because resource {_context.Groups.GetType().Name} is empty. See the inner exception"
+                    : "Element not found. See the inner exception";
                 _logger.LogError(ex, $"{ex.GetType().Name} {message} Operation failed.");
                 throw;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when retriving sighseeing group with id '{id}' from database. See inner exception for more details.", ex);
+                var internalException = new InternalDbServiceException($"Encountered problem when retriving sighseeing group with id '{id}' from database. See the inner exception", ex);
                 throw internalException;
             }
         }
@@ -252,7 +252,7 @@ namespace SDCWebApp.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when retrieving sightseeing groups from database. See inner excpetion for more details.", ex);
+                var internalException = new InternalDbServiceException($"Encountered problem when retrieving sightseeing groups from database. See inner excpetion", ex);
                 throw internalException;
             }
         }
@@ -307,13 +307,13 @@ namespace SDCWebApp.Services
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} Cannot found element for update. See exception for more details. Operation failed.");
+                _logger.LogError(ex, $"{ex.GetType().Name} Cannot found element for update. See exception Operation failed.");
                 throw;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when updating sighseeing group with id '{group.Id}'. See inner excpetion for more details.", ex);
+                var internalException = new InternalDbServiceException($"Encountered problem when updating sighseeing group with id '{group.Id}'. See inner excpetion", ex);
                 throw internalException;
             }
         }
@@ -346,8 +346,8 @@ namespace SDCWebApp.Services
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError($"{ex.GetType().Name} Changes made by add operations cannot be saved properly. See inner exception. Operation failed.", ex);
-                var internalException = new InternalDbServiceException("Changes made by add operations cannot be saved properly. See inner exception for more details.", ex);
+                _logger.LogError($"{ex.GetType().Name} Changes made by add operations cannot be saved properly. See the inner exception. Operation failed.", ex);
+                var internalException = new InternalDbServiceException("Changes made by add operations cannot be saved properly. See the inner exception", ex);
                 throw internalException;
             }
             catch (InvalidOperationException ex)
@@ -358,7 +358,7 @@ namespace SDCWebApp.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when adding sighseeing tarifff with id '{group?.Id}' to the database. See inner excpetion for more details.", ex);
+                var internalException = new InternalDbServiceException($"Encountered problem when adding sighseeing tarifff with id '{group?.Id}' to the database. See inner excpetion", ex);
                 throw internalException;
             }
         }
@@ -385,7 +385,7 @@ namespace SDCWebApp.Services
 
                 _logger.LogDebug($"Starting update sightseeing groupwith id '{group.Id}'.");
                 var originalGroup = await _context.Groups.SingleAsync(x => x.Id.Equals(group.Id));
-                var updatedGroup = RestrictedUpdate(originalGroup, group) as SightseeingGroup;
+                var updatedGroup = BasicRestrictedUpdate(originalGroup, group) as SightseeingGroup;
                 await _context.TrySaveChangesAsync();
                 _logger.LogDebug($"Update data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(RestrictedUpdateAsync)}'.");
@@ -393,13 +393,13 @@ namespace SDCWebApp.Services
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} Cannot found element for update. See exception for more details. Operation failed.");
+                _logger.LogError(ex, $"{ex.GetType().Name} Cannot found element for update. See exception Operation failed.");
                 throw;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when updating sighseeing group with id '{group.Id}'. See inner excpetion for more details.", ex);
+                var internalException = new InternalDbServiceException($"Encountered problem when updating sighseeing group with id '{group.Id}'. See inner excpetion", ex);
                 throw internalException;
             }
         }

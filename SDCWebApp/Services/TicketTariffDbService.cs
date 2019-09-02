@@ -11,7 +11,7 @@ using SDCWebApp.Models;
 namespace SDCWebApp.Services
 {
     /// <summary>
-    /// Provides methods for get, add, update and delete operations for <see cref="TicketTariff"/> entities in the database.
+    /// Provides methods for GET, ADD, UPDATE and DELETE operations for <see cref="TicketTariff"/> entities in the database.
     /// </summary>
     public class TicketTariffDbService : ServiceBase, ITicketTariffDbService
     {
@@ -60,8 +60,8 @@ namespace SDCWebApp.Services
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError($"{ex.GetType().Name} Changes made by add operations cannot be saved properly. See inner exception. Operation failed.", ex);
-                var internalException = new InternalDbServiceException("Changes made by add operations cannot be saved properly. See inner exception for more details.", ex);
+                _logger.LogError($"{ex.GetType().Name} Changes made by add operations cannot be saved properly. See the inner exception. Operation failed.", ex);
+                var internalException = new InternalDbServiceException("Changes made by add operations cannot be saved properly. See the inner exception", ex);
                 throw internalException;
             }
             catch (InvalidOperationException ex)
@@ -72,7 +72,7 @@ namespace SDCWebApp.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when adding ticket tarifff with id '{tariff?.Id}' to the database. See inner excpetion for more details.", ex);
+                var internalException = new InternalDbServiceException($"Encountered problem when adding ticket tarifff with id '{tariff?.Id}' to the database. See inner excpetion", ex);
                 throw internalException;
             }
         }
@@ -113,13 +113,13 @@ namespace SDCWebApp.Services
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} Cannot found element. See exception for more details. Operation failed.");
+                _logger.LogError(ex, $"{ex.GetType().Name} Cannot found element. See exception Operation failed.");
                 throw;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when removing ticket tariff with id '{id}' from database. See inner excpetion for more details.", ex);
+                var internalException = new InternalDbServiceException($"Encountered problem when removing ticket tariff with id '{id}' from database. See inner excpetion", ex);
                 throw internalException;
             }
         }
@@ -149,7 +149,7 @@ namespace SDCWebApp.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when retrieving all ticket tariffs from database. See inner excpetion for more details.", ex);
+                var internalException = new InternalDbServiceException($"Encountered problem when retrieving all ticket tariffs from database. See inner excpetion", ex);
                 throw internalException;
             }
         }
@@ -184,15 +184,15 @@ namespace SDCWebApp.Services
             }
             catch (InvalidOperationException ex)
             {
-                string message = _context.TicketTariffs.Count() == 0 ? $"Element not found because resource {_context.TicketTariffs.GetType().Name} does contain any elements. See inner exception for more details."
-                    : "Element not found. See inner exception for more details.";
+                string message = _context.TicketTariffs.Count() == 0 ? $"Element not found because resource {_context.TicketTariffs.GetType().Name} does contain any elements. See the inner exception"
+                    : "Element not found. See the inner exception";
                 _logger.LogError(ex, $"{ex.GetType().Name} {message} Operation failed.");
                 throw;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when retriving sighseeing tariff with id '{id}' from database. See inner exception for more details.", ex);
+                var internalException = new InternalDbServiceException($"Encountered problem when retriving sighseeing tariff with id '{id}' from database. See the inner exception", ex);
                 throw internalException;
             }
         }
@@ -253,7 +253,7 @@ namespace SDCWebApp.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when retrieving ticket tariffs from database. See inner excpetion for more details.", ex);
+                var internalException = new InternalDbServiceException($"Encountered problem when retrieving ticket tariffs from database. See inner excpetion", ex);
                 throw internalException;
             }
         }
@@ -306,13 +306,13 @@ namespace SDCWebApp.Services
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} Cannot found element for update. See exception for more details. Operation failed.");
+                _logger.LogError(ex, $"{ex.GetType().Name} Cannot found element for update. See exception Operation failed.");
                 throw;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when updating sighseeing tariff with id '{tariff.Id}'. See inner excpetion for more details.", ex);
+                var internalException = new InternalDbServiceException($"Encountered problem when updating sighseeing tariff with id '{tariff.Id}'. See inner excpetion", ex);
                 throw internalException;
             }
         }
@@ -344,8 +344,8 @@ namespace SDCWebApp.Services
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError($"{ex.GetType().Name} Changes made by add operations cannot be saved properly. See inner exception. Operation failed.", ex);
-                var internalException = new InternalDbServiceException("Changes made by add operations cannot be saved properly. See inner exception for more details.", ex);
+                _logger.LogError($"{ex.GetType().Name} Changes made by add operations cannot be saved properly. See the inner exception. Operation failed.", ex);
+                var internalException = new InternalDbServiceException("Changes made by add operations cannot be saved properly. See the inner exception", ex);
                 throw internalException;
             }
             catch (InvalidOperationException ex)
@@ -356,7 +356,7 @@ namespace SDCWebApp.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when adding sighseeing tarifff with id '{tariff?.Id}' to the database. See inner excpetion for more details.", ex);
+                var internalException = new InternalDbServiceException($"Encountered problem when adding sighseeing tarifff with id '{tariff?.Id}' to the database. See inner excpetion", ex);
                 throw internalException;
             }
         }
@@ -386,7 +386,7 @@ namespace SDCWebApp.Services
 
                 _logger.LogDebug($"Starting update tariff with id '{tariff.Id}'.");
                 var originalTariff = await _context.TicketTariffs.SingleAsync(x => x.Id.Equals(tariff.Id));
-                var updatedTariff = RestrictedUpdate(originalTariff, tariff) as TicketTariff;
+                var updatedTariff = BasicRestrictedUpdate(originalTariff, tariff) as TicketTariff;
                 await _context.TrySaveChangesAsync();
                 _logger.LogDebug($"Update data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(UpdateAsync)}'.");
@@ -394,13 +394,13 @@ namespace SDCWebApp.Services
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} Cannot found element for update. See exception for more details. Operation failed.");
+                _logger.LogError(ex, $"{ex.GetType().Name} Cannot found element for update. See exception Operation failed.");
                 throw;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when updating sighseeing tariff with id '{tariff.Id}'. See inner excpetion for more details.", ex);
+                var internalException = new InternalDbServiceException($"Encountered problem when updating sighseeing tariff with id '{tariff.Id}'. See inner excpetion", ex);
                 throw internalException;
             }
         }

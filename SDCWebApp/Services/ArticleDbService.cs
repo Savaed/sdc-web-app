@@ -11,7 +11,7 @@ using SDCWebApp.Models;
 namespace SDCWebApp.Services
 {
     /// <summary>
-    /// Provides methods for get, add, update and delete operations for <see cref="Article"/> entities in the database.
+    /// Provides methods for GET, ADD, UPDATE and DELETE operations for <see cref="Article"/> entities in the database.
     /// </summary>
     public class ArticleDbService : ServiceBase, IArticleDbService
     {
@@ -60,8 +60,8 @@ namespace SDCWebApp.Services
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError($"{ex.GetType().Name} Changes made by add operations cannot be saved properly. See inner exception. Operation failed.", ex);
-                var internalException = new InternalDbServiceException("Changes made by add operations cannot be saved properly. See inner exception for more details.", ex);
+                _logger.LogError($"{ex.GetType().Name} Changes made by add operations cannot be saved properly. See the inner exception for more details.. Operation failed.", ex);
+                var internalException = new InternalDbServiceException("Changes made by add operations cannot be saved properly. See the inner exception for more details.", ex);
                 throw internalException;
             }
             catch (InvalidOperationException ex)
@@ -184,15 +184,15 @@ namespace SDCWebApp.Services
             }
             catch (InvalidOperationException ex)
             {
-                string message = _context.Articles.Count() == 0 ? $"Element not found because resource {_context.Articles.GetType().Name} does contain any elements. See inner exception for more details."
-                    : "Element not found. See inner exception for more details.";
+                string message = _context.Articles.Count() == 0 ? $"Element not found because resource {_context.Articles.GetType().Name} does contain any elements. See the inner exception for more details."
+                    : "Element not found. See the inner exception for more details.";
                 _logger.LogError(ex, $"{ex.GetType().Name} {message} Operation failed.");
                 throw;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when retriving article with id '{id}' from database. See inner exception for more details.", ex);
+                var internalException = new InternalDbServiceException($"Encountered problem when retriving article with id '{id}' from database. See the inner exception for more details.", ex);
                 throw internalException;
             }
         }
@@ -351,7 +351,7 @@ namespace SDCWebApp.Services
                 _logger.LogDebug($"Starting update tariff with id '{article.Id}'.");
                 article.UpdatedAt = DateTime.UtcNow;
                 var originalArticle = await _context.Articles.SingleAsync(x => x.Id.Equals(article.Id));
-                var updatedArticle = RestrictedUpdate(originalArticle, article) as Article;
+                var updatedArticle = BasicRestrictedUpdate(originalArticle, article) as Article;
                 await _context.TrySaveChangesAsync();
                 _logger.LogDebug($"Update data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(RestrictedUpdateAsync)}'.");
@@ -405,8 +405,8 @@ namespace SDCWebApp.Services
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError($"{ex.GetType().Name} - Changes made by add operations cannot be saved properly. See inner exception. Operation failed.", ex);
-                var internalException = new InternalDbServiceException("Changes made by add operations cannot be saved properly. See inner exception for more details.", ex);
+                _logger.LogError($"{ex.GetType().Name} - Changes made by add operations cannot be saved properly. See the inner exception for more details.. Operation failed.", ex);
+                var internalException = new InternalDbServiceException("Changes made by add operations cannot be saved properly. See the inner exception for more details.", ex);
                 throw internalException;
             }
             catch (InvalidOperationException ex)
