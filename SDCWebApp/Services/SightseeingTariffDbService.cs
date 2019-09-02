@@ -39,8 +39,26 @@ namespace SDCWebApp.Services
         /// cannot save properly any changes made by add operation.</exception>
         public async Task<SightseeingTariff> AddAsync(SightseeingTariff tariff)
         {
+            _logger.LogInformation($"Starting method '{nameof(AddAsync)}'.");
             // Call normal add mode.
             return await AddBaseAsync(tariff);
+        }
+
+        /// <summary>
+        /// Asynchronously adds <see cref="SightseeingTariff"/> entity to the database. Do not allow add entity with the same Description property. Throws an exception if 
+        /// already there is the same entity in database or any problem with saving changes occurred.
+        /// </summary>
+        /// <param name="tariff">The tariff to be added. Cannot be null.</param>
+        /// <returns>The added entity.</returns>
+        /// <exception cref="ArgumentNullException">The value of <paramref name="tariff"/> to be added is null.</exception>
+        /// <exception cref="InvalidOperationException">There is the same entity that one to be added in database.</exception>
+        /// <exception cref="InternalDbServiceException">The table with <see cref="SightseeingTariff"/> entities does not exist or it is null or 
+        /// cannot save properly any changes made by add operation.</exception>
+        public async Task<SightseeingTariff> RestrictedAddAsync(SightseeingTariff tariff)
+        {
+            _logger.LogInformation($"Starting method '{nameof(RestrictedAddAsync)}'.");
+            // Call restricted add mode.
+            return await AddBaseAsync(tariff, true);
         }
 
         /// <summary>
@@ -237,6 +255,7 @@ namespace SDCWebApp.Services
         /// other problems with retrieving data from database occurred.</exception>
         public async Task<SightseeingTariff> UpdateAsync(SightseeingTariff tariff)
         {
+            _logger.LogInformation($"Starting method '{nameof(UpdateAsync)}'.");
             // Call normal update mode.
             return await UpdateBaseAsync(tariff);
         }
@@ -254,24 +273,9 @@ namespace SDCWebApp.Services
         /// other problems with retrieving data from database occurred.</exception>
         public async Task<SightseeingTariff> RestrictedUpdateAsync(SightseeingTariff tariff)
         {
+            _logger.LogInformation($"Starting method '{nameof(BasicRestrictedUpdate)}'.");
             // Call restricted update mode.
             return await UpdateBaseAsync(tariff, true);
-        }
-
-        /// <summary>
-        /// Asynchronously adds <see cref="SightseeingTariff"/> entity to the database. Do not allow add entity with the same Description property. Throws an exception if 
-        /// already there is the same entity in database or any problem with saving changes occurred.
-        /// </summary>
-        /// <param name="tariff">The tariff to be added. Cannot be null.</param>
-        /// <returns>The added entity.</returns>
-        /// <exception cref="ArgumentNullException">The value of <paramref name="tariff"/> to be added is null.</exception>
-        /// <exception cref="InvalidOperationException">There is the same entity that one to be added in database.</exception>
-        /// <exception cref="InternalDbServiceException">The table with <see cref="SightseeingTariff"/> entities does not exist or it is null or 
-        /// cannot save properly any changes made by add operation.</exception>
-        public async Task<SightseeingTariff> RestrictedAddAsync(SightseeingTariff tariff)
-        {
-            // Call restricted add mode.
-            return await AddBaseAsync(tariff, true);
         }
 
 
@@ -293,7 +297,7 @@ namespace SDCWebApp.Services
         /// <returns>Updated <see cref="SightseeingTariff"/> entity.</returns>
         private async Task<SightseeingTariff> UpdateBaseAsync(SightseeingTariff tariff, bool isRestrict = false)
         {
-            _logger.LogInformation($"Starting method '{nameof(UpdateAsync)}'.");
+            _logger.LogDebug($"Starting method '{nameof(UpdateBaseAsync)}'.");
 
             _ = tariff ?? throw new ArgumentNullException(nameof(tariff), $"Argument '{nameof(tariff)}' cannot be null.");
 
@@ -314,6 +318,7 @@ namespace SDCWebApp.Services
                 _logger.LogDebug($"Starting update tariff with id '{tariff.Id}'.");
 
                 SightseeingTariff updatedTariff = null;
+                tariff.UpdatedAt = DateTime.UtcNow;
 
                 if (isRestrict)
                 {
@@ -332,10 +337,9 @@ namespace SDCWebApp.Services
                     updatedTariff = _context.SightseeingTariffs.Update(tariff).Entity;
                 }
 
-                tariff.UpdatedAt = DateTime.UtcNow;
                 await _context.TrySaveChangesAsync();
                 _logger.LogDebug($"Update data succeeded.");
-                _logger.LogInformation($"Finished method '{nameof(UpdateAsync)}'.");
+                _logger.LogDebug($"Finished method '{nameof(UpdateBaseAsync)}'.");
                 return updatedTariff;
             }
             catch (InvalidOperationException ex)
@@ -355,13 +359,13 @@ namespace SDCWebApp.Services
         /// Asynchronously adds <see cref="SightseeingTariff"/> entity. If <paramref name="isRestrict"/> set to false then no restrictions will be used. If set to true then the restricted mode will be used.
         /// It will check if in database is entity with the same 'Name' value. Moreover it will does not allow to add navigation property while adding <see cref="SightseeingTariff"/>.
         /// </summary>
-        /// <param name="tariff">SightseeingTariff To be add.</param>
+        /// <param name="tariff"><see cref="SightseeingTariff"/> to be added.</param>
         /// <param name="isRestrict">If set to false then no restrictions will be used and update allow entirely entity updating. If set to true then the restricted mode will be used.
         /// It will check if in database is entity with the same 'Name' value. Moreover it will does not allow to add navigation property while adding <see cref="SightseeingTariff"/>.</param>
         /// <returns>Added <see cref="SightseeingTariff"/> entity.</returns>
         private async Task<SightseeingTariff> AddBaseAsync(SightseeingTariff tariff, bool isRestrict = false)
         {
-            _logger.LogInformation($"Starting method '{nameof(AddAsync)}'.");
+            _logger.LogDebug($"Starting method '{nameof(AddBaseAsync)}'.");
 
             if (tariff is null)
                 throw new ArgumentNullException($"Argument '{nameof(tariff)}' cannot be null.");
@@ -392,12 +396,12 @@ namespace SDCWebApp.Services
                 var addedTariff = _context.SightseeingTariffs.Add(tariff).Entity;
                 await _context.TrySaveChangesAsync();
                 _logger.LogDebug("Add data succeeded.");
-                _logger.LogInformation($"Finished method '{nameof(AddAsync)}'.");
+                _logger.LogDebug($"Finished method '{nameof(AddBaseAsync)}'.");
                 return addedTariff;
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError($"{ex.GetType().Name} - Changes made by add operations cannot be saved properly. See the inner exception for more details.. Operation failed.", ex);
+                _logger.LogError($"{ex.GetType().Name} - Changes made by add operations cannot be saved properly. See the inner exception for more details. Operation failed.", ex);
                 var internalException = new InternalDbServiceException("Changes made by add operations cannot be saved properly. See the inner exception for more details.", ex);
                 throw internalException;
             }

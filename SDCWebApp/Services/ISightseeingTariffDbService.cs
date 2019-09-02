@@ -55,6 +55,19 @@ namespace SDCWebApp.Services
         Task<SightseeingTariff> UpdateAsync(SightseeingTariff tariff);
 
         /// <summary>
+        /// Asynchronously updates <see cref="SightseeingTariff"/> entity ignoring read-only properties like Id, CreatedAt, UpdatedAt, ConcurrencyToken. 
+        /// Throws an exception if cannot found entity or any problem with updating occurred.
+        /// </summary>
+        /// <param name="tariff">The tariff to be updated. Cannot be null or has Id property set to null or empty string.</param>
+        /// <returns>Updated entity.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="tariff"/> is null.</exception>
+        /// <exception cref="ArgumentException"><paramref name="tariff"/> has Id property set to null or empty string.</exception>
+        /// <exception cref="InvalidOperationException">Cannot found entity to be updated.</exception>
+        /// <exception cref="InternalDbServiceException">The resource does not exist or has a null value or any
+        /// other problems with retrieving data from database occurred.</exception>
+        Task<SightseeingTariff> RestrictedUpdateAsync(SightseeingTariff tariff);
+
+        /// <summary>
         /// Asynchronously deletes <see cref="SightseeingTariff"/> entity from the database. Throws an exception if cannot found entity 
         /// to be deleted or any problem with saving changes occurred.
         /// </summary>
@@ -87,19 +100,6 @@ namespace SDCWebApp.Services
         /// <exception cref="InvalidOperationException">There is the same entity that one to be added in database.</exception>
         /// <exception cref="InternalDbServiceException">The table with <see cref="SightseeingTariff"/> entities does not exist or it is null or 
         /// cannot save properly any changes made by add operation.</exception>
-        Task<SightseeingTariff> RestrictedAddAsync(SightseeingTariff tariff);
-
-        /// <summary>
-        /// Asynchronously updates <see cref="SightseeingTariff"/> entity ignoring read-only properties like Id, CreatedAt, UpdatedAt, ConcurrencyToken. 
-        /// Throws an exception if cannot found entity or any problem with updating occurred.
-        /// </summary>
-        /// <param name="tariff">The tariff to be updated. Cannot be null or has Id property set to null or empty string.</param>
-        /// <returns>Updated entity.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="tariff"/> is null.</exception>
-        /// <exception cref="ArgumentException"><paramref name="tariff"/> has Id property set to null or empty string.</exception>
-        /// <exception cref="InvalidOperationException">Cannot found entity to be updated.</exception>
-        /// <exception cref="InternalDbServiceException">The resource does not exist or has a null value or any
-        /// other problems with retrieving data from database occurred.</exception>
-        Task<SightseeingTariff> RestrictedUpdateAsync(SightseeingTariff tariff);
+        Task<SightseeingTariff> RestrictedAddAsync(SightseeingTariff tariff);       
     }
 }

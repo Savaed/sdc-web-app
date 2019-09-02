@@ -21,7 +21,7 @@ namespace SDCWebApp.Models
         public bool Equals(Article article)
         {
             // If parameter is null, return false.
-            if (ReferenceEquals(article, null))
+            if (article is null)
             {
                 return false;
             }

@@ -1,8 +1,8 @@
-﻿using SDCWebApp.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+
+using SDCWebApp.Models;
 
 namespace SDCWebApp.Services
 {
@@ -41,7 +41,31 @@ namespace SDCWebApp.Services
         /// other problems with retrieving data from database occurred.</exception>
         Task<IEnumerable<Article>> GetWithPaginationAsync(int pageNumber, int pageSize);
 
+        /// <summary>
+        /// Asynchronously updates <see cref="Article"/> entity. 
+        /// Throws an exception if cannot found entity or any problem with updating occurred.
+        /// </summary>
+        /// <param name="article">The article to be updated. Cannot be null or has Id property set to null or empty string.</param>
+        /// <returns>Updated entity.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="article"/> is null.</exception>
+        /// <exception cref="ArgumentException"><paramref name="article"/> has Id property set to null or empty string.</exception>
+        /// <exception cref="InvalidOperationException">Cannot found entity to be updated.</exception>
+        /// <exception cref="InternalDbServiceException">The resource does not exist or has a null value or any
+        /// other problems with retrieving data from database occurred.</exception>
         Task<Article> UpdateAsync(Article article);
+
+        /// <summary>
+        /// Asynchronously updates <see cref="Article"/> entity ignoring read-only properties like as Id, CreatedAt, UpdatedAt, ConcurrencyToken. 
+        /// Throws an exception if cannot found entity or any problem with updating occurred.
+        /// </summary>
+        /// <param name="article">The article to be updated. Cannot be null or has Id property set to null or empty string.</param>
+        /// <returns>Updated entity.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="article"/> is null.</exception>
+        /// <exception cref="ArgumentException"><paramref name="article"/> has Id property set to null or empty string.</exception>
+        /// <exception cref="InvalidOperationException">Cannot found entity to be updated.</exception>
+        /// <exception cref="InternalDbServiceException">The resource does not exist or has a null value or any
+        /// other problems with retrieving data from database occurred.</exception>
+        Task<Article> RestrictedUpdateAsync(Article article);
 
         /// <summary>
         /// Asynchronously deletes <see cref="Article"/> entity from the database. Throws an exception if cannot found entity 
@@ -66,10 +90,16 @@ namespace SDCWebApp.Services
         /// cannot save properly any changes made by add operation.</exception>
         Task<Article> AddAsync(Article article);
 
-
-        Task<Article> RestrictedAddAsync(Article article);
-
-        Task<Article> RestrictedUpdateAsync(Article article);
-
+        /// <summary>
+        /// Asynchronously adds <see cref="Article"/> entity to the database. Do not allow to add an entity with the same Title, Text and Author properties.  
+        /// Throws an exception if already there is the same entity in database or any problem with saving changes occurred.
+        /// </summary>
+        /// <param name="article">The article to be added. Cannot be null.</param>
+        /// <returns>The added entity.</returns>
+        /// <exception cref="ArgumentNullException">The value of <paramref name="article"/> to be added is null.</exception>
+        /// <exception cref="InvalidOperationException">There is the same entity that one to be added in database.</exception>
+        /// <exception cref="InternalDbServiceException">The table with <see cref="Article"/> entities does not exist or it is null or 
+        /// cannot save properly any changes made by add operation.</exception>
+        Task<Article> RestrictedAddAsync(Article article);    
     }
 }

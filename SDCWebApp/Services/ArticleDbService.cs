@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+
 using SDCWebApp.Data;
 using SDCWebApp.Helpers.Extensions;
 using SDCWebApp.Models;
@@ -39,42 +40,25 @@ namespace SDCWebApp.Services
         public async Task<Article> AddAsync(Article article)
         {
             _logger.LogInformation($"Starting method '{nameof(AddAsync)}'.");
+            // Call normal add mode.
+            return await AddBaseAsync(article);
+        }
 
-            if (article is null)
-                throw new ArgumentNullException($"Argument '{nameof(article)}' cannot be null.");
-
-            await EnsureDatabaseCreatedAsync();
-            _ = _context?.Articles ?? throw new InternalDbServiceException($"Table of type '{typeof(Article).Name}' is null.");
-
-            try
-            {
-                if (_context.Articles.Contains(article))
-                    throw new InvalidOperationException($"There is already the same element in the database as the one to be added. Id of this element: '{article.Id}'.");
-
-                _logger.LogDebug($"Starting add article with id '{article.Id}'.");
-                var addedTariff = _context.Articles.Add(article).Entity;
-                await _context.TrySaveChangesAsync();
-                _logger.LogDebug("Add data succeeded.");
-                _logger.LogInformation($"Finished method '{nameof(AddAsync)}'.");
-                return addedTariff;
-            }
-            catch (DbUpdateException ex)
-            {
-                _logger.LogError($"{ex.GetType().Name} Changes made by add operations cannot be saved properly. See the inner exception for more details.. Operation failed.", ex);
-                var internalException = new InternalDbServiceException("Changes made by add operations cannot be saved properly. See the inner exception for more details.", ex);
-                throw internalException;
-            }
-            catch (InvalidOperationException ex)
-            {
-                _logger.LogError($"{ex.GetType().Name} There is already the same element in the database as the one to be added. Id of this element: '{article.Id}'.", ex);
-                throw;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when adding ticket article with id '{article?.Id}' to the database. See inner excpetion for more details.", ex);
-                throw internalException;
-            }
+        /// <summary>
+        /// Asynchronously adds <see cref="Article"/> entity to the database. Do not allow to add an entity with the same Title, Text and Author properties.  
+        /// Throws an exception if already there is the same entity in database or any problem with saving changes occurred.
+        /// </summary>
+        /// <param name="article">The article to be added. Cannot be null.</param>
+        /// <returns>The added entity.</returns>
+        /// <exception cref="ArgumentNullException">The value of <paramref name="article"/> to be added is null.</exception>
+        /// <exception cref="InvalidOperationException">There is the same entity that one to be added in database.</exception>
+        /// <exception cref="InternalDbServiceException">The table with <see cref="Article"/> entities does not exist or it is null or 
+        /// cannot save properly any changes made by add operation.</exception>
+        public async Task<Article> RestrictedAddAsync(Article article)
+        {
+            _logger.LogInformation($"Starting method '{nameof(RestrictedAddAsync)}'.");
+            // Call restricted add mode.
+            return await AddBaseAsync(article, true);
         }
 
         /// <summary>
@@ -271,50 +255,18 @@ namespace SDCWebApp.Services
         /// other problems with retrieving data from database occurred.</exception>
         public async Task<Article> UpdateAsync(Article article)
         {
+            // If _context.Articles does not null, but does not exist (as table in database, not as object using by EF Core)
+            // following if statement (exactly Count method) will throw exception about this table ("no such table: 'Articles'." or something like that).
+            // So you can catch this exception and re-throw in InternalDbServiceException to next handling in next level layer e.g Controller.
+
+            // Maybe throwing exception in try block seems to be bad practice and a little bit tricky, but in this case is neccessery.
+            // Refference to Groups while it does not exist cause throwing exception and without this 2 conditions below you cannot check 
+            // is there any element for update in database.
+
             _logger.LogInformation($"Starting method '{nameof(UpdateAsync)}'.");
 
-            _ = article ?? throw new ArgumentNullException(nameof(article), $"Argument '{nameof(article)}' cannot be null.");
-
-            if (string.IsNullOrEmpty(article.Id))
-                throw new ArgumentException($"Argument '{nameof(article.Id)}' cannot be null or empty.");
-
-            await EnsureDatabaseCreatedAsync();
-            _ = _context?.Articles ?? throw new InternalDbServiceException($"Table of type '{typeof(Article).Name}' is null.");
-
-            try
-            {
-                // If _context.Articles does not null, but does not exist (as table in database, not as object using by EF Core)
-                // following if statement (exactly Count method) will throw exception about this table ("no such table: 'Articles'." or something like that).
-                // So you can catch this exception and re-throw in InternalDbServiceException to next handling in next level layer e.g Controller.
-
-                // Maybe throwing exception in try block seems to be bad practice and a little bit tricky, but in this case is neccessery.
-                // Refference to Groups while it does not exist cause throwing exception and without this 2 conditions below you cannot check 
-                // is there any element for update in database.
-                if (_context.Articles.Count() == 0)
-                    throw new InvalidOperationException($"Cannot found element with id '{article.Id}' for update. Resource {_context.Articles.GetType().Name} does not contain any element.");
-
-                if (await _context.Articles.ContainsAsync(article) == false)
-                    throw new InvalidOperationException($"Cannot found element with id '{article.Id}' for update. Any element does not match to the one to be updated.");
-
-                _logger.LogDebug($"Starting update tariff with id '{article.Id}'.");
-                article.UpdatedAt = DateTime.UtcNow;
-                var updatedArticle = _context.Articles.Update(article).Entity;
-                await _context.TrySaveChangesAsync();
-                _logger.LogDebug($"Update data succeeded.");
-                _logger.LogInformation($"Finished method '{nameof(UpdateAsync)}'.");
-                return updatedArticle;
-            }
-            catch (InvalidOperationException ex)
-            {
-                _logger.LogError(ex, $"{ex.GetType().Name} Cannot found element for update. See exception for more details. Operation failed.");
-                throw;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when updating article with id '{article.Id}'. See inner excpetion for more details.", ex);
-                throw internalException;
-            }
+            // Call normal update mode.
+            return await UpdateBaseAsync(article);
         }
 
         /// <summary>
@@ -331,6 +283,86 @@ namespace SDCWebApp.Services
         public async Task<Article> RestrictedUpdateAsync(Article article)
         {
             _logger.LogInformation($"Starting method '{nameof(RestrictedUpdateAsync)}'.");
+            // Call restricted update mode.
+            return await UpdateBaseAsync(article, true);
+        }    
+
+
+        #region Privates
+
+        /// <summary>
+        /// Asynchronously adds <see cref="Article"/> entity. If <paramref name="isRestrict"/> set to false then no restrictions will be used. If set to true then the restricted mode will be used.
+        /// It will check if in database is entity with the same 'Title', 'Text', 'Author' value.
+        /// </summary>
+        /// <param name="article"><see cref="Article"/> to be added.</param>
+        /// <param name="isRestrict">If set to false then no restrictions will be used and update allow entirely entity updating. If set to true then the restricted mode will be used.
+        /// It will check if in database is entity with the same 'Title', 'Text', 'Author' value.</param>
+        /// <returns>Added <see cref="Article"/> entity.</returns>
+        private async Task<Article> AddBaseAsync(Article article, bool isRestrict = false)
+        {
+            _logger.LogInformation($"Starting method '{nameof(AddAsync)}'.");
+
+            if (article is null)
+                throw new ArgumentNullException($"Argument '{nameof(article)}' cannot be null.");
+
+            await EnsureDatabaseCreatedAsync();
+            _ = _context?.Articles ?? throw new InternalDbServiceException($"Table of type '{typeof(Article).Name}' is null.");
+
+            try
+            {
+                if (isRestrict)
+                {
+                    // Resticted add mode that use custom equality comparer. The sightseeing tariffs are equal if they have the same Name.
+
+                    // Check if exist in db tariff with the same 'Title', 'Text' and 'Author' as adding.
+                    if (await IsEntityAlreadyExistsAsync(article))
+                        throw new InvalidOperationException($"There is already the same element in the database as the one to be added. The value of '{nameof(article.Title)}', " +
+                            $"'{nameof(article.Text)}' and '{nameof(article.Author)}' are not unique.");
+                }
+                else
+                {
+                    // Normal add mode without any additional restrictions.
+                    if (_context.Articles.Contains(article))
+                        throw new InvalidOperationException($"There is already the same element in the database as the one to be added. Id of this element: '{article.Id}'.");
+                }
+
+                _logger.LogDebug($"Starting add tariff with id '{article.Id}'.");
+                var addedArticle = _context.Articles.Add(article).Entity;
+                await _context.TrySaveChangesAsync();
+                _logger.LogDebug("Add data succeeded.");
+                _logger.LogInformation($"Finished method '{nameof(AddAsync)}'.");
+                return addedArticle;
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError($"{ex.GetType().Name} - Changes made by add operations cannot be saved properly. See the inner exception for more details. Operation failed.", ex);
+                var internalException = new InternalDbServiceException("Changes made by add operations cannot be saved properly. See the inner exception for more details.", ex);
+                throw internalException;
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogError($"{ex.GetType().Name} - {ex.Message}", ex);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
+                var internalException = new InternalDbServiceException($"Encountered problem when adding an article to the database. See the inner excpetion for more details.", ex);
+                throw internalException;
+            }
+        }
+
+        /// <summary>
+        /// Asynchronously updates <see cref="Article"/> entity. If <paramref name="isRestrict"/> set to false then no restrictions will be used and update allow entirely entity updating. 
+        /// Otherwise the restricted mode will be using. It will ignore updating some read-only properties.
+        /// </summary>
+        /// <param name="article"><see cref="Article"/> to be updated.</param>
+        /// <param name="isRestrict">If set to false then no restrictions will be used and update allow entirely entity updating. If set to true then the restricted mode will be used.
+        /// It will ignore some read-only properties changes.</param>
+        /// <returns>Updated <see cref="Article"/> entity.</returns>
+        private async Task<Article> UpdateBaseAsync(Article article, bool isRestrict = false)
+        {
+            _logger.LogDebug($"Starting method '{nameof(UpdateBaseAsync)}'.");
 
             _ = article ?? throw new ArgumentNullException(nameof(article), $"Argument '{nameof(article)}' cannot be null.");
 
@@ -341,7 +373,7 @@ namespace SDCWebApp.Services
             _ = _context?.Articles ?? throw new InternalDbServiceException($"Table of type '{typeof(Article).Name}' is null.");
 
             try
-            {                
+            {
                 if (_context.Articles.Count() == 0)
                     throw new InvalidOperationException($"Cannot found element with id '{article.Id}' for update. Resource {_context.Articles.GetType().Name} does not contain any element.");
 
@@ -349,12 +381,25 @@ namespace SDCWebApp.Services
                     throw new InvalidOperationException($"Cannot found element with id '{article.Id}' for update. Any element does not match to the one to be updated.");
 
                 _logger.LogDebug($"Starting update tariff with id '{article.Id}'.");
+
+                Article updatedArticle = null;
                 article.UpdatedAt = DateTime.UtcNow;
-                var originalArticle = await _context.Articles.SingleAsync(x => x.Id.Equals(article.Id));
-                var updatedArticle = BasicRestrictedUpdate(originalArticle, article) as Article;
+
+                if (isRestrict)
+                {
+                    // Resticted update mode that ignores all changes in read-only properties like Id, CreatedAt, UpdatedAt, ConcurrencyToken.
+                    var originalArticle = await _context.Articles.SingleAsync(x => x.Id.Equals(article.Id));
+                    updatedArticle = BasicRestrictedUpdate(originalArticle, article) as Article;
+                }
+                else
+                {
+                    // Normal update mode without any additional restrictions.
+                    updatedArticle = _context.Articles.Update(article).Entity;
+                }
+
                 await _context.TrySaveChangesAsync();
                 _logger.LogDebug($"Update data succeeded.");
-                _logger.LogInformation($"Finished method '{nameof(RestrictedUpdateAsync)}'.");
+                _logger.LogDebug($"Finished method '{nameof(UpdateBaseAsync)}'.");
                 return updatedArticle;
             }
             catch (InvalidOperationException ex)
@@ -364,79 +409,17 @@ namespace SDCWebApp.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
+                _logger.LogError(ex, $"{ex.GetType().Name} - {ex.Message}");
                 var internalException = new InternalDbServiceException($"Encountered problem when updating article with id '{article.Id}'. See inner excpetion for more details.", ex);
                 throw internalException;
             }
-        }
-
-        /// <summary>
-        /// Asynchronously adds <see cref="Article"/> entity to the database. Do not allow to add an entity with the same Title, Text and Author properties.  
-        /// Throws an exception if already there is the same entity in database or any problem with saving changes occurred.
-        /// </summary>
-        /// <param name="article">The article to be added. Cannot be null.</param>
-        /// <returns>The added entity.</returns>
-        /// <exception cref="ArgumentNullException">The value of <paramref name="article"/> to be added is null.</exception>
-        /// <exception cref="InvalidOperationException">There is the same entity that one to be added in database.</exception>
-        /// <exception cref="InternalDbServiceException">The table with <see cref="Article"/> entities does not exist or it is null or 
-        /// cannot save properly any changes made by add operation.</exception>
-        public async Task<Article> RestrictedAddAsync(Article article)
-        {
-            _logger.LogInformation($"Starting method '{nameof(RestrictedAddAsync)}'.");
-
-            if (article is null)
-                throw new ArgumentNullException($"Argument '{nameof(article)}' cannot be null.");
-
-            await EnsureDatabaseCreatedAsync();
-            _ = _context?.Articles ?? throw new InternalDbServiceException($"Table of type '{typeof(Article).Name}' is null.");
-
-            try
-            {
-                if (await IsEntityAlreadyExistsAsync(article))
-                    throw new InvalidOperationException($"There is already the same element in the database as the one to be added. " +
-                        $"The value of '{nameof(article.Title)}', '{nameof(article.Text)}' and '{nameof(article.Author)}' must be unique.");
-
-                _logger.LogDebug($"Starting add article with id '{article.Id}'.");
-                var addedTariff = _context.Articles.Add(article).Entity;
-                await _context.TrySaveChangesAsync();
-                _logger.LogDebug("Add data succeeded.");
-                _logger.LogInformation($"Finished method '{nameof(RestrictedAddAsync)}'.");
-                return addedTariff;
-            }
-            catch (DbUpdateException ex)
-            {
-                _logger.LogError($"{ex.GetType().Name} - Changes made by add operations cannot be saved properly. See the inner exception for more details.. Operation failed.", ex);
-                var internalException = new InternalDbServiceException("Changes made by add operations cannot be saved properly. See the inner exception for more details.", ex);
-                throw internalException;
-            }
-            catch (InvalidOperationException ex)
-            {
-                _logger.LogError($"{ex.GetType().Name} - There is already the same element in the database as the one to be added. " +
-                        $"The value of '{nameof(article.Title)}', '{nameof(article.Text)}' and '{nameof(article.Author)}' must be unique.", ex);
-                throw;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"{ex.GetType().Name} - {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when adding ticket article with id '{article?.Id}' to the database. See inner excpetion for more details.", ex);
-                throw internalException;
-            }
-        }
-
-
-        #region Privates
-
-        private async Task EnsureDatabaseCreatedAsync()
-        {
-            if (await _context.Database.EnsureCreatedAsync() == false)
-                _logger.LogWarning($"Database with provider '{_context.Database.ProviderName}' does not exist. NOTE It will be created but not using migrations so it cannot be updating using migrations later.");
         }
 
         protected override async Task<bool> IsEntityAlreadyExistsAsync(BasicEntity entity)
         {
             var allArticles = await _context.Articles.ToArrayAsync();
             return allArticles.Any(x => x.Equals(entity as Article));
-        }       
+        }
 
         #endregion
 

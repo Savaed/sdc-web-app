@@ -1,19 +1,14 @@
 ﻿using FluentAssertions;
-using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SDCWebApp.Data;
-using SDCWebApp.Data.Validators;
 using SDCWebApp.Models;
 using SDCWebApp.Services;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using UnitTests.Helpers;
 
@@ -22,7 +17,7 @@ namespace UnitTests.Services
     [TestFixture]
     public class ArticleDbServiceTests
     {
-        private static Article[] _articleForRestrictedUpdateCases = new Article[]
+        private static readonly Article[] _articleForRestrictedUpdateCases = new Article[]
         {
             new Article{ ConcurrencyToken = Encoding.ASCII.GetBytes("Updated ConcurrencyToken") },    // Attempt to change 'ConcurrencyToken' which is read-only property.
             new Article{ UpdatedAt = DateTime.Now.AddYears(100) }                                     // Attempt to change 'UpdatedAt' which is read-only property.
@@ -466,6 +461,7 @@ namespace UnitTests.Services
                 using (var context = await factory.CreateContextAsync())
                 {
                     _validArticle.Title = "changed title";
+                    _validArticle.Text = "changed text";
                     var service = new ArticleDbService(context, _logger);
 
                     Func<Task> result = async () => await service.RestrictedAddAsync(_validArticle);

@@ -431,11 +431,7 @@ namespace SDCWebApp.Services
             return allInfo.Any(x => x.Equals(entity as GeneralSightseeingInfo));
         }
 
-        private async Task EnsureDatabaseCreatedAsync()
-        {
-            if (await _context.Database.EnsureCreatedAsync() == false)
-                _logger.LogWarning($"Database with provider '{_context.Database.ProviderName}' does not exist. It Will be created but not using migrations so it cannot be updating using migrations later.");
-        }
+     
 
         #endregion
 
