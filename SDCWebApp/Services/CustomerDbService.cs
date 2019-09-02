@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+
 using SDCWebApp.Data;
 using SDCWebApp.Helpers.Extensions;
 using SDCWebApp.Models;
@@ -32,49 +33,32 @@ namespace SDCWebApp.Services
         /// </summary>
         /// <param name="customer">The customer to be added. Cannot be null.</param>
         /// <returns>The added entity.</returns>
-        /// <exception cref="ArgumentNullException">The value of <paramref name="customer"/> to be added is null.</exception>
+        /// <exception cref="ArgumentNullException">The value of <paramref name="customer"/> is null.</exception>
         /// <exception cref="InvalidOperationException">There is the same entity that one to be added in database.</exception>
         /// <exception cref="InternalDbServiceException">The table with <see cref="Customer"/> entities does not exist or it is null or 
         /// cannot save properly any changes made by add operation.</exception>
         public async Task<Customer> AddAsync(Customer customer)
         {
             _logger.LogInformation($"Starting method '{nameof(AddAsync)}'.");
+            // Call normal add mode.
+            return await AddBaseAsync(customer);
+        }
 
-            if (customer is null)
-                throw new ArgumentNullException($"Argument '{nameof(customer)}' cannot be null.");
-
-            await EnsureDatabaseCreatedAsync();
-            _ = _context?.Customers ?? throw new InternalDbServiceException($"Table of type '{typeof(Customer).Name}' is null.");
-
-            try
-            {
-                if (_context.Customers.Contains(customer))
-                    throw new InvalidOperationException($"There is already the same element in the database as the one to be added. Id of this element: '{customer.Id}'.");
-
-                _logger.LogDebug($"Starting add customer with id '{customer.Id}'.");
-                var addedCustomer = _context.Customers.Add(customer).Entity;
-                await _context.TrySaveChangesAsync();
-                _logger.LogDebug("Add data succeeded.");
-                _logger.LogInformation($"Finished method '{nameof(AddAsync)}'.");
-                return addedCustomer;
-            }
-            catch (DbUpdateException ex)
-            {
-                _logger.LogError($"{ex.GetType().Name} Changes made by add operations cannot be saved properly. See the inner exception. Operation failed.", ex);
-                var internalException = new InternalDbServiceException("Changes made by add operations cannot be saved properly. See the inner exception", ex);
-                throw internalException;
-            }
-            catch (InvalidOperationException ex)
-            {
-                _logger.LogError($"{ex.GetType().Name} There is already the same element in the database as the one to be added. Id of this element: '{customer.Id}'.", ex);
-                throw;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when adding customer with id '{customer?.Id}' to the database. See inner excpetion", ex);
-                throw internalException;
-            }
+        /// <summary>
+        /// Asynchronously adds <see cref="Customer"/> entity to the database. Does not allow to add entity with the same EmailAddress.
+        /// Throws an exception if already there is the same entity in database or any problem with saving changes occurred.
+        /// </summary>
+        /// <param name="customer">The customer to be added. Cannot be null.</param>
+        /// <returns>The added entity.</returns>
+        /// <exception cref="ArgumentNullException">The value of <paramref name="customer"/> is null.</exception>
+        /// <exception cref="InvalidOperationException">There is the same entity that one to be added in database.</exception>
+        /// <exception cref="InternalDbServiceException">The table with <see cref="Customer"/> entities does not exist or it is null or 
+        /// cannot save properly any changes made by add operation.</exception>
+        public async Task<Customer> RestrictedAddAsync(Customer customer)
+        {
+            _logger.LogInformation($"Starting method '{nameof(RestrictedAddAsync)}'.");
+            // Call restricted add mode.
+            return await AddBaseAsync(customer, true);
         }
 
         /// <summary>
@@ -113,13 +97,13 @@ namespace SDCWebApp.Services
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} Cannot found element. See exception Operation failed.");
+                _logger.LogError(ex, $"{ex.GetType().Name} - Cannot found element. See exception Operation failed.");
                 throw;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when removing customer with id '{id}' from database. See inner excpetion", ex);
+                _logger.LogError(ex, $"{ex.GetType().Name} - {ex.Message}");
+                var internalException = new InternalDbServiceException($"Encountered problem when removing customer with id '{id}' from database. See the inner exception for more details.", ex);
                 throw internalException;
             }
         }
@@ -141,15 +125,15 @@ namespace SDCWebApp.Services
             try
             {
                 _logger.LogDebug($"Starting retrieve all customers from database.");
-                var customers = await _context.Customers.Include(x => x.Tickets).ToListAsync();
+                var customers = await _context.Customers.Include(x => x.Tickets).ToArrayAsync();
                 _logger.LogDebug("Retrieve data succeeded.");
-                _logger.LogInformation($"Finished method '{nameof(GetAllAsync)}'. Returning {customers.Count} elements.");
+                _logger.LogInformation($"Finished method '{nameof(GetAllAsync)}'. Returning {customers.Count()} elements.");
                 return customers.AsEnumerable();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when retrieving sightseeing group from database. See inner excpetion", ex);
+                _logger.LogError(ex, $"{ex.GetType().Name} - {ex.Message}");
+                var internalException = new InternalDbServiceException($"Encountered problem when retrieving all customers from database. See the inner exception for more details.", ex);
                 throw internalException;
             }
         }
@@ -184,15 +168,15 @@ namespace SDCWebApp.Services
             }
             catch (InvalidOperationException ex)
             {
-                string message = _context.Customers.Count() == 0 ? $"Element not found because resource {_context.Customers.GetType().Name} does contain any elements. See the inner exception"
-                    : "Element not found. See the inner exception";
-                _logger.LogError(ex, $"{ex.GetType().Name} {message} Operation failed.");
+                string message = _context.Customers.Count() == 0 ? $"Element not found because resource {_context.Customers.GetType().Name} does contain any elements. " +
+                    $"See the inner exception for more details." : "Element not found. See the inner exception for more details.";
+                _logger.LogError(ex, $"{ex.GetType().Name} - {message} Operation failed.");
                 throw;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when retriving customer with id '{id}' from database. See the inner exception", ex);
+                _logger.LogError(ex, $"{ex.GetType().Name} - {ex.Message}");
+                var internalException = new InternalDbServiceException($"Encountered problem when retriving customer with id '{id}' from database. See the inner exception for more details.", ex);
                 throw internalException;
             }
         }
@@ -212,10 +196,10 @@ namespace SDCWebApp.Services
             _logger.LogInformation($"Starting method '{nameof(GetWithPaginationAsync)}'.");
 
             if (pageNumber < 1)
-                throw new ArgumentOutOfRangeException(nameof(pageNumber), $"'{pageNumber}' is not valid value for argument '{nameof(pageNumber)}'. Only number greater or equal to 1 are valid.");
+                throw new ArgumentOutOfRangeException(nameof(pageNumber), $"'{pageNumber}' is not valid value for argument '{nameof(pageNumber)}'. Only number greater or equals to 1 is valid.");
 
             if (pageSize < 0)
-                throw new ArgumentOutOfRangeException(nameof(pageSize), $"'{pageSize}' is not valid value for argument '{nameof(pageSize)}'. Only number greater or equal to 0 are valid.");
+                throw new ArgumentOutOfRangeException(nameof(pageSize), $"'{pageSize}' is not valid value for argument '{nameof(pageSize)}'. Only number greater or equals to 0 is valid.");
 
             await EnsureDatabaseCreatedAsync();
             _ = _context?.Customers ?? throw new InternalDbServiceException($"Table of type '{typeof(Customer).Name}' is null.");
@@ -232,7 +216,7 @@ namespace SDCWebApp.Services
                 if (numberOfElementsOnLastPage > 0)
                 {
                     maxNumberOfPageWithData = ++numberOfFullPages;
-                    _logger.LogWarning($"Last page of data contains {numberOfElementsOnLastPage} elements which is less than specified in {nameof(pageSize)}: {pageSize}.");
+                    _logger.LogWarning($"Last page of data contains {numberOfElementsOnLastPage} elements which is less than specified in '{nameof(pageSize)}': {pageSize}.");
                 }
                 else
                     maxNumberOfPageWithData = numberOfFullPages;
@@ -252,7 +236,7 @@ namespace SDCWebApp.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when retrieving customers from database. See inner excpetion", ex);
+                var internalException = new InternalDbServiceException($"Encountered problem when retrieving customers from database. See the inner exception for more details.", ex);
                 throw internalException;
             }
         }
@@ -271,49 +255,8 @@ namespace SDCWebApp.Services
         public async Task<Customer> UpdateAsync(Customer customer)
         {
             _logger.LogInformation($"Starting method '{nameof(UpdateAsync)}'.");
-
-            _ = customer ?? throw new ArgumentNullException(nameof(customer), $"Argument '{nameof(customer)}' cannot be null.");
-
-            if (string.IsNullOrEmpty(customer.Id))
-                throw new ArgumentException($"Argument '{nameof(customer.Id)}' cannot be null or empty.");
-
-            await EnsureDatabaseCreatedAsync();
-            _ = _context?.Customers ?? throw new InternalDbServiceException($"Table of type '{typeof(Customer).Name}' is null.");
-
-            try
-            {
-                // If _context.Customers does not null, but does not exist (as table in database, not as object using by EF Core)
-                // following if statement (exactly Count method) will throw exception about this table ("no such table: 'Customers'." or something like that).
-                // So you can catch this exception and re-throw in InternalDbServiceException to next handling in next level layer e.g Controller.
-
-                // Maybe throwing exception in try block seems to be bad practice and a little bit tricky, but in this case is neccessery.
-                // Refference to Groups while it does not exist cause throwing exception and without this 2 conditions below you cannot check 
-                // is there any element for update in database.
-                if (_context.Customers.Count() == 0)
-                    throw new InvalidOperationException($"Cannot found element with id '{customer.Id}' for update. Resource {_context.Customers.GetType().Name} does not contain any element.");
-
-                if (await _context.Customers.ContainsAsync(customer) == false)
-                    throw new InvalidOperationException($"Cannot found element with id '{customer.Id}' for update. Any element does not match to the one to be updated.");
-
-                _logger.LogDebug($"Starting update customer with id '{customer.Id}'.");
-                customer.UpdatedAt = DateTime.UtcNow;
-                var updatedCustomer = _context.Customers.Update(customer).Entity;
-                await _context.TrySaveChangesAsync();
-                _logger.LogDebug($"Update data succeeded.");
-                _logger.LogInformation($"Finished method '{nameof(UpdateAsync)}'.");
-                return updatedCustomer;
-            }
-            catch (InvalidOperationException ex)
-            {
-                _logger.LogError(ex, $"{ex.GetType().Name} Cannot found element for update. See exception Operation failed.");
-                throw;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when updating customer with id '{customer.Id}'. See inner excpetion", ex);
-                throw internalException;
-            }
+            // Call normal update mode.
+            return await UpdateBaseAsync(customer);
         }
 
         /// <summary>
@@ -329,7 +272,98 @@ namespace SDCWebApp.Services
         /// other problems with retrieving data from database occurred.</exception>
         public async Task<Customer> RestrictedUpdateAsync(Customer customer)
         {
-            _logger.LogInformation($"Starting method '{nameof(RestrictedAddAsync)}'.");
+            _logger.LogInformation($"Starting method '{nameof(RestrictedUpdateAsync)}'.");
+            // Call restricted update mode.
+            return await UpdateBaseAsync(customer, true);
+        }
+     
+
+        #region Privates       
+
+        protected override async Task<bool> IsEntityAlreadyExistsAsync(BasicEntity entity)
+        {
+            var allCustomers = await _context.Customers.ToArrayAsync();
+            return allCustomers.Any(x => x.Equals(entity as Customer));
+        }
+
+        /// <summary>
+        /// Asynchronously adds <see cref="Customer"/> entity. If <paramref name="isRestrict"/> set to false then no restrictions will be used. If set to true then the restricted mode will be used.
+        /// It will check if in database is entity with the same 'EmailAddress' value.
+        /// </summary>
+        /// <param name="customer"><see cref="Customer"/> to be added.</param>
+        /// <param name="isRestrict">If set to false then no restrictions will be used and update allow entirely entity updating. If set to true then the restricted mode will be used.
+        /// It will check if in database is entity with the same 'EmailAddress' value.</param>
+        /// <returns>Added <see cref="Customer"/> entity.</returns>
+        private async Task<Customer> AddBaseAsync(Customer customer, bool isRestrict = false)
+        {
+            _logger.LogDebug($"Starting method '{nameof(AddBaseAsync)}'.");
+
+            if (customer is null)
+                throw new ArgumentNullException($"Argument '{nameof(customer)}' cannot be null.");
+
+            await EnsureDatabaseCreatedAsync();
+            _ = _context?.Customers ?? throw new InternalDbServiceException($"Table of type '{typeof(Customer).Name}' is null.");
+
+            try
+            {
+                if (_context.Customers.Contains(customer))
+                    throw new InvalidOperationException($"There is already the same element in the database as the one to be added. Id of this element: '{customer.Id}'.");
+
+
+                Customer addedCustomer = null;
+
+                if (isRestrict)
+                {
+                    // Resticted add mode that use custom equality comparer. Customers are equal if they have the same EmailAddress.
+
+                    // Check if exist in db customer with the same EmailAddress as adding.
+                    if (await IsEntityAlreadyExistsAsync(customer))
+                        throw new InvalidOperationException($"There is already the same element in the database as the one to be added. The value of '{nameof(customer.EmailAddress)}' is not unique.");
+                }
+                else
+                {
+                    // Normal add mode without any additional restrictions.
+                    if (_context.Customers.Contains(customer))
+                        throw new InvalidOperationException($"There is already the same element in the database as the one to be added. Id of this element: '{customer.Id}'.");
+                }
+
+                _logger.LogDebug($"Starting add customer with id '{customer.Id}'.");
+                addedCustomer = _context.Customers.Add(customer).Entity;
+                await _context.TrySaveChangesAsync();
+                _logger.LogDebug("Add data succeeded.");
+                _logger.LogInformation($"Finished method '{nameof(AddBaseAsync)}'.");
+                return addedCustomer;
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError($"{ex.GetType().Name} - Changes made by add operations cannot be saved properly. See the inner exception for more details.. Operation failed.", ex);
+                var internalException = new InternalDbServiceException("Changes made by add operations cannot be saved properly. See the inner exception for more details.", ex);
+                throw internalException;
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogError($"{ex.GetType().Name} - {ex.Message}", ex);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{ex.GetType().Name} - {ex.Message}");
+                var internalException = new InternalDbServiceException($"Encountered problem when adding customer to the database. See the inner exception for more details.", ex);
+                throw internalException;
+            }
+        }
+
+        /// <summary>
+        /// Asynchronously updates <see cref="Customer"/> entity. If <paramref name="isRestrict"/> set to false then no restrictions will be used and update allow entirely entity updating. 
+        /// Otherwise the restricted mode will be using. It will ignore updating some read-only properties.
+        /// </summary>
+        /// <param name="customer"><see cref="Customer"/> to be updated.</param>
+        /// <param name="isRestrict">If set to false then no restrictions will be used and update allow entirely entity updating. If set to true then the restricted mode will be used.
+        /// It will ignore some read-only properties changes.</param>
+        /// <returns>Updated <see cref="Customer"/> entity.</returns>
+        private async Task<Customer> UpdateBaseAsync(Customer customer, bool isRestrict = false)
+        {
+            _logger.LogDebug($"Starting method '{nameof(UpdateBaseAsync)}'.");
 
             _ = customer ?? throw new ArgumentNullException(nameof(customer), $"Argument '{nameof(customer)}' cannot be null.");
 
@@ -342,92 +376,44 @@ namespace SDCWebApp.Services
             try
             {
                 if (_context.Customers.Count() == 0)
-                    throw new InvalidOperationException($"Cannot found element with id '{customer.Id}' for update. Resource {_context.Articles.GetType().Name} does not contain any element.");
+                    throw new InvalidOperationException($"Cannot found element with id '{customer.Id}' for update. Resource {_context.Customers.GetType().Name} does not contain any element.");
 
                 if (await _context.Customers.ContainsAsync(customer) == false)
                     throw new InvalidOperationException($"Cannot found element with id '{customer.Id}' for update. Any element does not match to the one to be updated.");
 
                 _logger.LogDebug($"Starting update customer with id '{customer.Id}'.");
+
+                Customer updatedCustomer = null;
                 customer.UpdatedAt = DateTime.UtcNow;
-                var originalCustomer = await _context.Customers.SingleAsync(x => x.Id.Equals(customer.Id));
-                var updatedCustomer = BasicRestrictedUpdate(originalCustomer, customer) as Customer;
+
+                if (isRestrict)
+                {
+                    // Resticted update mode that ignores all changes in read-only properties like Id, CreatedAt, UpdatedAt, ConcurrencyToken.
+                    var originalCustomer = await _context.Customers.SingleAsync(x => x.Id.Equals(customer.Id));
+                    updatedCustomer = BasicRestrictedUpdate(originalCustomer, customer) as Customer;
+                }
+                else
+                {
+                    // Normal update mode without any additional restrictions.
+                    updatedCustomer = _context.Customers.Update(customer).Entity;
+                }
+
                 await _context.TrySaveChangesAsync();
                 _logger.LogDebug($"Update data succeeded.");
-                _logger.LogInformation($"Finished method '{nameof(RestrictedAddAsync)}'.");
+                _logger.LogDebug($"Finished method '{nameof(UpdateBaseAsync)}'.");
                 return updatedCustomer;
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} Cannot found element for update. See exception Operation failed.");
-                throw;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when updating article with id '{customer.Id}'. See inner excpetion", ex);
-                throw internalException;
-            }
-        }
-
-        /// <summary>
-        /// Asynchronously adds <see cref="Customer"/> entity to the database. Does not allow to add entity with the same EmailAddress.
-        /// Throws an exception if already there is the same entity in database or any problem with saving changes occurred.
-        /// </summary>
-        /// <param name="customer">The customer to be added. Cannot be null.</param>
-        /// <returns>The added entity.</returns>
-        /// <exception cref="ArgumentNullException">The value of <paramref name="customer"/> to be added is null.</exception>
-        /// <exception cref="InvalidOperationException">There is the same entity that one to be added in database.</exception>
-        /// <exception cref="InternalDbServiceException">The table with <see cref="Customer"/> entities does not exist or it is null or 
-        /// cannot save properly any changes made by add operation.</exception>
-        public async Task<Customer> RestrictedAddAsync(Customer customer)
-        {
-            _logger.LogInformation($"Starting method '{nameof(RestrictedAddAsync)}'.");
-
-            if (customer is null)
-                throw new ArgumentNullException($"Argument '{nameof(customer)}' cannot be null.");
-
-            await EnsureDatabaseCreatedAsync();
-            _ = _context?.Customers ?? throw new InternalDbServiceException($"Table of type '{typeof(Customer).Name}' is null.");
-
-            try
-            {
-                if (await IsEntityAlreadyExistsAsync(customer))
-                    throw new InvalidOperationException($"There is already the same element in the database as the one to be added. " +
-                        $"The value of '{nameof(customer.EmailAddress)}' must be unique.");
-
-                _logger.LogDebug($"Starting add article with id '{customer.Id}'.");
-                var addedCustomer = _context.Customers.Add(customer).Entity;
-                await _context.TrySaveChangesAsync();
-                _logger.LogDebug("Add data succeeded.");
-                _logger.LogInformation($"Finished method '{nameof(RestrictedAddAsync)}'.");
-                return addedCustomer;
-            }
-            catch (DbUpdateException ex)
-            {
-                _logger.LogError($"{ex.GetType().Name} - Changes made by add operations cannot be saved properly. See the inner exception. Operation failed.", ex);
-                var internalException = new InternalDbServiceException("Changes made by add operations cannot be saved properly. See the inner exception", ex);
-                throw internalException;
-            }
-            catch (InvalidOperationException ex)
-            {
-                _logger.LogError($"{ex.GetType().Name} - There is already the same element in the database as the one to be added. " +
-                        $"The value of '{nameof(customer.EmailAddress)}' must be unique.", ex);
+                _logger.LogError(ex, $"{ex.GetType().Name} Cannot found element for update. See exception for more details. Operation failed.");
                 throw;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} - {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when adding customer with id '{customer?.Id}' to the database. See inner excpetion", ex);
+                var internalException = new InternalDbServiceException($"Encountered problem when updating customer with id '{customer.Id}'. See the inner exception for more details. for more details.", ex);
                 throw internalException;
             }
-        }
-
-        #region Privates       
-
-        protected override async Task<bool> IsEntityAlreadyExistsAsync(BasicEntity entity)
-        {
-            var allCustomers = await _context.Customers.ToArrayAsync();
-            return allCustomers.Any(x => x.Equals(entity as Customer));
         }
 
         #endregion

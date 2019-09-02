@@ -102,8 +102,8 @@ namespace SDCWebApp.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when removing article with id '{id}' from database. See inner excpetion for more details.", ex);
+                _logger.LogError(ex, $"{ex.GetType().Name} - {ex.Message}");
+                var internalException = new InternalDbServiceException($"Encountered problem when removing article with id '{id}' from database. See the inner exception for more details.", ex);
                 throw internalException;
             }
         }
@@ -124,16 +124,16 @@ namespace SDCWebApp.Services
 
             try
             {
-                _logger.LogDebug($"Starting retrieve all ticket tariffs from database.");
-                var articles = await _context.Articles.ToListAsync();
+                _logger.LogDebug($"Starting retrieve all articles from database.");
+                var articles = await _context.Articles.ToArrayAsync();
                 _logger.LogDebug("Retrieve data succeeded.");
-                _logger.LogInformation($"Finished method '{nameof(GetAllAsync)}'. Returning {articles.Count} elements.");
+                _logger.LogInformation($"Finished method '{nameof(GetAllAsync)}'. Returning {articles.Count()} elements.");
                 return articles.AsEnumerable();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when retrieving all articles from database. See inner excpetion for more details.", ex);
+                _logger.LogError(ex, $"{ex.GetType().Name} - {ex.Message}");
+                var internalException = new InternalDbServiceException($"Encountered problem when retrieving all articles from database. See the inner exception for more details.", ex);
                 throw internalException;
             }
         }
@@ -170,12 +170,12 @@ namespace SDCWebApp.Services
             {
                 string message = _context.Articles.Count() == 0 ? $"Element not found because resource {_context.Articles.GetType().Name} does contain any elements. See the inner exception for more details."
                     : "Element not found. See the inner exception for more details.";
-                _logger.LogError(ex, $"{ex.GetType().Name} {message} Operation failed.");
+                _logger.LogError(ex, $"{ex.GetType().Name} - {message} Operation failed.");
                 throw;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
+                _logger.LogError(ex, $"{ex.GetType().Name} - {ex.Message}");
                 var internalException = new InternalDbServiceException($"Encountered problem when retriving article with id '{id}' from database. See the inner exception for more details.", ex);
                 throw internalException;
             }
@@ -228,7 +228,7 @@ namespace SDCWebApp.Services
                     return articles;
                 }
 
-                _logger.LogDebug($"Starting retrieve data. {nameof(pageNumber)} '{pageNumber.ToString()}', {nameof(pageSize)} '{pageSize.ToString()}'.");
+                _logger.LogDebug($"Starting retrieve data. '{nameof(pageNumber)}': {pageNumber.ToString()}, '{nameof(pageSize)}': {pageSize.ToString()}.");
                 articles = _context.Articles.Skip(pageSize * (pageNumber - 1)).Take(pageSize);
                 _logger.LogDebug("Retrieve data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(GetWithPaginationAsync)}'.");
@@ -236,8 +236,8 @@ namespace SDCWebApp.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when retrieving articles from database. See inner excpetion for more details.", ex);
+                _logger.LogError(ex, $"{ex.GetType().Name} - {ex.Message}");
+                var internalException = new InternalDbServiceException($"Encountered problem when retrieving articles from database. See the inner exception for more details.", ex);
                 throw internalException;
             }
         }
@@ -292,15 +292,15 @@ namespace SDCWebApp.Services
 
         /// <summary>
         /// Asynchronously adds <see cref="Article"/> entity. If <paramref name="isRestrict"/> set to false then no restrictions will be used. If set to true then the restricted mode will be used.
-        /// It will check if in database is entity with the same 'Title', 'Text', 'Author' value.
+        /// It will check if in database is entity with the same 'Title', 'Text' and 'Author' value.
         /// </summary>
         /// <param name="article"><see cref="Article"/> to be added.</param>
         /// <param name="isRestrict">If set to false then no restrictions will be used and update allow entirely entity updating. If set to true then the restricted mode will be used.
-        /// It will check if in database is entity with the same 'Title', 'Text', 'Author' value.</param>
+        /// It will check if in database is entity with the same 'Title', 'Text' and 'Author' value.</param>
         /// <returns>Added <see cref="Article"/> entity.</returns>
         private async Task<Article> AddBaseAsync(Article article, bool isRestrict = false)
         {
-            _logger.LogInformation($"Starting method '{nameof(AddAsync)}'.");
+            _logger.LogInformation($"Starting method '{nameof(AddBaseAsync)}'.");
 
             if (article is null)
                 throw new ArgumentNullException($"Argument '{nameof(article)}' cannot be null.");
@@ -312,9 +312,9 @@ namespace SDCWebApp.Services
             {
                 if (isRestrict)
                 {
-                    // Resticted add mode that use custom equality comparer. The sightseeing tariffs are equal if they have the same Name.
+                    // Resticted add mode that use custom equality comparer. Articles are equal if they have the same Title, Text and Author.
 
-                    // Check if exist in db tariff with the same 'Title', 'Text' and 'Author' as adding.
+                    // Check if exist in db article with the same Title, Text and Author as adding.
                     if (await IsEntityAlreadyExistsAsync(article))
                         throw new InvalidOperationException($"There is already the same element in the database as the one to be added. The value of '{nameof(article.Title)}', " +
                             $"'{nameof(article.Text)}' and '{nameof(article.Author)}' are not unique.");
@@ -330,7 +330,7 @@ namespace SDCWebApp.Services
                 var addedArticle = _context.Articles.Add(article).Entity;
                 await _context.TrySaveChangesAsync();
                 _logger.LogDebug("Add data succeeded.");
-                _logger.LogInformation($"Finished method '{nameof(AddAsync)}'.");
+                _logger.LogInformation($"Finished method '{nameof(AddBaseAsync)}'.");
                 return addedArticle;
             }
             catch (DbUpdateException ex)
@@ -380,7 +380,7 @@ namespace SDCWebApp.Services
                 if (await _context.Articles.ContainsAsync(article) == false)
                     throw new InvalidOperationException($"Cannot found element with id '{article.Id}' for update. Any element does not match to the one to be updated.");
 
-                _logger.LogDebug($"Starting update tariff with id '{article.Id}'.");
+                _logger.LogDebug($"Starting update article with id '{article.Id}'.");
 
                 Article updatedArticle = null;
                 article.UpdatedAt = DateTime.UtcNow;

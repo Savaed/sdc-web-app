@@ -1,15 +1,13 @@
-﻿using SDCWebApp.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+
+using SDCWebApp.Models;
 
 namespace SDCWebApp.Services
 {
     public interface ICustomerDbService
-    {
-      
-
+    {     
         /// <summary>
         /// Asynchronously retrievs <see cref="Customer"/> entity with given <paramref name="id"/> from the database. 
         /// Throws an exception if cannot found entity or any problem with retrieving occurred.
@@ -57,6 +55,19 @@ namespace SDCWebApp.Services
         Task<Customer> UpdateAsync(Customer customer);
 
         /// <summary>
+        /// Asynchronously updates <see cref="Customer"/> entity ignoring read-only properties like as Id, CreatedAt, UpdatedAt, ConcurrencyToken. 
+        /// Throws an exception if cannot found entity or any problem with updating occurred.
+        /// </summary>
+        /// <param name="customer">The customer to be updated. Cannot be null or has Id property set to null or empty string.</param>
+        /// <returns>Updated entity.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="customer"/> is null.</exception>
+        /// <exception cref="ArgumentException"><paramref name="customer"/> has Id property set to null or empty string.</exception>
+        /// <exception cref="InvalidOperationException">Cannot found entity to be updated.</exception>
+        /// <exception cref="InternalDbServiceException">The resource does not exist or has a null value or any
+        /// other problems with retrieving data from database occurred.</exception>
+        Task<Customer> RestrictedUpdateAsync(Customer customer);
+
+        /// <summary>
         /// Asynchronously deletes <see cref="Customer"/> entity from the database. Throws an exception if cannot found entity 
         /// to be deleted or any problem with saving changes occurred.
         /// </summary>
@@ -77,10 +88,18 @@ namespace SDCWebApp.Services
         /// <exception cref="InvalidOperationException">There is the same entity that one to be added in database.</exception>
         /// <exception cref="InternalDbServiceException">The table with <see cref="Customer"/> entities does not exist or it is null or 
         /// cannot save properly any changes made by add operation.</exception>
-        Task<Customer> AddAsync(Customer customer);
+        Task<Customer> AddAsync(Customer customer);       
 
-        Task<Customer> RestrictedUpdateAsync(Customer customer);
-
+        /// <summary>
+        /// Asynchronously adds <see cref="Customer"/> entity to the database. Does not allow to add entity with the same EmailAddress.
+        /// Throws an exception if already there is the same entity in database or any problem with saving changes occurred.
+        /// </summary>
+        /// <param name="customer">The customer to be added. Cannot be null.</param>
+        /// <returns>The added entity.</returns>
+        /// <exception cref="ArgumentNullException">The value of <paramref name="customer"/> is null.</exception>
+        /// <exception cref="InvalidOperationException">There is the same entity that one to be added in database.</exception>
+        /// <exception cref="InternalDbServiceException">The table with <see cref="Customer"/> entities does not exist or it is null or 
+        /// cannot save properly any changes made by add operation.</exception>
         Task<Customer> RestrictedAddAsync(Customer customer);
     }
 }
