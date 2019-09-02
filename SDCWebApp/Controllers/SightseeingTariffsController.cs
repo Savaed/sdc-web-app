@@ -1,17 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+
 using SDCWebApp.Models;
-using SDCWebApp.ApiErrors;
 using SDCWebApp.Models.Dtos;
 using SDCWebApp.Services;
-using Microsoft.AspNetCore.Authorization;
-using System.Net;
 
 namespace SDCWebApp.Controllers
 {
@@ -39,7 +38,7 @@ namespace SDCWebApp.Controllers
         /// <summary>
         /// Asynchronously gets <see cref="IEnumerable{SightseeingTariff}"/> wrapped in <see cref="ResponseWrapper"/>.
         /// Returns <see cref="HttpStatusCode.OK"/> response regardless if returned set is empty or not.
-        /// Throws an <see cref="InternalS ServiceException"/> or <see cref="Exception"/> if any internal problem with processing data.
+        /// Throws an <see cref="InternalDbServiceException"/> or <see cref="Exception"/> if any internal problem with processing data.
         /// </summary>
         /// <returns><see cref="IEnumerable{SightseeingTariff}"/>.</returns>
         [HttpGet]
@@ -52,9 +51,9 @@ namespace SDCWebApp.Controllers
             {
                 var tariffs = await _tariffDbService.GetAllAsync();
                 var tariffsDto = MapToDtoEnumerable(tariffs);
-                var okResponse = new ResponseWrapper(tariffsDto);
+                var response = new ResponseWrapper(tariffsDto);
                 _logger.LogInformation($"Finished method '{nameof(GetAllTariffsAsync)}'.");
-                return Ok(okResponse);
+                return Ok(response);
             }
             catch (InternalDbServiceException ex)
             {
@@ -69,12 +68,12 @@ namespace SDCWebApp.Controllers
         }
 
         /// <summary>
-        /// Asynchronously gets the most current <see cref="SightseeingTariff"/> wrapped in <see cref="ResponseWrapper"/>.
-        /// Returns <see cref="HttpStatusCode.OK"/> response if the most current <see cref="SightseeingTariff"/> found or 
+        /// Asynchronously gets the most recent <see cref="SightseeingTariff"/> wrapped in <see cref="ResponseWrapper"/>.
+        /// Returns <see cref="HttpStatusCode.OK"/> response if the most recent <see cref="SightseeingTariff"/> found or 
         /// <see cref="HttpStatusCode.NotFound"/> response if none <see cref="SightseeingTariff"/> exist. 
         /// Throws an <see cref="InternalDbServiceException"/> or <see cref="Exception"/> if any internal problem with processing data.
         /// </summary>
-        /// <returns>The most current <see cref="SightseeingTariff"/>.</returns>
+        /// <returns>The most recent <see cref="SightseeingTariff"/>.</returns>
         [HttpGet("current")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -89,9 +88,9 @@ namespace SDCWebApp.Controllers
                 var currentTariff = tariffs.OrderByDescending(x => x.UpdatedAt == DateTime.MinValue ? x.CreatedAt : x.UpdatedAt).First();
 
                 var currentTariffDto = MapToDto(currentTariff);
-                var okResponse = new ResponseWrapper(currentTariffDto);
+                var response = new ResponseWrapper(currentTariffDto);
                 _logger.LogInformation($"Finished method '{nameof(GetCurrentTariffAsync)}'.");
-                return Ok(okResponse);
+                return Ok(response);
             }
             catch (InvalidOperationException ex)
             {
@@ -133,9 +132,9 @@ namespace SDCWebApp.Controllers
             {
                 var tariff = await _tariffDbService.GetAsync(id);
                 var tariffDto = MapToDto(tariff);
-                var okResponse = new ResponseWrapper(tariffDto);
+                var response = new ResponseWrapper(tariffDto);
                 _logger.LogInformation($"Finished method '{nameof(GetTariffAsync)}'.");
-                return Ok(okResponse);
+                return Ok(response);
             }
             catch (InvalidOperationException ex)
             {
@@ -155,7 +154,7 @@ namespace SDCWebApp.Controllers
 
         /// <summary>
         /// Asynchronously adds <see cref="SightseeingTariff"/>.
-        /// Returns <see cref="HttpStatusCode.Created"/> response if <see cref="SightseeingTariff"/> created or
+        /// Returns <see cref="HttpStatusCode.Created"/> response if <see cref="SightseeingTariff"/> created succeeded or
         /// <see cref="HttpStatusCode.BadRequest"/> response if the request is malformed.
         /// Throws an <see cref="InternalDbServiceException"/> or <see cref="Exception"/> if any internal problem with processing data.
         /// </summary>
@@ -166,16 +165,17 @@ namespace SDCWebApp.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> AddTariffAsync([FromBody] SightseeingTariffDto tariff)
         {
-            //throw new NotImplementedException();
-
             _logger.LogInformation($"Starting method '{nameof(AddTariffAsync)}'.");
 
             try
             {
+                // Ignore Id if the client set it. Id of entity is set internally by the server.
+                tariff.Id = null;
+
                 var tariffToBeAdded = MapToDomainModel(tariff);
                 var addedTariff = await _tariffDbService.RestrictedAddAsync(tariffToBeAdded);
 
-                // Reverse maps from SightseeingTariff to SightseeingTariffDto only for response to the client.
+                // Reverse map only for response to the client.
                 var addedTariffDto = MapToDto(addedTariff);
                 var response = new ResponseWrapper(addedTariffDto);
                 string addedTariffUrl = $"{ControllerPrefix}/{addedTariff.Id}";
@@ -200,7 +200,7 @@ namespace SDCWebApp.Controllers
 
         /// <summary>
         /// Asynchronously deletes specified <see cref="SightseeingTariff"/> by <paramref name="id"/>.
-        /// Returns <see cref="HttpStatusCode.OK"/> response if <see cref="SightseeingTariff"/> deleted,
+        /// Returns <see cref="HttpStatusCode.OK"/> response if <see cref="SightseeingTariff"/> deleted succeeded,
         /// <see cref="HttpStatusCode.BadRequest"/> response if the request is malformed or
         /// <see cref="HttpStatusCode.NotFound"/> if specified <see cref="SightseeingTariff"/> not found.
         /// Throws an <see cref="InternalDbServiceException"/> or <see cref="Exception"/> if any internal problem with processing data.
@@ -220,9 +220,9 @@ namespace SDCWebApp.Controllers
             try
             {
                 await _tariffDbService.DeleteAsync(id);
-                var okResponse = new ResponseWrapper();
+                var response = new ResponseWrapper();
                 _logger.LogInformation($"Finished method '{nameof(DeleteTariffAsync)}'.");
-                return Ok(okResponse);
+                return Ok(response);
             }
             catch (InvalidOperationException ex)
             {
@@ -242,12 +242,12 @@ namespace SDCWebApp.Controllers
 
         /// <summary>
         /// Asynchronously updates <see cref="SightseeingTariff"/>.
-        /// Returns <see cref="HttpStatusCode.OK"/> response if <see cref="SightseeingTariff"/> updated,
+        /// Returns <see cref="HttpStatusCode.OK"/> response if <see cref="SightseeingTariff"/> update succeeded,
         /// <see cref="HttpStatusCode.BadRequest"/> response if the request is malformed or
         /// <see cref="HttpStatusCode.NotFound"/> response if specified <see cref="SightseeingTariff"/> does not exist.
         /// Throws an <see cref="InternalDbServiceException"/> or <see cref="Exception"/> if any internal problem with processing data.
         /// </summary>
-        /// <param name="id">The id of <see cref="SightseeingTariff"/> to be updated. Cannot be null or empty. Must matches to <paramref name="tariff"/>.Id property.</param>
+        /// <param name="id">The id of <see cref="SightseeingTariff"/> to be updated. Cannot be null or empty. Must match to <paramref name="tariff"/>.Id property.</param>
         /// <param name="tariff">The <see cref="SightseeingTariffDto"/> tariff to be added. This parameter is a body of JSON request. Cannot be null.</param>
         /// <returns>An updated <see cref="SightseeingTariff"/>.</returns>
         [HttpPut("{id}")]
@@ -257,8 +257,6 @@ namespace SDCWebApp.Controllers
 
         public async Task<IActionResult> UpdateTariffAsync(string id, [FromBody] SightseeingTariffDto tariff)
         {
-            //throw new NotImplementedException();
-
             _logger.LogInformation($"Starting method '{nameof(UpdateTariffAsync)}'.");
 
             if (string.IsNullOrEmpty(id))
@@ -271,6 +269,8 @@ namespace SDCWebApp.Controllers
             {
                 var tariffToBeUpdated = MapToDomainModel(tariff);
                 var updatedTariff = await _tariffDbService.RestrictedUpdateAsync(tariffToBeUpdated);
+
+                // Revers map for client response.
                 tariff = MapToDto(updatedTariff);
                 _logger.LogInformation($"Finished method '{nameof(UpdateTariffAsync)}'.");
                 var response = new ResponseWrapper(tariff);
@@ -279,7 +279,7 @@ namespace SDCWebApp.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                return OnNotFoundError($"Cannot found element {typeof(SightseeingTariff).Name} with specified id: '{id}'.", ex);
+                return OnNotFoundError($"Cannot found element '{typeof(SightseeingTariff).Name}' with specified id: '{id}'.", ex);
             }
             catch (InternalDbServiceException ex)
             {
@@ -298,7 +298,6 @@ namespace SDCWebApp.Controllers
 
         private SightseeingTariff MapToDomainModel(SightseeingTariffDto tariffDto) => _mapper.Map<SightseeingTariff>(tariffDto);
         private SightseeingTariffDto MapToDto(SightseeingTariff tariff) => _mapper.Map<SightseeingTariffDto>(tariff);
-        private IEnumerable<SightseeingTariff> MapToDomainModelEnumerable(IEnumerable<SightseeingTariffDto> tariffDtos) => _mapper.Map<IEnumerable<SightseeingTariff>>(tariffDtos);
         private IEnumerable<SightseeingTariffDto> MapToDtoEnumerable(IEnumerable<SightseeingTariff> tariff) => _mapper.Map<IEnumerable<SightseeingTariffDto>>(tariff);
 
         #endregion

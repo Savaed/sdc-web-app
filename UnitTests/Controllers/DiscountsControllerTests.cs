@@ -234,6 +234,7 @@ namespace UnitTests.Controllers
             // Example of these errors: database does not exist, table does not exist etc.
 
             _discountDbServiceMock.Setup(x => x.AddAsync(It.IsAny<Discount>())).ThrowsAsync(new InternalDbServiceException());
+            _discountDbServiceMock.Setup(x => x.RestrictedAddAsync(It.IsAny<Discount>())).ThrowsAsync(new InternalDbServiceException());
             var controller = new DiscountsController(_discountDbServiceMock.Object, _logger, _mapperMock.Object);
 
             Func<Task> result = async () => await controller.AddDiscountAsync(_discountDtos[0]);
@@ -245,6 +246,7 @@ namespace UnitTests.Controllers
         public async Task AddDiscountAsync__An_unexpected_internal_error_occurred__Should_throw_Exception()
         {
             _discountDbServiceMock.Setup(x => x.AddAsync(It.IsAny<Discount>())).ThrowsAsync(new Exception());
+            _discountDbServiceMock.Setup(x => x.RestrictedAddAsync(It.IsAny<Discount>())).ThrowsAsync(new Exception());
             var controller = new DiscountsController(_discountDbServiceMock.Object, _logger, _mapperMock.Object);
 
             Func<Task> result = async () => await controller.AddDiscountAsync(_discountDtos[0]);
@@ -258,6 +260,7 @@ namespace UnitTests.Controllers
             var discountDto = CreateDiscountDto(_discounts[0]);
             _mapperMock.Setup(x => x.Map<Discount>(discountDto)).Returns(_discounts[0]);
             _discountDbServiceMock.Setup(x => x.AddAsync(It.IsNotNull<Discount>())).ThrowsAsync(new InvalidOperationException());
+            _discountDbServiceMock.Setup(x => x.RestrictedAddAsync(It.IsNotNull<Discount>())).ThrowsAsync(new InvalidOperationException());
             var controller = new DiscountsController(_discountDbServiceMock.Object, _logger, _mapperMock.Object);
 
             var result = await controller.AddDiscountAsync(discountDto);
@@ -274,6 +277,7 @@ namespace UnitTests.Controllers
             _mapperMock.Setup(x => x.Map<Discount>(It.IsNotNull<DiscountDto>())).Returns(validDiscount);
             _mapperMock.Setup(x => x.Map<DiscountDto>(It.IsNotNull<Discount>())).Returns(validDiscountDto);
             _discountDbServiceMock.Setup(x => x.AddAsync(validDiscount)).ReturnsAsync(validDiscount);
+            _discountDbServiceMock.Setup(x => x.RestrictedAddAsync(validDiscount)).ReturnsAsync(validDiscount);
             var controller = new DiscountsController(_discountDbServiceMock.Object, _logger, _mapperMock.Object);
 
             var result = await controller.AddDiscountAsync(validDiscountDto);
@@ -298,6 +302,7 @@ namespace UnitTests.Controllers
             // Example of these errors: database does not exist, table does not exist etc.
 
             _discountDbServiceMock.Setup(x => x.UpdateAsync(It.IsAny<Discount>())).ThrowsAsync(new InternalDbServiceException());
+            _discountDbServiceMock.Setup(x => x.RestrictedUpdateAsync(It.IsAny<Discount>())).ThrowsAsync(new InternalDbServiceException());
             var controller = new DiscountsController(_discountDbServiceMock.Object, _logger, _mapperMock.Object);
 
             Func<Task> result = async () => await controller.UpdateDiscountAsync(_discountDtos[0].Id, _discountDtos[0]);
@@ -309,6 +314,7 @@ namespace UnitTests.Controllers
         public async Task UpdateDiscountAsync__An_unexpected_internal_error_occurred__Should_throw_Exception()
         {
             _discountDbServiceMock.Setup(x => x.UpdateAsync(It.IsAny<Discount>())).ThrowsAsync(new Exception());
+            _discountDbServiceMock.Setup(x => x.RestrictedUpdateAsync(It.IsAny<Discount>())).ThrowsAsync(new Exception());
             var controller = new DiscountsController(_discountDbServiceMock.Object, _logger, _mapperMock.Object);
 
             Func<Task> result = async () => await controller.UpdateDiscountAsync(_discountDtos[0].Id, _discountDtos[0]);
@@ -324,7 +330,9 @@ namespace UnitTests.Controllers
             _mapperMock.Setup(x => x.Map<Discount>(It.IsNotNull<DiscountDto>())).Returns(validDiscount);
             _mapperMock.Setup(x => x.Map<DiscountDto>(It.IsNotNull<Discount>())).Returns(validDiscountDto);
             _discountDbServiceMock.Setup(x => x.UpdateAsync(It.IsNotNull<Discount>())).ThrowsAsync(new InvalidOperationException());
+            _discountDbServiceMock.Setup(x => x.RestrictedUpdateAsync(It.IsNotNull<Discount>())).ThrowsAsync(new InvalidOperationException());
             var controller = new DiscountsController(_discountDbServiceMock.Object, _logger, _mapperMock.Object);
+
 
             var result = await controller.UpdateDiscountAsync(validDiscountDto.Id, validDiscountDto);
 
@@ -365,6 +373,7 @@ namespace UnitTests.Controllers
             _mapperMock.Setup(x => x.Map<Discount>(It.IsNotNull<DiscountDto>())).Returns(validDiscount);
             _mapperMock.Setup(x => x.Map<DiscountDto>(It.IsNotNull<Discount>())).Returns(validDiscountDto);
             _discountDbServiceMock.Setup(x => x.UpdateAsync(validDiscount)).ReturnsAsync(validDiscount);
+            _discountDbServiceMock.Setup(x => x.RestrictedUpdateAsync(validDiscount)).ReturnsAsync(validDiscount);
             var controller = new DiscountsController(_discountDbServiceMock.Object, _logger, _mapperMock.Object);
 
             var result = await controller.UpdateDiscountAsync(validDiscountDto.Id, validDiscountDto);

@@ -330,7 +330,7 @@ namespace SDCWebApp.Services
         /// other problems with retrieving data from database occurred.</exception>
         public async Task<Article> RestrictedUpdateAsync(Article article)
         {
-            _logger.LogInformation($"Starting method '{nameof(UpdateAsync)}'.");
+            _logger.LogInformation($"Starting method '{nameof(RestrictedUpdateAsync)}'.");
 
             _ = article ?? throw new ArgumentNullException(nameof(article), $"Argument '{nameof(article)}' cannot be null.");
 
@@ -354,7 +354,7 @@ namespace SDCWebApp.Services
                 var updatedArticle = RestrictedUpdate(originalArticle, article) as Article;
                 await _context.TrySaveChangesAsync();
                 _logger.LogDebug($"Update data succeeded.");
-                _logger.LogInformation($"Finished method '{nameof(UpdateAsync)}'.");
+                _logger.LogInformation($"Finished method '{nameof(RestrictedUpdateAsync)}'.");
                 return updatedArticle;
             }
             catch (InvalidOperationException ex)

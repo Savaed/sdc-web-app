@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Net;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+
 using SDCWebApp.ApiErrors;
 
 namespace SDCWebApp.Controllers
 {
+    /// <summary>
+    /// Custom error responses with default, generic messages.
+    /// </summary>
     [Route("[controller]")]
     [ApiController]
     public class ErrorsController : ControllerBase
@@ -18,12 +17,16 @@ namespace SDCWebApp.Controllers
         private const string UnauthorizedErrorMessage = "No valid access token was passed.";
         private const string ForbiddenErrorMessage = "The access token passed does not have sufficient permissions.";
 
-
+        /// <summary>
+        /// Generate custom error response.
+        /// </summary>
+        /// <param name="code">The error <see cref="HttpStatusCode"/>.</param>
+        /// <returns><see cref="ObjectResult"/> error response.</returns>
         [Route("{code}")]
         public IActionResult Error(int code)
         {
             HttpStatusCode parsedCode = (HttpStatusCode)code;
-            string genericErrorMessage = null;
+            string genericErrorMessage = "";
 
             switch (code)
             {
@@ -40,11 +43,11 @@ namespace SDCWebApp.Controllers
                     break;
             }
 
-            ApiError apiError = new ApiError(code, parsedCode.ToString(), genericErrorMessage);
+            // Set the response header for error according to https://tools.ietf.org/html/rfc7807#section-6
             Response.ContentType = "application/problem+json";
-           //Response.Headers.Add("Content - Language", "en");
+            ApiError apiError = new ApiError(code, parsedCode.ToString(), genericErrorMessage);
 
             return new ObjectResult(new { error = apiError });
-        }      
+        }
     }
 }

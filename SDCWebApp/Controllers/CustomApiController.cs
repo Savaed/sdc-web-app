@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SDCWebApp.ApiErrors;
-using System.Net;
-using SDCWebApp.Models;
-using SDCWebApp.Models.Dtos;
 using System;
+using System.Net;
+
+using SDCWebApp.ApiErrors;
+using SDCWebApp.Models.Dtos;
 using SDCWebApp.Services;
 
 namespace SDCWebApp.Controllers

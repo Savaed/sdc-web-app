@@ -197,7 +197,7 @@ namespace UnitTests.Controllers
             var result = await controller.GetCurrentTariffAsync();
 
             (result as ObjectResult).StatusCode.Should().Be(200);
-            ((result as ObjectResult).Value as ResponseWrapper).Data.Should().BeEquivalentTo(currentTariffDto);    
+            ((result as ObjectResult).Value as ResponseWrapper).Data.Should().BeEquivalentTo(currentTariffDto);
         }
 
         [Test]
@@ -316,40 +316,14 @@ namespace UnitTests.Controllers
             var tariffDto = CreateSightseeingTariffDto(_tariffs[0]);
             _mapperMock.Setup(x => x.Map<SightseeingTariff>(tariffDto)).Returns(_tariffs[0]);
             _tariffDbServiceMock.Setup(x => x.AddAsync(It.IsNotNull<SightseeingTariff>())).ThrowsAsync(new InvalidOperationException());
-            var controller = new SightseeingTariffsController(_tariffDbServiceMock.Object, _logger, _mapperMock.Object);
             _tariffDbServiceMock.Setup(x => x.RestrictedAddAsync(It.IsNotNull<SightseeingTariff>())).ThrowsAsync(new InvalidOperationException());
+            var controller = new SightseeingTariffsController(_tariffDbServiceMock.Object, _logger, _mapperMock.Object);
 
             var result = await controller.AddTariffAsync(tariffDto);
 
             (result as ObjectResult).StatusCode.Should().Be(400);
             ((result as ObjectResult).Value as ResponseWrapper).Error.Should().NotBeNull();
         }
-
-        //[Test]
-        //public async Task AddTariffAsync__Argument_is_null__Should_return_400BadRequest_response()
-        //{
-        //    _tariffDbServiceMock.Setup(x => x.AddAsync(It.IsNotNull<SightseeingTariff>())).ThrowsAsync(new ArgumentNullException());
-        //    var controller = new SightseeingTariffsController(_tariffDbServiceMock.Object, _logger, _mapperMock.Object);
-
-        //    var result = await controller.AddTariffAsync(null as SightseeingTariffDto);
-
-        //    (result as ObjectResult).StatusCode.Should().Be(400);
-        //    ((result as ObjectResult).Value as ResponseWrapper).Error.Should().NotBeNull();
-        //}
-
-        // Request body is validating before any controller action and this is a resposibility of SighseeingTariffValidator.
-        //[Test]
-        //public async Task AddTariffAsync__Argument_is_not_null_but_invalid__Should_return_400BadRequest_response()
-        //{
-        //    _tariffDbServiceMock.Setup(x => x.AddAsync(It.IsNotNull<SightseeingTariff>())).ThrowsAsync(new ArgumentNullException());
-        //    var controller = new SightseeingTariffsController(_tariffDbServiceMock.Object, _logger, _mapperMock.Object);
-        //    var invalidTariff = new SightseeingTariffDto { Name = null };   // Propert Name is required. Max length = 50.
-
-        //    var result = await controller.AddTariffAsync(invalidTariff);
-
-        //    (result as ObjectResult).StatusCode.Should().Be(400);
-        //    ((result as ObjectResult).Value as ResponseWrapper).Error.Should().NotBeNull();
-        //}
 
         [Test]
         public async Task AddTariffAsync__Add_succeeded__Should_return_200OK_response_with_added_element()

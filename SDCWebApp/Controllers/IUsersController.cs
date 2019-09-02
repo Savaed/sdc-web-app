@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SDCWebApp.Models.ViewModels;
 using System.Threading.Tasks;
+
+using SDCWebApp.Models.ViewModels;
 
 namespace SDCWebApp.Controllers
 {

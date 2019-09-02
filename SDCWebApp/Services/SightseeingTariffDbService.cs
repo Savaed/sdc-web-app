@@ -342,7 +342,13 @@ namespace SDCWebApp.Services
 
                 _logger.LogDebug($"Starting update tariff with id '{tariff.Id}'.");
                 var originalTariff = await _context.SightseeingTariffs.SingleAsync(x => x.Id.Equals(tariff.Id));
+
+                // Set 'TicketTariffs' to original value since this method does not allow to update navigation property 'TicketTariffs'.
+                // For any changes from client in TicketTariff objects TicketTairiffsController's methods should be used.
+                tariff.TicketTariffs = originalTariff.TicketTariffs;
+
                 var updatedTariff = RestrictedUpdate(originalTariff, tariff) as SightseeingTariff;
+
                 await _context.TrySaveChangesAsync();
                 _logger.LogDebug($"Update data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(UpdateAsync)}'.");

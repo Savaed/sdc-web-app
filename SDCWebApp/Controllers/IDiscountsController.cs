@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SDCWebApp.Models.Dtos;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+
+using SDCWebApp.Models.Dtos;
 
 namespace SDCWebApp.Controllers
 {

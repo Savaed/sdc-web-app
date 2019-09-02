@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Threading.Tasks;
+
 using SDCWebApp.Models;
 using SDCWebApp.Models.Dtos;
 using SDCWebApp.Services;
-using System.Net;
-using Newtonsoft.Json;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Microsoft.AspNetCore.Authorization;
 
 namespace SDCWebApp.Controllers
 {
@@ -39,30 +36,28 @@ namespace SDCWebApp.Controllers
 
         /// <summary>
         /// Asynchronously adds <see cref="Discount"/>.
-        /// Returns <see cref="HttpStatusCode.Created"/> response if <see cref="Discount"/> created or
+        /// Returns <see cref="HttpStatusCode.Created"/> response if <see cref="Discount"/> create succeeded or
         /// <see cref="HttpStatusCode.BadRequest"/> response if the request is malformed.
         /// Throws an <see cref="InternalDbServiceException"/> or <see cref="Exception"/> if any internal problem with processing data.
         /// </summary>
         /// <param name="discount">The <see cref="DiscountDto"/> discount to be added. This parameter is a body of JSON request. Cannot be null.</param>
         /// <returns>An added <see cref="DiscountDto"/>.</returns>
-        //[Authorize]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> AddDiscountAsync([FromBody] DiscountDto discount)
         {
-
             _logger.LogInformation($"Starting method '{nameof(AddDiscountAsync)}'.");
 
             try
             {
-                // Ignore Id if client set it.
+                // Ignore Id if the client set it. Id of entity is set internally by the server.
                 discount.Id = null;
 
                 var discountToBeAdded = MapToDomainModel(discount);
                 var addedDiscount = await _discountDbService.RestrictedAddAsync(discountToBeAdded);
 
-                // Reverse maps from SightseeingTariff to SightseeingTariffDto only for response to the client.
+                // Reverse map only for response to the client.
                 var addedTariffDto = MapToDto(addedDiscount);
                 var response = new ResponseWrapper(addedTariffDto);
                 string addedDiscountUrl = $"{ControllerPrefix}/{addedDiscount.Id}";
@@ -87,7 +82,7 @@ namespace SDCWebApp.Controllers
 
         /// <summary>
         /// Asynchronously deletes specified <see cref="Discount"/> by <paramref name="id"/>.
-        /// Returns <see cref="HttpStatusCode.OK"/> response if <see cref="Discount"/> deleted,
+        /// Returns <see cref="HttpStatusCode.OK"/> response if <see cref="Discount"/> delete succeeded,
         /// <see cref="HttpStatusCode.BadRequest"/> response if the request is malformed or
         /// <see cref="HttpStatusCode.NotFound"/> if specified <see cref="Discount"/> not found.
         /// Throws an <see cref="InternalDbServiceException"/> or <see cref="Exception"/> if any internal problem with processing data.
@@ -107,9 +102,9 @@ namespace SDCWebApp.Controllers
             try
             {
                 await _discountDbService.DeleteAsync(id);
-                var okResponse = new ResponseWrapper();
+                var response = new ResponseWrapper();
                 _logger.LogInformation($"Finished method '{nameof(DeleteDiscountAsync)}'.");
-                return Ok(okResponse);
+                return Ok(response);
             }
             catch (InvalidOperationException ex)
             {
@@ -128,7 +123,7 @@ namespace SDCWebApp.Controllers
         }
 
         /// <summary>
-        /// Asynchronously gets <see cref="IEnumerable{Discount}"/> wrapped in <see cref="ResponseWrapper"/>.
+        /// Asynchronously gets <see cref="IEnumerable{Discount}"/>.
         /// Returns <see cref="HttpStatusCode.OK"/> response regardless if returned set is empty or not.
         /// Throws an <see cref="InternalDbServiceException"/> or <see cref="Exception"/> if any internal problem with processing data.
         /// </summary>
@@ -142,10 +137,10 @@ namespace SDCWebApp.Controllers
             try
             {
                 var discounts = await _discountDbService.GetAllAsync();
-                var discountsDto = MapToDtoEnumerable(discounts);
-                var okResponse = new ResponseWrapper(discountsDto);
+                var discountDtos = MapToDtoEnumerable(discounts);
+                var response = new ResponseWrapper(discountDtos);
                 _logger.LogInformation($"Finished method '{nameof(GetAllDiscountsAsync)}'.");
-                return Ok(okResponse);
+                return Ok(response);
             }
             catch (InternalDbServiceException ex)
             {
@@ -183,10 +178,9 @@ namespace SDCWebApp.Controllers
             {
                 var discount = await _discountDbService.GetAsync(id);
                 var discountDto = MapToDto(discount);
-
-                var okResponse = new ResponseWrapper(discountDto);
+                var response = new ResponseWrapper(discountDto);
                 _logger.LogInformation($"Finished method '{nameof(GetDiscountAsync)}'.");
-                return Ok(okResponse);
+                return Ok(response);
             }
             catch (InvalidOperationException ex)
             {
@@ -205,15 +199,15 @@ namespace SDCWebApp.Controllers
         }
 
         /// <summary>
-        /// Asynchronously updates <see cref="SightseeingTariff"/>.
-        /// Returns <see cref="HttpStatusCode.OK"/> response if <see cref="SightseeingTariff"/> updated,
+        /// Asynchronously updates <see cref="Discount"/>.
+        /// Returns <see cref="HttpStatusCode.OK"/> response if <see cref="Discount"/> update succeeded,
         /// <see cref="HttpStatusCode.BadRequest"/> response if the request is malformed or
-        /// <see cref="HttpStatusCode.NotFound"/> response if specified <see cref="SightseeingTariff"/> does not exist.
+        /// <see cref="HttpStatusCode.NotFound"/> response if specified <see cref="Discount"/> does not exist.
         /// Throws an <see cref="InternalDbServiceException"/> or <see cref="Exception"/> if any internal problem with processing data.
         /// </summary>
-        /// <param name="id">The id of <see cref="SightseeingTariff"/> to be updated. Cannot be null or empty. Must matches to <paramref name="discount"/>.Id property.</param>
-        /// <param name="discount">The <see cref="SightseeingTariffDto"/> tariff to be added. This parameter is a body of JSON request. Cannot be null.</param>
-        /// <returns>An updated <see cref="SightseeingTariff"/>.</returns>
+        /// <param name="id">The id of <see cref="Discount"/> to be updated. Cannot be null or empty. Must match to <paramref name="discount"/>.Id property.</param>
+        /// <param name="discount">The <see cref="DiscountDto"/> discount to be added. This parameter is a body of JSON request. Cannot be null.</param>
+        /// <returns>An updated <see cref="Discount"/>.</returns>
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -221,8 +215,6 @@ namespace SDCWebApp.Controllers
 
         public async Task<IActionResult> UpdateDiscountAsync(string id, [FromBody] DiscountDto discount)
         {
-            //throw new NotImplementedException();
-
             _logger.LogInformation($"Starting method '{nameof(UpdateDiscountAsync)}'.");
 
             if (string.IsNullOrEmpty(id))
@@ -235,6 +227,8 @@ namespace SDCWebApp.Controllers
             {
                 var discountToBeUpdated = MapToDomainModel(discount);
                 var updatedDiscount = await _discountDbService.RestrictedUpdateAsync(discountToBeUpdated);
+
+                // Revers map for client response.
                 discount = MapToDto(updatedDiscount);
                 var response = new ResponseWrapper(discount);
                 _logger.LogInformation($"Finished method '{nameof(UpdateDiscountAsync)}'");
@@ -242,7 +236,7 @@ namespace SDCWebApp.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                return OnNotFoundError($"Cannot found element {typeof(Discount).Name} with specified id: '{id}'.", ex);
+                return OnNotFoundError($"Cannot found element '{typeof(Discount).Name}' with specified id: '{id}'.", ex);
             }
             catch (InternalDbServiceException ex)
             {
@@ -261,7 +255,6 @@ namespace SDCWebApp.Controllers
 
         private Discount MapToDomainModel(DiscountDto tariffDto) => _mapper.Map<Discount>(tariffDto);
         private DiscountDto MapToDto(Discount tariff) => _mapper.Map<DiscountDto>(tariff);
-        private IEnumerable<Discount> MapToDomainModelEnumerable(IEnumerable<DiscountDto> tariffDtos) => _mapper.Map<IEnumerable<Discount>>(tariffDtos);
         private IEnumerable<DiscountDto> MapToDtoEnumerable(IEnumerable<Discount> tariff) => _mapper.Map<IEnumerable<DiscountDto>>(tariff);
 
         #endregion

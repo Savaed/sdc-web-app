@@ -65,5 +65,11 @@ namespace SDCWebApp.Services
         /// <exception cref="InternalDbServiceException">The table with <see cref="Article"/> entities does not exist or it is null or 
         /// cannot save properly any changes made by add operation.</exception>
         Task<Article> AddAsync(Article article);
+
+
+        Task<Article> RestrictedAddAsync(Article article);
+
+        Task<Article> RestrictedUpdateAsync(Article article);
+
     }
 }
