@@ -1,8 +1,8 @@
-﻿using SDCWebApp.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+
+using SDCWebApp.Models;
 
 namespace SDCWebApp.Services
 {
@@ -55,6 +55,19 @@ namespace SDCWebApp.Services
         Task<GeneralSightseeingInfo> UpdateAsync(GeneralSightseeingInfo info);
 
         /// <summary>
+        /// Asynchronously updates <see cref="SightseeingTariff"/> entity ignoring read-only properties like Id, CreatedAt, UpdatedAt, ConcurrencyToken. 
+        /// Throws an exception if cannot found entity or any problem with updating occurred.
+        /// </summary>
+        /// <param name="tariff">The tariff to be updated. Cannot be null or has Id property set to null or empty string.</param>
+        /// <returns>Updated entity.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="tariff"/> is null.</exception>
+        /// <exception cref="ArgumentException"><paramref name="tariff"/> has Id property set to null or empty string.</exception>
+        /// <exception cref="InvalidOperationException">Cannot found entity to be updated.</exception>
+        /// <exception cref="InternalDbServiceException">The resource does not exist or has a null value or any
+        /// other problems with retrieving data from database occurred.</exception>
+        Task<GeneralSightseeingInfo> RestrictedUpdateAsync(GeneralSightseeingInfo info);
+
+        /// <summary>
         /// Asynchronously deletes <see cref="GeneralSightseeingInfo"/> entity from the database. Throws an exception if cannot found entity 
         /// to be deleted or any problem with saving changes occurred.
         /// </summary>
@@ -76,12 +89,17 @@ namespace SDCWebApp.Services
         /// <exception cref="InternalDbServiceException">The table with <see cref="GeneralSightseeingInfo"/> entities does not exist or it is null or 
         /// cannot save properly any changes made by add operation.</exception>
         Task<GeneralSightseeingInfo> AddAsync(GeneralSightseeingInfo info);
-
-        Task<GeneralSightseeingInfo> RestrictedUpdateAsync(GeneralSightseeingInfo info);
-
-
+      
+        /// <summary>
+        /// Asynchronously adds <see cref="GeneralSightseeingInfo"/> entity to the database. Do not allow to add entity with the same properties value as existing one.
+        /// Throws an exception if already there is the same entity in database or any problem with saving changes occurred.
+        /// </summary>
+        /// <param name="info">The info to be added. Cannot be null.</param>
+        /// <returns>The added entity.</returns>
+        /// <exception cref="ArgumentNullException">The value of <paramref name="info"/> to be added is null.</exception>
+        /// <exception cref="InvalidOperationException">There is the same entity that one to be added in database.</exception>
+        /// <exception cref="InternalDbServiceException">The table with <see cref="GeneralSightseeingInfo"/> entities does not exist or it is null or 
+        /// cannot save properly any changes made by add operation.</exception>
         Task<GeneralSightseeingInfo> RestrictedAddAsync(GeneralSightseeingInfo info);
-
-
     }
 }
