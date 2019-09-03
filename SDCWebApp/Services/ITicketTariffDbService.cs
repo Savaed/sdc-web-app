@@ -78,9 +78,29 @@ namespace SDCWebApp.Services
         Task<TicketTariff> AddAsync(TicketTariff tariff);
 
 
+        /// <summary>
+        /// Asynchronously adds <see cref="SightseeingTariff"/> entity to the database. Do not allow add entity with the same Description, IsPerHour, IsPerPerson and DefaultPrice. 
+        /// Throws an exception if already there is the same entity in database or any problem with saving changes occurred.
+        /// </summary>
+        /// <param name="tariff">The tariff to be added. Cannot be null.</param>
+        /// <returns>The added entity.</returns>
+        /// <exception cref="ArgumentNullException">The value of <paramref name="tariff"/> to be added is null.</exception>
+        /// <exception cref="InvalidOperationException">There is the same entity that one to be added in database.</exception>
+        /// <exception cref="InternalDbServiceException">The table with <see cref="SightseeingTariff"/> entities does not exist or it is null or 
+        /// cannot save properly any changes made by add operation.</exception>
         Task<TicketTariff> RestrictedAddAsync(TicketTariff tariff);
 
 
+        /// <summary>
+        /// Asynchronously adds <see cref="SightseeingTariff"/> entity to the database. Do not allow add entity with the same Description, IsPerHour, IsPerPerson and DefaultPrice. 
+        /// Throws an exception if already there is the same entity in database or any problem with saving changes occurred.
+        /// </summary>
+        /// <param name="tariff">The tariff to be added. Cannot be null.</param>
+        /// <returns>The added entity.</returns>
+        /// <exception cref="ArgumentNullException">The value of <paramref name="tariff"/> to be added is null.</exception>
+        /// <exception cref="InvalidOperationException">There is the same entity that one to be added in database.</exception>
+        /// <exception cref="InternalDbServiceException">The table with <see cref="SightseeingTariff"/> entities does not exist or it is null or 
+        /// cannot save properly any changes made by add operation.</exception>
         Task<TicketTariff> RestrictedUpdateAsync(TicketTariff tariff);
 
     }
