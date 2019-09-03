@@ -309,7 +309,6 @@ namespace SDCWebApp.Services
                 if (_context.Customers.Contains(customer))
                     throw new InvalidOperationException($"There is already the same element in the database as the one to be added. Id of this element: '{customer.Id}'.");
 
-
                 Customer addedCustomer = null;
 
                 if (isRestrict)
@@ -348,7 +347,7 @@ namespace SDCWebApp.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} - {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when adding customer to the database. See the inner exception for more details.", ex);
+                var internalException = new InternalDbServiceException($"Encountered problem when adding customer with id: '{customer.Id}' to the database. See the inner exception for more details.", ex);
                 throw internalException;
             }
         }
@@ -388,7 +387,7 @@ namespace SDCWebApp.Services
 
                 if (isRestrict)
                 {
-                    // Resticted update mode that ignores all changes in read-only properties like Id, CreatedAt, UpdatedAt, ConcurrencyToken.
+                    // Restricted update mode that ignores all changes in read-only properties like Id, CreatedAt, UpdatedAt, ConcurrencyToken.
                     var originalCustomer = await _context.Customers.SingleAsync(x => x.Id.Equals(customer.Id));
                     updatedCustomer = BasicRestrictedUpdate(originalCustomer, customer) as Customer;
                 }
@@ -411,7 +410,7 @@ namespace SDCWebApp.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} - {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when updating customer with id '{customer.Id}'. See the inner exception for more details. for more details.", ex);
+                var internalException = new InternalDbServiceException($"Encountered problem when updating customer with id '{customer.Id}'. See the inner exception for more details.", ex);
                 throw internalException;
             }
         }

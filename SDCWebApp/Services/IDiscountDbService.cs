@@ -1,8 +1,8 @@
-﻿using SDCWebApp.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+
+using SDCWebApp.Models;
 
 namespace SDCWebApp.Services
 {
@@ -55,6 +55,19 @@ namespace SDCWebApp.Services
         Task<Discount> UpdateAsync(Discount discount);
 
         /// <summary>
+        /// Asynchronously updates <see cref="Discount"/> entity ignoring read-only properties like as Id, CreatedAt, UpdatedAt, ConcurrencyToken. 
+        /// Throws an exception if cannot found entity or any problem with updating occurred.
+        /// </summary>
+        /// <param name="discount">The disount to be updated. Cannot be null or has Id property set to null or empty string.</param>
+        /// <returns>Updated entity.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="discount"/> is null.</exception>
+        /// <exception cref="ArgumentException"><paramref name="discount"/> has Id property set to null or empty string.</exception>
+        /// <exception cref="InvalidOperationException">Cannot found entity to be updated.</exception>
+        /// <exception cref="InternalDbServiceException">The resource does not exist or has a null value or any
+        /// other problems with retrieving data from database occurred.</exception>
+        Task<Discount> RestrictedUpdateAsync(Discount discount);
+
+        /// <summary>
         /// Asynchronously deletes <see cref="Discount"/> entity from the database. Throws an exception if cannot found entity 
         /// to be deleted or any problem with saving changes occurred.
         /// </summary>
@@ -75,10 +88,19 @@ namespace SDCWebApp.Services
         /// <exception cref="InvalidOperationException">There is the same entity that one to be added in database.</exception>
         /// <exception cref="InternalDbServiceException">The table with <see cref="Discount"/> entities does not exist or it is null or 
         /// cannot save properly any changes made by add operation.</exception>
-        Task<Discount> AddAsync(Discount discount);
+        Task<Discount> AddAsync(Discount discount);     
 
-        Task<Discount> RestrictedUpdateAsync(Discount discount);
-
+        /// <summary>
+        /// Asynchronously adds <see cref="Customer"/> entity to the database. Does not allow to add entity with the same 
+        /// Description, DiscountValueInPercentage, GroupSizeForDiscount and Type values.
+        /// Throws an exception if already there is the same entity in database or any problem with saving changes occurred.
+        /// </summary>
+        /// <param name="customer">The customer to be added. Cannot be null.</param>
+        /// <returns>The added entity.</returns>
+        /// <exception cref="ArgumentNullException">The value of <paramref name="customer"/> is null.</exception>
+        /// <exception cref="InvalidOperationException">There is the same entity that one to be added in database.</exception>
+        /// <exception cref="InternalDbServiceException">The table with <see cref="Customer"/> entities does not exist or it is null or 
+        /// cannot save properly any changes made by add operation.</exception>
         Task<Discount> RestrictedAddAsync(Discount discount);
     }
 }

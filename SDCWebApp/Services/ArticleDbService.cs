@@ -346,8 +346,8 @@ namespace SDCWebApp.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when adding an article to the database. See the inner excpetion for more details.", ex);
+                _logger.LogError(ex, $"{ex.GetType().Name} - {ex.Message}");
+                var internalException = new InternalDbServiceException($"Encountered problem when adding an article with id: '{article?.Id}' to the database. See the inner excpetion for more details.", ex);
                 throw internalException;
             }
         }

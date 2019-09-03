@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+
 using SDCWebApp.Data;
 using SDCWebApp.Helpers.Extensions;
 using SDCWebApp.Models;
@@ -46,42 +47,26 @@ namespace SDCWebApp.Services
         public async Task<Discount> AddAsync(Discount discount)
         {
             _logger.LogInformation($"Starting method '{nameof(AddAsync)}'.");
+            // Call normal add mode.
+            return await AddBaseAsync(discount);
+        }
 
-            if (discount is null)
-                throw new ArgumentNullException($"Argument '{nameof(discount)}' cannot be null.");
-
-            await EnsureDatabaseCreatedAsync();
-            _ = _context?.Discounts ?? throw new InternalDbServiceException($"Table of type '{typeof(Discount).Name}' is null.");
-
-            try
-            {
-                if (_context.Discounts.Contains(discount))
-                    throw new InvalidOperationException($"There is already the same element in the database as the one to be added. Id of this element: '{discount.Id}'.");
-
-                _logger.LogDebug($"Starting add discount with id '{discount.Id}'.");
-                var addedDiscount = _context.Discounts.Add(discount).Entity;
-                await _context.TrySaveChangesAsync();
-                _logger.LogDebug("Add data succeeded.");
-                _logger.LogInformation($"Finished method '{nameof(AddAsync)}'.");
-                return addedDiscount;
-            }
-            catch (DbUpdateException ex)
-            {
-                _logger.LogError($"{ex.GetType().Name} Changes made by add operations cannot be saved properly. See the inner exception. Operation failed.", ex);
-                var internalException = new InternalDbServiceException("Changes made by add operations cannot be saved properly. See the inner exception", ex);
-                throw internalException;
-            }
-            catch (InvalidOperationException ex)
-            {
-                _logger.LogError($"{ex.GetType().Name} There is already the same element in the database as the one to be added. Id of this element: '{discount.Id}'.", ex);
-                throw;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when adding disount with id '{discount?.Id}' to database. See inner excpetion", ex);
-                throw internalException;
-            }
+        /// <summary>
+        /// Asynchronously adds <see cref="Customer"/> entity to the database. Does not allow to add entity with the same 
+        /// Description, DiscountValueInPercentage, GroupSizeForDiscount and Type values.
+        /// Throws an exception if already there is the same entity in database or any problem with saving changes occurred.
+        /// </summary>
+        /// <param name="customer">The customer to be added. Cannot be null.</param>
+        /// <returns>The added entity.</returns>
+        /// <exception cref="ArgumentNullException">The value of <paramref name="customer"/> is null.</exception>
+        /// <exception cref="InvalidOperationException">There is the same entity that one to be added in database.</exception>
+        /// <exception cref="InternalDbServiceException">The table with <see cref="Customer"/> entities does not exist or it is null or 
+        /// cannot save properly any changes made by add operation.</exception>
+        public async Task<Discount> RestrictedAddAsync(Discount discount)
+        {
+            _logger.LogInformation($"Starting method '{nameof(RestrictedAddAsync)}'.");
+            // Call restricted add mode.
+            return await AddBaseAsync(discount, true);
         }
 
         /// <summary>
@@ -120,19 +105,19 @@ namespace SDCWebApp.Services
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} Cannot found element. See exception Operation failed.");
+                _logger.LogError(ex, $"{ex.GetType().Name} - Cannot found element. See exception Operation failed.");
                 throw;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when removing disounts with id '{id}' from database. See inner excpetion", ex);
+                _logger.LogError(ex, $"{ex.GetType().Name} - {ex.Message}");
+                var internalException = new InternalDbServiceException($"Encountered problem when removing disount with id '{id}' from database. See the inner exception for more details.", ex);
                 throw internalException;
             }
         }
 
         /// <summary>
-        /// Asynchronously retrievs all <see cref="Discount"/> entities from the database. 
+        /// Asynchronously retrieves all <see cref="Discount"/> entities from the database. 
         /// Throws an exception if any problem with retrieving occurred.
         /// </summary>
         /// <returns>Set of all <see cref="Discount"/> entities from database.</returns>
@@ -147,16 +132,16 @@ namespace SDCWebApp.Services
 
             try
             {
-                _logger.LogDebug($"Starting retrieve all discounts from database.");
-                var discounts = await _context.Discounts.ToListAsync();
+                _logger.LogDebug($"Starting retrieve all discounts from the database.");
+                var discounts = await _context.Discounts.ToArrayAsync();
                 _logger.LogDebug("Retrieve data succeeded.");
-                _logger.LogInformation($"Finished method '{nameof(GetAllAsync)}'. Returning {discounts.Count} elements.");
+                _logger.LogInformation($"Finished method '{nameof(GetAllAsync)}'. Returning {discounts.Count()} elements.");
                 return discounts.AsEnumerable();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when retrieving disounts from database. See inner excpetion", ex);
+                _logger.LogError(ex, $"{ex.GetType().Name} - {ex.Message}");
+                var internalException = new InternalDbServiceException($"Encountered problem when retrieving all disounts from the database. See the inner exception for more details.", ex);
                 throw internalException;
             }
         }
@@ -166,7 +151,7 @@ namespace SDCWebApp.Services
         /// Throws an exception if cannot found entity or any problem with retrieving occurred.
         /// </summary>
         /// <param name="id">The id of entity to be retrived. Cannot be nul or empty.</param>
-        /// <returns>The entity with given <paramref name="id"/>.</returns>
+        /// <returns>The <see cref="Discount"/> entity with given <paramref name="id"/>.</returns>
         /// <exception cref="ArgumentException">Argument <paramref name="id"/> is null or empty string.</exception>
         /// <exception cref="InvalidOperationException">Cannot found entity with given <paramref name="id"/>.</exception>
         /// <exception cref="InternalDbServiceException">The resource does not exist or has a null value or any
@@ -183,7 +168,7 @@ namespace SDCWebApp.Services
 
             try
             {
-                _logger.LogDebug($"Starting retrieve discount with id: '{id}' from database.");
+                _logger.LogDebug($"Starting retrieve discount with id: '{id}' from the database.");
                 var discount = await _context.Discounts.SingleAsync(x => x.Id.Equals(id));
                 _logger.LogDebug("Retrieve data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(GetAsync)}'.");
@@ -191,15 +176,15 @@ namespace SDCWebApp.Services
             }
             catch (InvalidOperationException ex)
             {
-                string message = _context.Discounts.Count() == 0 ? $"Element not found because resource {_context.Discounts.GetType().Name} is empty. See the inner exception"
-                    : "Element not found. See the inner exception";
-                _logger.LogError(ex, $"{ex.GetType().Name} {message} Operation failed.");
+                string message = _context.Discounts.Count() == 0 ? $"Element not found because resource {_context.Discounts.GetType().Name} is empty. See the inner exception for more details."
+                    : "Element not found. See the inner exception for more details.";
+                _logger.LogError(ex, $"{ex.GetType().Name} - {message} Operation failed.");
                 throw;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when retriving discount with id '{id}' from database. See the inner exception", ex);
+                _logger.LogError(ex, $"{ex.GetType().Name} - {ex.Message}");
+                var internalException = new InternalDbServiceException($"Encountered problem when retriving discount with id '{id}' from the database. See the inner exception for more details.", ex);
                 throw internalException;
             }
         }
@@ -219,10 +204,10 @@ namespace SDCWebApp.Services
             _logger.LogInformation($"Starting method '{nameof(GetWithPaginationAsync)}'.");
 
             if (pageNumber < 1)
-                throw new ArgumentOutOfRangeException(nameof(pageNumber), $"'{pageNumber}' is not valid value for argument '{nameof(pageNumber)}'. Only number greater or equal to 1 are valid.");
+                throw new ArgumentOutOfRangeException(nameof(pageNumber), $"'{pageNumber}' is not valid value for argument '{nameof(pageNumber)}'. Only number greater or equals to 1 is valid.");
 
             if (pageSize < 0)
-                throw new ArgumentOutOfRangeException(nameof(pageSize), $"'{pageSize}' is not valid value for argument '{nameof(pageSize)}'. Only number greater or equal to 0 are valid.");
+                throw new ArgumentOutOfRangeException(nameof(pageSize), $"'{pageSize}' is not valid value for argument '{nameof(pageSize)}'. Only number greater or equals to 0 is valid.");
 
             await EnsureDatabaseCreatedAsync();
             _ = _context?.Discounts ?? throw new InternalDbServiceException($"Table of type '{typeof(Discount).Name}' is null.");
@@ -239,7 +224,7 @@ namespace SDCWebApp.Services
                 if (numberOfElementsOnLastPage > 0)
                 {
                     maxNumberOfPageWithData = ++numberOfFullPages;
-                    _logger.LogWarning($"Last page of data contain {numberOfElementsOnLastPage} elements which is less than specified in {nameof(pageSize)}: {pageSize}.");
+                    _logger.LogWarning($"Last page of data contain {numberOfElementsOnLastPage} elements which is less than specified in '{nameof(pageSize)}': {pageSize}.");
                 }
                 else
                     maxNumberOfPageWithData = numberOfFullPages;
@@ -250,7 +235,7 @@ namespace SDCWebApp.Services
                     return discounts;
                 }
 
-                _logger.LogDebug($"Starting retrieve data. {nameof(pageNumber)} '{pageNumber.ToString()}', {nameof(pageSize)} '{pageSize.ToString()}'.");
+                _logger.LogDebug($"Starting retrieve data. '{nameof(pageNumber)}': {pageNumber.ToString()}, '{nameof(pageSize)}': {pageSize.ToString()}.");
                 discounts = _context.Discounts.Skip(pageSize * (pageNumber - 1)).Take(pageSize);
                 _logger.LogDebug("Retrieve data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(GetWithPaginationAsync)}'.");
@@ -259,7 +244,7 @@ namespace SDCWebApp.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when retrieving disounts from database. See inner excpetion", ex);
+                var internalException = new InternalDbServiceException($"Encountered problem when retrieving disounts from database. See the inner exception for more details.", ex);
                 throw internalException;
             }
         }
@@ -278,96 +263,42 @@ namespace SDCWebApp.Services
         public async Task<Discount> UpdateAsync(Discount discount)
         {
             _logger.LogInformation($"Starting method '{nameof(UpdateAsync)}'.");
-
-            _ = discount ?? throw new ArgumentNullException(nameof(discount), $"Argument '{nameof(discount)}' cannot be null.");
-
-            if (string.IsNullOrEmpty(discount.Id))
-                throw new ArgumentException($"Argument '{nameof(discount.Id)}' cannot be null or empty.");
-
-            await EnsureDatabaseCreatedAsync();
-            _ = _context?.Discounts ?? throw new InternalDbServiceException($"Table of type '{typeof(Discount).Name}' is null.");
-
-            try
-            {
-                // If _context.Discounts does not null, but does not exist (as table in database, not as object using by EF Core)
-                // following if statement (exacly Count method) will throw exception about this table ("no such table: 'Discounts'." or something like that).
-                // So you can catch this exception and re-throw in InternalDbServiceException to next handling in next level layer e.g Controller.
-
-                // Maybe throwing exception in try block seems to be bad practice and a little bit tricky, but in this case is neccessery.
-                // Refference to Discounts while it does not exist cause throwing exception and without this 2 conditions below you cannot check 
-                // is there any element for update in database.
-                if (_context.Discounts.Count() == 0)
-                    throw new InvalidOperationException($"Cannot found element with id '{discount.Id}' for update. Resource {_context.Discounts.GetType().Name} does not contain any element.");
-
-                if (await _context.Discounts.ContainsAsync(discount) == false)
-                    throw new InvalidOperationException($"Cannot found element with id '{discount.Id}' for update. Any element does not match to the one to be updated.");
-
-                _logger.LogDebug($"Starting update discount with id '{discount.Id}'.");
-                discount.UpdatedAt = DateTime.UtcNow;
-                var updatedDiscount = _context.Discounts.Update(discount).Entity;
-                await _context.TrySaveChangesAsync();
-                _logger.LogDebug($"Update data succeeded.");
-                _logger.LogInformation($"Finished method '{nameof(UpdateAsync)}'.");
-                return updatedDiscount;
-            }
-            catch (InvalidOperationException ex)
-            {
-                _logger.LogError(ex, $"{ex.GetType().Name} Cannot found element for update. See exception Operation failed.");
-                throw;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when updating disount with id '{discount.Id}'. See inner excpetion", ex);
-                throw internalException;
-            }
+            // Call normal updated mode.
+            return await UpdateBaseAsync(discount);
         }
 
+        /// <summary>
+        /// Asynchronously updates <see cref="Discount"/> entity ignoring read-only properties like as Id, CreatedAt, UpdatedAt, ConcurrencyToken. 
+        /// Throws an exception if cannot found entity or any problem with updating occurred.
+        /// </summary>
+        /// <param name="discount">The disount to be updated. Cannot be null or has Id property set to null or empty string.</param>
+        /// <returns>Updated entity.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="discount"/> is null.</exception>
+        /// <exception cref="ArgumentException"><paramref name="discount"/> has Id property set to null or empty string.</exception>
+        /// <exception cref="InvalidOperationException">Cannot found entity to be updated.</exception>
+        /// <exception cref="InternalDbServiceException">The resource does not exist or has a null value or any
+        /// other problems with retrieving data from database occurred.</exception>
         public async Task<Discount> RestrictedUpdateAsync(Discount discount)
         {
-            _logger.LogInformation($"Starting method '{nameof(UpdateAsync)}'.");
-
-            _ = discount ?? throw new ArgumentNullException(nameof(discount), $"Argument '{nameof(discount)}' cannot be null.");
-
-            if (string.IsNullOrEmpty(discount.Id))
-                throw new ArgumentException($"Argument '{nameof(discount.Id)}' cannot be null or empty.");
-
-            await EnsureDatabaseCreatedAsync();
-            _ = _context?.Discounts ?? throw new InternalDbServiceException($"Table of type '{typeof(Discount).Name}' is null.");
-
-            try
-            {
-               if (_context.Discounts.Count() == 0)
-                    throw new InvalidOperationException($"Cannot found element with id '{discount.Id}' for update. Resource {_context.Discounts.GetType().Name} does not contain any element.");
-
-                if (await _context.Discounts.ContainsAsync(discount) == false)
-                    throw new InvalidOperationException($"Cannot found element with id '{discount.Id}' for update. Any element does not match to the one to be updated.");
-
-                _logger.LogDebug($"Starting update discount with id '{discount.Id}'.");
-                discount.UpdatedAt = DateTime.UtcNow;
-                var originalDiscount = await _context.Discounts.SingleAsync(x => x.Id.Equals(discount.Id));
-                var updatedDiscount = BasicRestrictedUpdate(originalDiscount, discount) as Discount;
-                await _context.TrySaveChangesAsync();
-                _logger.LogDebug($"Update data succeeded.");
-                _logger.LogInformation($"Finished method '{nameof(UpdateAsync)}'.");
-                return updatedDiscount;
-            }
-            catch (InvalidOperationException ex)
-            {
-                _logger.LogError(ex, $"{ex.GetType().Name} Cannot found element for update. See exception Operation failed.");
-                throw;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when updating disount with id '{discount.Id}'. See inner excpetion", ex);
-                throw internalException;
-            }
+            _logger.LogInformation($"Starting method '{nameof(RestrictedUpdateAsync)}'.");
+            // Call restricted update mode.
+            return await UpdateBaseAsync(discount, true);
         }
 
-        public async Task<Discount> RestrictedAddAsync(Discount discount)
+
+        #region Privates      
+
+        /// <summary>
+        /// Asynchronously adds <see cref="Discount"/> entity. If <paramref name="isRestrict"/> set to false then no restrictions will be used. If set to true then the restricted mode will be used.
+        /// It will check if in database is entity with the same 'Description', 'DiscountValueInPercentage', 'GroupSizeForDiscount' and 'Type' values.
+        /// </summary>
+        /// <param name="discount"><see cref="Discount"/> to be added.</param>
+        /// <param name="isRestrict">If set to false then no restrictions will be used and update allow entirely entity updating. If set to true then the restricted mode will be used.
+        /// It will check if in database is entity with the same 'Description', 'DiscountValueInPercentage', 'GroupSizeForDiscount' and 'Type' values.</param>
+        /// <returns>Added <see cref="Discount"/> entity.</returns>
+        private async Task<Discount> AddBaseAsync(Discount discount, bool isRestrict = false)
         {
-            _logger.LogInformation($"Starting method '{nameof(AddAsync)}'.");
+            _logger.LogDebug($"Starting method '{nameof(AddBaseAsync)}'.");
 
             if (discount is null)
                 throw new ArgumentNullException($"Argument '{nameof(discount)}' cannot be null.");
@@ -377,10 +308,22 @@ namespace SDCWebApp.Services
 
             try
             {
-                // Check if exist in db tariff with the same props as adding.
-                if (await IsEntityAlreadyExistsAsync(discount))
-                    throw new InvalidOperationException($"There is already the same element in the database as the one to be added. " +
-                        $"The value of '{nameof(discount.Description)}', '{nameof(discount.DiscountValueInPercentage)}' etc. , are not unique.");
+                if (isRestrict)
+                {
+                    // Restricted add mode that use custom equality comparer. Discounts are equal if they have the same Description, DiscountValueInPercentage, GroupSizeForDiscount and Type.
+
+                    // Check if exist in db disount with the same properties as adding.
+                    if (await IsEntityAlreadyExistsAsync(discount))
+                        throw new InvalidOperationException($"There is already the same element in the database as the one to be added. " +
+                            $"The value of '{nameof(discount.Description)}', '{nameof(discount.DiscountValueInPercentage)}', '{nameof(discount.GroupSizeForDiscount)}' and " +
+                            $"'{nameof(discount.Type)}' are not unique.");
+                }
+                else
+                {
+                    // Normal add mode without any additional restrictions.
+                    if (_context.Discounts.Contains(discount))
+                        throw new InvalidOperationException($"There is already the same element in the database as the one to be added. Id of this element: '{discount.Id}'.");
+                }
 
                 _logger.LogDebug($"Starting add discount with id '{discount.Id}'.");
                 var addedDiscount = _context.Discounts.Add(discount).Entity;
@@ -391,27 +334,85 @@ namespace SDCWebApp.Services
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError($"{ex.GetType().Name} Changes made by add operations cannot be saved properly. See the inner exception. Operation failed.", ex);
-                var internalException = new InternalDbServiceException("Changes made by add operations cannot be saved properly. See the inner exception", ex);
+                _logger.LogError($"{ex.GetType().Name} - Changes made by add operations cannot be saved properly. See the inner exception for more details. Operation failed.", ex);
+                var internalException = new InternalDbServiceException("Changes made by add operations cannot be saved properly. See the inner exception for more details.", ex);
                 throw internalException;
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogError($"{ex.GetType().Name} There is already the same element in the database as the one to be added. Id of this element: '{discount.Id}'.", ex);
+                _logger.LogError($"{ex.GetType().Name} - There is already the same element in the database as the one to be added. Id of this element: '{discount.Id}'.", ex);
                 throw;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when adding disount with id '{discount?.Id}' to database. See inner excpetion", ex);
+                var internalException = new InternalDbServiceException($"Encountered problem when adding disount with id '{discount.Id}' to database. See the inner exception for more details.", ex);
                 throw internalException;
             }
         }
 
+        /// <summary>
+        /// Asynchronously updates <see cref="Discount"/> entity. If <paramref name="isRestrict"/> set to false then no restrictions will be used and update allow entirely entity updating. 
+        /// Otherwise the restricted mode will be using. It will ignore updating some read-only properties.
+        /// </summary>
+        /// <param name="discount"><see cref="Discount"/> to be updated.</param>
+        /// <param name="isRestrict">If set to false then no restrictions will be used and update allow entirely entity updating. If set to true then the restricted mode will be used.
+        /// It will ignore some read-only properties changes.</param>
+        /// <returns>Updated <see cref="Customer"/> entity.</returns>
+        private async Task<Discount> UpdateBaseAsync(Discount discount, bool isRestrict = false)
+        {
+            _logger.LogDebug($"Starting method '{nameof(UpdateBaseAsync)}'.");
 
-        #region Privates      
+            _ = discount ?? throw new ArgumentNullException(nameof(discount), $"Argument '{nameof(discount)}' cannot be null.");
 
-       
+            if (string.IsNullOrEmpty(discount.Id))
+                throw new ArgumentException($"Argument '{nameof(discount.Id)}' cannot be null or empty.");
+
+            await EnsureDatabaseCreatedAsync();
+            _ = _context?.Discounts ?? throw new InternalDbServiceException($"Table of type '{typeof(Discount).Name}' is null.");
+
+            try
+            {
+                if (_context.Discounts.Count() == 0)
+                    throw new InvalidOperationException($"Cannot found element with id '{discount.Id}' for update. Resource {_context.Discounts.GetType().Name} does not contain any element.");
+
+                if (await _context.Discounts.ContainsAsync(discount) == false)
+                    throw new InvalidOperationException($"Cannot found element with id '{discount.Id}' for update. Any element does not match to the one to be updated.");
+
+                _logger.LogDebug($"Starting update customer with id '{discount.Id}'.");
+
+                Discount updatedDiscount = null;
+                discount.UpdatedAt = DateTime.UtcNow;
+
+                if (isRestrict)
+                {
+                    // Restricted update mode that ignores all changes in read-only properties like Id, CreatedAt, UpdatedAt, ConcurrencyToken.
+                    var originalDiscount = await _context.Discounts.SingleAsync(x => x.Id.Equals(discount.Id));
+                    updatedDiscount = BasicRestrictedUpdate(originalDiscount, discount) as Discount;
+                }
+                else
+                {
+                    // Normal update mode without any additional restrictions.
+                    updatedDiscount = _context.Discounts.Update(discount).Entity;
+                }
+
+                await _context.TrySaveChangesAsync();
+                _logger.LogDebug($"Update data succeeded.");
+                _logger.LogDebug($"Finished method '{nameof(UpdateBaseAsync)}'.");
+                return updatedDiscount;
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogError(ex, $"{ex.GetType().Name} - Cannot found element for update. See exception for more details. Operation failed.");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{ex.GetType().Name} - {ex.Message}");
+                var internalException = new InternalDbServiceException($"Encountered problem when updating customer with id '{discount.Id}'. See the inner exception for more details.", ex);
+                throw internalException;
+            }
+        }
 
         protected override async Task<bool> IsEntityAlreadyExistsAsync(BasicEntity entity)
         {
