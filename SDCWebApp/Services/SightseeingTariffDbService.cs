@@ -273,7 +273,7 @@ namespace SDCWebApp.Services
         /// other problems with retrieving data from database occurred.</exception>
         public async Task<SightseeingTariff> RestrictedUpdateAsync(SightseeingTariff tariff)
         {
-            _logger.LogInformation($"Starting method '{nameof(BasicRestrictedUpdate)}'.");
+            _logger.LogInformation($"Starting method '{nameof(RestrictedUpdateAsync)}'.");
             // Call restricted update mode.
             return await UpdateBaseAsync(tariff, true);
         }

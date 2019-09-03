@@ -1,12 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using SDCWebApp.Data;
-using SDCWebApp.Helpers.Extensions;
-using SDCWebApp.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
+using SDCWebApp.Data;
+using SDCWebApp.Helpers.Extensions;
+using SDCWebApp.Models;
 
 namespace SDCWebApp.Services
 {
@@ -39,42 +40,25 @@ namespace SDCWebApp.Services
         public async Task<SightseeingGroup> AddAsync(SightseeingGroup group)
         {
             _logger.LogInformation($"Starting method '{nameof(AddAsync)}'.");
+            // Call normal add mode.
+            return await AddBaseAsync(group);
+        }
 
-            if (group is null)
-                throw new ArgumentNullException($"Argument '{nameof(group)}' cannot be null.");
-
-            await EnsureDatabaseCreatedAsync();
-            _ = _context?.Groups ?? throw new InternalDbServiceException($"Table of type '{typeof(SightseeingGroup).Name}' is null.");
-
-            try
-            {
-                if (_context.Groups.Contains(group))
-                    throw new InvalidOperationException($"There is already the same element in the database as the one to be added. Id of this element: '{group.Id}'.");
-
-                _logger.LogDebug($"Starting add group with id '{group.Id}'.");
-                var addedGroup = _context.Groups.Add(group).Entity;
-                await _context.TrySaveChangesAsync();
-                _logger.LogDebug("Add data succeeded.");
-                _logger.LogInformation($"Finished method '{nameof(AddAsync)}'.");
-                return addedGroup;
-            }
-            catch (DbUpdateException ex)
-            {
-                _logger.LogError($"{ex.GetType().Name} Changes made by add operations cannot be saved properly. See the inner exception. Operation failed.", ex);
-                var internalException = new InternalDbServiceException("Changes made by add operations cannot be saved properly. See the inner exception", ex);
-                throw internalException;
-            }
-            catch (InvalidOperationException ex)
-            {
-                _logger.LogError($"{ex.GetType().Name} There is already the same element in the database as the one to be added. Id of this element: '{group.Id}'.", ex);
-                throw;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when adding element with id '{group?.Id}' to the database. See inner excpetion", ex);
-                throw internalException;
-            }
+        /// <summary>
+        /// Asynchronously adds <see cref="SightseeingTariff"/> entity to the database. Do not allow add entity with the same SightseeingDate property. 
+        /// Throws an exception if already there is the same entity in database or any problem with saving changes occurred.
+        /// </summary>
+        /// <param name="group">The group to be added. Cannot be null.</param>
+        /// <returns>The added entity.</returns>
+        /// <exception cref="ArgumentNullException">The value of <paramref name="group"/> to be added is null.</exception>
+        /// <exception cref="InvalidOperationException">There is the same entity that one to be added in database.</exception>
+        /// <exception cref="InternalDbServiceException">The table with <see cref="SightseeingGroup"/> entities does not exist or it is null or 
+        /// cannot save properly any changes made by add operation.</exception>
+        public async Task<SightseeingGroup> RestrictedAddAsync(SightseeingGroup group)
+        {
+            _logger.LogInformation($"Starting method '{nameof(RestrictedAddAsync)}'.");
+            // Call restricted add mode.
+            return await AddBaseAsync(group, true);
         }
 
         /// <summary>
@@ -113,13 +97,13 @@ namespace SDCWebApp.Services
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} Cannot found element. See exception Operation failed.");
+                _logger.LogError(ex, $"{ex.GetType().Name} - Cannot found element. See the exception for more datails. Operation failed.");
                 throw;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when removing element with id '{id}' from database. See inner excpetion", ex);
+                _logger.LogError(ex, $"{ex.GetType().Name} - {ex.Message}");
+                var internalException = new InternalDbServiceException($"Encountered problem when removing sightseeing group with id '{id}' from database. See the inner exception for more details.", ex);
                 throw internalException;
             }
         }
@@ -140,22 +124,22 @@ namespace SDCWebApp.Services
 
             try
             {
-                _logger.LogDebug($"Starting retrieve all sightseeing groups from database.");
-                var groups = await _context.Groups.Include(x => x.Tickets).ToListAsync();
+                _logger.LogDebug($"Starting retrieve all sightseeing groups from the database.");
+                var groups = await _context.Groups.Include(x => x.Tickets).ToArrayAsync();
                 _logger.LogDebug("Retrieve data succeeded.");
-                _logger.LogInformation($"Finished method '{nameof(GetAllAsync)}'. Returning {groups.Count} elements.");
+                _logger.LogInformation($"Finished method '{nameof(GetAllAsync)}'. Returning {groups.Count()} elements.");
                 return groups.AsEnumerable();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when retrieving sightseeing group from database. See inner excpetion", ex);
+                _logger.LogError(ex, $"{ex.GetType().Name} - {ex.Message}");
+                var internalException = new InternalDbServiceException($"Encountered problem when retrieving sightseeing groups from the database. See the inner exception for more details.", ex);
                 throw internalException;
             }
         }
 
         /// <summary>
-        /// Asynchronously retrievs <see cref="SightseeingGroup"/> entity with given <paramref name="id"/> from the database. 
+        /// Asynchronously retrieves <see cref="SightseeingGroup"/> entity with given <paramref name="id"/> from the database. 
         /// Throws an exception if cannot found entity or any problem with retrieving occurred.
         /// </summary>
         /// <param name="id">The id of entity to be retrived. Cannot be nul or empty.</param>
@@ -176,7 +160,7 @@ namespace SDCWebApp.Services
 
             try
             {
-                _logger.LogDebug($"Starting retrieve sighseeing group with id: '{id}' from database.");
+                _logger.LogDebug($"Starting retrieve sighseeing group with id: '{id}' from the database.");
                 var group = await _context.Groups.Include(x => x.Tickets).SingleAsync(x => x.Id.Equals(id));
                 _logger.LogDebug("Retrieve data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(GetAsync)}'.");
@@ -184,15 +168,15 @@ namespace SDCWebApp.Services
             }
             catch (InvalidOperationException ex)
             {
-                string message = _context.Groups.Count() == 0 ? $"Element not found because resource {_context.Groups.GetType().Name} is empty. See the inner exception"
-                    : "Element not found. See the inner exception";
-                _logger.LogError(ex, $"{ex.GetType().Name} {message} Operation failed.");
+                string message = _context.Groups.Count() == 0 ? $"Element not found because resource {_context.Groups.GetType().Name} is empty. See the inner exception."
+                    : "Element not found. See the inner exception.";
+                _logger.LogError(ex, $"{ex.GetType().Name} - {message} Operation failed.");
                 throw;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when retriving sighseeing group with id '{id}' from database. See the inner exception", ex);
+                _logger.LogError(ex, $"{ex.GetType().Name} - {ex.Message}");
+                var internalException = new InternalDbServiceException($"Encountered problem when retriving sighseeing group with id '{id}' from the database. See the inner exception for more details.", ex);
                 throw internalException;
             }
         }
@@ -243,7 +227,7 @@ namespace SDCWebApp.Services
                     return groups;
                 }
 
-                _logger.LogDebug($"Starting retrieve data. {nameof(pageNumber)} '{pageNumber.ToString()}', {nameof(pageSize)} '{pageSize.ToString()}'.");
+                _logger.LogDebug($"Starting retrieve data. '{nameof(pageNumber)}': {pageNumber.ToString()}, '{nameof(pageSize)}': {pageSize.ToString()}.");
                 groups = _context.Groups.Include(x => x.Tickets).Skip(pageSize * (pageNumber - 1)).Take(pageSize);
                 _logger.LogDebug("Retrieve data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(GetWithPaginationAsync)}'.");
@@ -251,13 +235,11 @@ namespace SDCWebApp.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when retrieving sightseeing groups from database. See inner excpetion", ex);
+                _logger.LogError(ex, $"{ex.GetType().Name} - {ex.Message}");
+                var internalException = new InternalDbServiceException($"Encountered problem when retrieving sightseeing groups from the database. See the inner exception for more details.", ex);
                 throw internalException;
             }
         }
-
-     
 
         /// <summary>
         /// Asynchronously updates <see cref="SightseeingGroup"/> entity. 
@@ -273,6 +255,42 @@ namespace SDCWebApp.Services
         public async Task<SightseeingGroup> UpdateAsync(SightseeingGroup group)
         {
             _logger.LogInformation($"Starting method '{nameof(UpdateAsync)}'.");
+            // Call normal update mode.
+            return await UpdateBaseAsync(group);
+        }        
+
+        /// <summary>
+        /// Asynchronously updates <see cref="SightseeingGroup"/> entity ignoring read-only properties like Id, CreatedAt, UpdatedAt, ConcurrencyToken. 
+        /// Throws an exception if cannot found entity or any problem with updating occurred.
+        /// </summary>
+        /// <param name="group">The group to be updated. Cannot be null or has Id property set to null or empty string.</param>
+        /// <returns>Updated entity.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="group"/> is null.</exception>
+        /// <exception cref="ArgumentException"><paramref name="group"/> has Id property set to null or empty string.</exception>
+        /// <exception cref="InvalidOperationException">Cannot found entity to be updated.</exception>
+        /// <exception cref="InternalDbServiceException">The resource does not exist or has a null value or any
+        /// other problems with retrieving data from database occurred.</exception>
+        public async Task<SightseeingGroup> RestrictedUpdateAsync(SightseeingGroup group)
+        {
+            _logger.LogInformation($"Starting method '{nameof(RestrictedUpdateAsync)}'.");
+            // Call restricted update mode.
+            return await UpdateBaseAsync(group, true);
+        }
+
+
+        #region Privates      
+
+        /// <summary>
+        /// Asynchronously updates <see cref="SightseeingGroup"/> entity. If <paramref name="isRestrict"/> set to false then no restrictions will be used and update allow entirely entity updating. 
+        /// Otherwise the restricted mode will be using. It will ignore updating some read-only properties.
+        /// </summary>
+        /// <param name="group"><see cref="SightseeingGroup"/> to be updated.</param>
+        /// <param name="isRestrict">If set to false then no restrictions will be used and update allow entirely entity updating. If set to true then the restricted mode will be used.
+        /// It will ignore some read-only properties changes.</param>
+        /// <returns>Updated <see cref="SightseeingGroup"/> entity.</returns>
+        private async Task<SightseeingGroup> UpdateBaseAsync(SightseeingGroup group, bool isRestrict = false)
+        {
+            _logger.LogDebug($"Starting method '{nameof(UpdateBaseAsync)}'.");
 
             _ = group ?? throw new ArgumentNullException(nameof(group), $"Argument '{nameof(group)}' cannot be null.");
 
@@ -284,46 +302,58 @@ namespace SDCWebApp.Services
 
             try
             {
-                // If _context.Groups does not null, but does not exist (as table in database, not as object using by EF Core)
-                // following if statement (exactly Count method) will throw exception about this table ("no such table: 'Groups'." or something like that).
-                // So you can catch this exception and re-throw in InternalDbServiceException to next handling in next level layer e.g Controller.
-
-                // Maybe throwing exception in try block seems to be bad practice and a little bit tricky, but in this case is neccessery.
-                // Refference to Groups while it does not exist cause throwing exception and without this 2 conditions below you cannot check 
-                // is there any element for update in database.
                 if (_context.Groups.Count() == 0)
                     throw new InvalidOperationException($"Cannot found element with id '{group.Id}' for update. Resource {_context.Groups.GetType().Name} does not contain any element.");
 
                 if (await _context.Groups.ContainsAsync(group) == false)
                     throw new InvalidOperationException($"Cannot found element with id '{group.Id}' for update. Any element does not match to the one to be updated.");
 
-                _logger.LogDebug($"Starting update discount with id '{group.Id}'.");
+                _logger.LogDebug($"Starting update sightseeing group with id '{group.Id}'.");
+
+                SightseeingGroup updatedGroup = null;
                 group.UpdatedAt = DateTime.UtcNow;
-                var updatedGroup = _context.Groups.Update(group).Entity;
+
+                if (isRestrict)
+                {
+                    // Resticted update mode that ignores all changes in read-only properties like Id, CreatedAt, UpdatedAt, ConcurrencyToken.
+                    var originalGroup = await _context.Groups.SingleAsync(x => x.Id.Equals(group.Id));
+                    updatedGroup = BasicRestrictedUpdate(originalGroup, group) as SightseeingGroup;
+                }
+                else
+                {
+                    // Normal update mode without any additional restrictions.
+                    updatedGroup = _context.Groups.Update(group).Entity;
+                }
+
                 await _context.TrySaveChangesAsync();
                 _logger.LogDebug($"Update data succeeded.");
-                _logger.LogInformation($"Finished method '{nameof(UpdateAsync)}'.");
+                _logger.LogDebug($"Finished method '{nameof(UpdateBaseAsync)}'.");
                 return updatedGroup;
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} Cannot found element for update. See exception Operation failed.");
+                _logger.LogError(ex, $"{ex.GetType().Name} - Cannot found element for update. See the exception for more details. Operation failed.");
                 throw;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when updating sighseeing group with id '{group.Id}'. See inner excpetion", ex);
+                _logger.LogError(ex, $"{ex.GetType().Name} - {ex.Message}");
+                var internalException = new InternalDbServiceException($"Encountered problem when updating sighseeing group with id '{group.Id}'. See the inner exception for more details.", ex);
                 throw internalException;
             }
         }
 
-
-
-
-        public async Task<SightseeingGroup> RestrictedAddAsync(SightseeingGroup group)
+        /// <summary>
+        /// Asynchronously adds <see cref="SightseeingGroup"/> entity. If <paramref name="isRestrict"/> set to false then no restrictions will be used. If set to true then the restricted mode will be used.
+        /// It will check if in database is entity with the same 'SightseeingDate' value.
+        /// </summary>
+        /// <param name="group"><see cref="SightseeingGroup"/> to be added.</param>
+        /// <param name="isRestrict">If set to false then no restrictions will be used and update allow entirely entity updating. If set to true then the restricted mode will be used.
+        /// It will check if in database is entity with the same 'SightseeingDate' value.</param>
+        /// <returns>Added <see cref="SightseeingGroup"/> entity.</returns>
+        private async Task<SightseeingGroup> AddBaseAsync(SightseeingGroup group, bool isRestrict = false)
         {
-            _logger.LogInformation($"Starting method '{nameof(RestrictedAddAsync)}'.");
+            _logger.LogDebug($"Starting method '{nameof(AddBaseAsync)}'.");
 
             if (group is null)
                 throw new ArgumentNullException($"Argument '{nameof(group)}' cannot be null.");
@@ -333,82 +363,46 @@ namespace SDCWebApp.Services
 
             try
             {
-                // Check if exist in db tariff with the same 'Name' as adding.
-                if (await IsEntityAlreadyExistsAsync(group))
-                    throw new InvalidOperationException($"There is already the same element in the database as the one to be added. The value of '{nameof(group)}' is not unique.");
+                if (isRestrict)
+                {
+                    // Resticted add mode that use custom equality comparer. The sightseeing tariffs are equal if they have the same SightseeingDate.
 
-                _logger.LogDebug($"Starting add tariff with id '{group.Id}'.");
+                    // Check if exist in db tariff with the same 'SightseeingDate' as adding.
+                    if (await IsEntityAlreadyExistsAsync(group))
+                        throw new InvalidOperationException($"There is already the same element in the database as the one to be added. The value of '{nameof(group.SightseeingDate)}' is not unique.");
+                }
+                else
+                {
+                    // Normal add mode without any additional restrictions.
+                    if (_context.Groups.Contains(group))
+                        throw new InvalidOperationException($"There is already the same element in the database as the one to be added. Id of this element: '{group.Id}'.");
+                }
+
+                _logger.LogDebug($"Starting add sightseeing group with id '{group.Id}'.");
                 var addedGroup = _context.Groups.Add(group).Entity;
                 await _context.TrySaveChangesAsync();
                 _logger.LogDebug("Add data succeeded.");
-                _logger.LogInformation($"Finished method '{nameof(RestrictedAddAsync)}'.");
+                _logger.LogDebug($"Finished method '{nameof(AddBaseAsync)}'.");
                 return addedGroup;
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError($"{ex.GetType().Name} Changes made by add operations cannot be saved properly. See the inner exception. Operation failed.", ex);
-                var internalException = new InternalDbServiceException("Changes made by add operations cannot be saved properly. See the inner exception", ex);
+                _logger.LogError($"{ex.GetType().Name} - Changes made by add operations cannot be saved properly. See the inner exception for more details. Operation failed.", ex);
+                var internalException = new InternalDbServiceException("Changes made by add operations cannot be saved properly. See the inner exception for more details.", ex);
                 throw internalException;
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogError($"{ex.GetType().Name} There is already the same element in the database as the one to be added. The value of '{nameof(group)}' is not unique.", ex);
+                _logger.LogError($"{ex.GetType().Name} - {ex.Message}", ex);
                 throw;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when adding sighseeing tarifff with id '{group?.Id}' to the database. See inner excpetion", ex);
+                var internalException = new InternalDbServiceException($"Encountered problem when adding sighseeing group with id: '{group.Id}' to the database. See the inner excpetion for more details.", ex);
                 throw internalException;
             }
         }
-
-        public async Task<SightseeingGroup> RestrictedUpdateAsync(SightseeingGroup group)
-        {
-            _logger.LogInformation($"Starting method '{nameof(RestrictedUpdateAsync)}'.");
-
-            _ = group ?? throw new ArgumentNullException(nameof(group), $"Argument '{nameof(group)}' cannot be null.");
-
-            if (string.IsNullOrEmpty(group.Id))
-                throw new ArgumentException($"Argument '{nameof(group.Id)}' cannot be null or empty.");
-
-            await EnsureDatabaseCreatedAsync();
-            _ = _context?.Groups ?? throw new InternalDbServiceException($"Table of type '{typeof(SightseeingGroup).Name}' is null.");
-
-            try
-            {
-                if (_context.Groups.Count() == 0)
-                    throw new InvalidOperationException($"Cannot found element with id '{group.Id}' for update. Resource {_context.Groups.GetType().Name} does not contain any element.");
-
-                if (await _context.Groups.ContainsAsync(group) == false)
-                    throw new InvalidOperationException($"Cannot found element with id '{group.Id}' for update. Any element does not match to the one to be updated.");
-
-                _logger.LogDebug($"Starting update sightseeing groupwith id '{group.Id}'.");
-                var originalGroup = await _context.Groups.SingleAsync(x => x.Id.Equals(group.Id));
-                var updatedGroup = BasicRestrictedUpdate(originalGroup, group) as SightseeingGroup;
-                await _context.TrySaveChangesAsync();
-                _logger.LogDebug($"Update data succeeded.");
-                _logger.LogInformation($"Finished method '{nameof(RestrictedUpdateAsync)}'.");
-                return updatedGroup;
-            }
-            catch (InvalidOperationException ex)
-            {
-                _logger.LogError(ex, $"{ex.GetType().Name} Cannot found element for update. See exception Operation failed.");
-                throw;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"{ex.GetType().Name} {ex.Message}");
-                var internalException = new InternalDbServiceException($"Encountered problem when updating sighseeing group with id '{group.Id}'. See inner excpetion", ex);
-                throw internalException;
-            }
-        }
-
-
-
-        #region Privates      
-
-     
 
         protected override async Task<bool> IsEntityAlreadyExistsAsync(BasicEntity entity)
         {
