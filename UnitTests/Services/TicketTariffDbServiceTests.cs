@@ -36,13 +36,141 @@ namespace UnitTests.Services
             DefaultPrice = 10,
             UpdatedAt = DateTime.Now.AddDays(-1)
         };
+        private Expression<Func<TicketTariff, bool>> _predicate;
 
         [OneTimeSetUp]
         public void SetUp()
         {
+            _predicate = x => x.CreatedAt > DateTime.MinValue;
             _dbContextMock = new Mock<ApplicationDbContext>(Mock.Of<DbContextOptions<ApplicationDbContext>>(o => o.ContextType == typeof(ApplicationDbContext)));
             _logger = Mock.Of<ILogger<TicketTariffDbService>>();
         }
+
+
+
+        #region GetByAsync(predicate)
+        // tabela nie istnieje -> internal exc
+        // tabela jest nullem - > internal exc
+        // zasob jest pusty -> pusty ienumer
+        // predicate jest null -> arg null exc
+        // znalazlo -> ienum<TicketTariff> dla wszystkich znalezionych
+        // zaden ele nie spelnia war -> pusty ienum
+
+        [Test]
+        public async Task GetByAsync__Resource_is_null__Should_throw_InternalDbServiceException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.TicketTariffs = null as DbSet<TicketTariff>;
+                    var service = new TicketTariffDbService(context, _logger);
+
+                    Func<Task> action = async () => await service.GetByAsync(_predicate);
+
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource reference is set to null");
+                }
+            }
+        }
+
+        [Test]
+        public async Task GetByAsync__Argument_predicate_is_null__Should_throw_ArgumentNullException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new TicketTariffDbService(context, _logger);
+
+                    Func<Task> action = async () => await service.GetByAsync(null);
+
+                    await action.Should().ThrowExactlyAsync<ArgumentNullException>();
+                }
+            }
+        }
+
+        [Test]
+        public async Task GetByAsync__Resource_does_not_exist__Should_throw_InternalDbServiceException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    // Drop TicketTariffs table.
+                    context.Database.ExecuteSqlCommand("DROP TABLE [TicketTariffs]");
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new TicketTariffDbService(context, _logger);
+
+                    Func<Task> action = async () => await service.GetByAsync(_predicate);
+
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of TicketTariff. " +
+                         "NOTE Excaption actually is type of 'SqLiteError' only if database provider is SQLite.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task GetByAsync__Resource_is_empty__Should_return_empty_IEnumerable()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.TicketTariffs.RemoveRange(await context.TicketTariffs.ToArrayAsync());
+                    await context.SaveChangesAsync();
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new TicketTariffDbService(context, _logger);
+
+                    var result = await service.GetByAsync(_predicate);
+
+                    result.Count().Should().Be(0);
+                }
+            }
+        }
+
+        [Test]
+        public async Task GetByAsync__At_least_one_Ticket_tariffs_found__Should_return_IEnumerable_for_this_tarifs()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    int expectedLength = context.TicketTariffs.ToArray().Length;
+                    var service = new TicketTariffDbService(context, _logger);
+
+                    // This predicate filters tariffs with CreatedAt after DateTime.MinValue. It will be all of tariffs.
+                    var result = await service.GetByAsync(_predicate);
+
+                    result.Count().Should().Be(expectedLength);
+                }
+            }
+        }
+
+        [Test]
+        public async Task GetByAsync__None_Ticket_tariffs_satisfy_predicate__Should_return_empty_IEnumerable()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new TicketTariffDbService(context, _logger);
+
+                    // This predicate filters tariffs with CreatedAt equals DateTime.MaxValue. It will none tariffs.
+                    var result = await service.GetByAsync(x => x.CreatedAt == DateTime.MaxValue);
+
+                    result.Count().Should().Be(0);
+                }
+            }
+        }
+
+        #endregion
+
 
 
         #region GetAsync(string id)
@@ -453,7 +581,7 @@ namespace UnitTests.Services
 
 
         [Test]
-        public async Task RestrictedAddAsync__In_resource_exists_sightseeing_tariff_with_the_same_id_as_this_one_to_be_added__Should_throw_InvalidOperationException()
+        public async Task RestrictedAddAsync__In_resource_exists_Ticket_tariff_with_the_same_id_as_this_one_to_be_added__Should_throw_InvalidOperationException()
         {
             using (var factory = new DbContextFactory())
             {
@@ -500,7 +628,7 @@ namespace UnitTests.Services
         }
 
         [Test]
-        public async Task RestrictedAddAsync__Add_successful__Should_return_added_sightseeing_tariff()
+        public async Task RestrictedAddAsync__Add_successful__Should_return_added_Ticket_tariff()
         {
             using (var factory = new DbContextFactory())
             {
@@ -533,7 +661,7 @@ namespace UnitTests.Services
         }
 
         [Test]
-        public async Task RestrictedAddAsync__Add_successful__Resource_contains_added_sightseeing_tariff()
+        public async Task RestrictedAddAsync__Add_successful__Resource_contains_added_Ticket_tariff()
         {
             using (var factory = new DbContextFactory())
             {
@@ -965,7 +1093,7 @@ namespace UnitTests.Services
         }
 
         [Test]
-        public async Task RestrictedUpdateAsync__Update_successful__Should_return_updated_sightseeing_tariff()
+        public async Task RestrictedUpdateAsync__Update_successful__Should_return_updated_Ticket_tariff()
         {
             TicketTariff ticketTariffBeforUpdate;
 
@@ -986,7 +1114,7 @@ namespace UnitTests.Services
         }
 
         [Test]
-        public async Task RestrictedUpdateAsync__Update_successful__Resource_should_contains_updated_sightseeing_tariff()
+        public async Task RestrictedUpdateAsync__Update_successful__Resource_should_contains_updated_Ticket_tariff()
         {
             TicketTariff ticketTariff;
 
@@ -1009,7 +1137,7 @@ namespace UnitTests.Services
         }
 
         [Test]
-        public async Task RestrictedUpdateAsync__Update_successful__Resource_should_doesnt_contain_previous_version_of_sightseeing_tariff()
+        public async Task RestrictedUpdateAsync__Update_successful__Resource_should_doesnt_contain_previous_version_of_Ticket_tariff()
         {
             TicketTariff ticketTariffBeforUpdate;
             TicketTariff ticketTariff;

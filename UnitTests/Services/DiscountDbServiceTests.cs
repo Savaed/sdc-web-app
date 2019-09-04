@@ -29,15 +29,143 @@ namespace UnitTests.Services
         };
         private Mock<ApplicationDbContext> _dbContextMock;
         private ILogger<DiscountDbService> _logger;
-        Discount _validDiscount = new Discount { Id = "1", Description = "Sample", DiscountValueInPercentage = 12, Type = Discount.DiscountType.ForGroup, GroupSizeForDiscount = 23 };
+        private Discount _validDiscount = new Discount { Id = "1", Description = "Sample", DiscountValueInPercentage = 12, Type = Discount.DiscountType.ForGroup, GroupSizeForDiscount = 23 };
+        private Expression<Func<Discount, bool>> _predicate;
 
 
         [OneTimeSetUp]
         public void SetUp()
         {
+            _predicate = x => x.CreatedAt > DateTime.MinValue;
             _dbContextMock = new Mock<ApplicationDbContext>(Mock.Of<DbContextOptions<ApplicationDbContext>>(o => o.ContextType == typeof(ApplicationDbContext)));
             _logger = Mock.Of<ILogger<DiscountDbService>>();
         }
+
+
+
+
+        #region GetByAsync(predicate)
+        // tabela nie istnieje -> internal exc
+        // tabela jest nullem - > internal exc
+        // zasob jest pusty -> pusty ienumer
+        // predicate jest null -> arg null exc
+        // znalazlo -> ienum<Discount> dla wszystkich znalezionych
+        // zaden ele nie spelnia war -> pusty ienum
+
+        [Test]
+        public async Task GetByAsync__Resource_is_null__Should_throw_InternalDbServiceException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.Discounts = null as DbSet<Discount>;
+                    var service = new DiscountDbService(context, _logger);
+
+                    Func<Task> action = async () => await service.GetByAsync(_predicate);
+
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource reference is set to null");
+                }
+            }
+        }
+
+        [Test]
+        public async Task GetByAsync__Argument_predicate_is_null__Should_throw_ArgumentNullException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new DiscountDbService(context, _logger);
+
+                    Func<Task> action = async () => await service.GetByAsync(null);
+
+                    await action.Should().ThrowExactlyAsync<ArgumentNullException>();
+                }
+            }
+        }
+
+        [Test]
+        public async Task GetByAsync__Resource_does_not_exist__Should_throw_InternalDbServiceException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    // Drop Discounts table.
+                    context.Database.ExecuteSqlCommand("DROP TABLE [Discounts]");
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new DiscountDbService(context, _logger);
+
+                    Func<Task> action = async () => await service.GetByAsync(_predicate);
+
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of Discount. " +
+                         "NOTE Excaption actually is type of 'SqLiteError' only if database provider is SQLite.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task GetByAsync__Resource_is_empty__Should_return_empty_IEnumerable()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.Discounts.RemoveRange(await context.Discounts.ToArrayAsync());
+                    await context.SaveChangesAsync();
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new DiscountDbService(context, _logger);
+
+                    var result = await service.GetByAsync(_predicate);
+
+                    result.Count().Should().Be(0);
+                }
+            }
+        }
+
+        [Test]
+        public async Task GetByAsync__At_least_one_Ticket_tariffs_found__Should_return_IEnumerable_for_this_tarifs()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    int expectedLength = context.Discounts.ToArray().Length;
+                    var service = new DiscountDbService(context, _logger);
+
+                    // This predicate filters tariffs with CreatedAt after DateTime.MinValue. It will be all of tariffs.
+                    var result = await service.GetByAsync(_predicate);
+
+                    result.Count().Should().Be(expectedLength);
+                }
+            }
+        }
+
+        [Test]
+        public async Task GetByAsync__None_Ticket_tariffs_satisfy_predicate__Should_return_empty_IEnumerable()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new DiscountDbService(context, _logger);
+
+                    // This predicate filters tariffs with CreatedAt equals DateTime.MaxValue. It will none tariffs.
+                    var result = await service.GetByAsync(x => x.CreatedAt == DateTime.MaxValue);
+
+                    result.Count().Should().Be(0);
+                }
+            }
+        }
+
+        #endregion
 
 
         #region GetAsync(string id)

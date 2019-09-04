@@ -3,14 +3,16 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using SDCWebApp.Data;
-using SDCWebApp.Models;
-using SDCWebApp.Services;
 using System;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using UnitTests.Helpers;
+
+using SDCWebApp.Data;
+using SDCWebApp.Models;
+using SDCWebApp.Services;
 
 namespace UnitTests.Services
 {
@@ -22,32 +24,159 @@ namespace UnitTests.Services
             new Article{ ConcurrencyToken = Encoding.ASCII.GetBytes("Updated ConcurrencyToken") },    // Attempt to change 'ConcurrencyToken' which is read-only property.
             new Article{ UpdatedAt = DateTime.Now.AddYears(100) }                                     // Attempt to change 'UpdatedAt' which is read-only property.
         };
-        private Mock<ApplicationDbContext> _dbContextMock;
-        private ILogger<ArticleDbService> _logger;
         private readonly Article _validArticle = new Article
         {
             Id = "1",
             Author = "Mr Test",
             Text = "TestTestTest",
-            Title = "Id TDD worth?",
+            Title = "Is TDD worth?",
             UpdatedAt = DateTime.Now.AddDays(-1)
         };
+        private Mock<ApplicationDbContext> _dbContextMock;
+        private ILogger<ArticleDbService> _logger;
+        private Expression<Func<Article, bool>> _predicate;
+
 
         [OneTimeSetUp]
         public void SetUp()
         {
+            _predicate = x => x.CreatedAt > DateTime.MinValue;
             _dbContextMock = new Mock<ApplicationDbContext>(Mock.Of<DbContextOptions<ApplicationDbContext>>(o => o.ContextType == typeof(ApplicationDbContext)));
             _logger = Mock.Of<ILogger<ArticleDbService>>();
         }
 
 
+        #region GetByAsync(predicate)
+        // The 'Articles' table doesn't exist       -> throw InternalDbServiceException
+        // The 'Articles' table is null             -> throw InternalDbServiceException
+        // The 'Articles' resource is empty         -> return an empty Ienumerable<Article>
+        // The parameter 'predicate' is null        -> throw ArguemntNullException
+        // At lesat one elements satifies predicate -> return this element
+        // None element satifies predicate          -> return an empty Ienumerable<Article>    
+
+        [Test]
+        public async Task GetByAsync__Resource_is_null__Should_throw_InternalDbServiceException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.Articles = null as DbSet<Article>;
+                    var service = new ArticleDbService(context, _logger);
+
+                    Func<Task> action = async () => await service.GetByAsync(_predicate);
+
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource reference is set to null");
+                }
+            }
+        }
+
+        [Test]
+        public async Task GetByAsync__Argument_predicate_is_null__Should_throw_ArgumentNullException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new ArticleDbService(context, _logger);
+
+                    Func<Task> action = async () => await service.GetByAsync(null);
+
+                    await action.Should().ThrowExactlyAsync<ArgumentNullException>();
+                }
+            }
+        }
+
+        [Test]
+        public async Task GetByAsync__Resource_does_not_exist__Should_throw_InternalDbServiceException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    // Drop Articles table.
+                    context.Database.ExecuteSqlCommand("DROP TABLE [Articles]");
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new ArticleDbService(context, _logger);
+
+                    Func<Task> action = async () => await service.GetByAsync(_predicate);
+
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of Article. " +
+                         "NOTE Excaption actually is type of 'SqLiteError' only if database provider is SQLite.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task GetByAsync__Resource_is_empty__Should_return_empty_IEnumerable()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.Articles.RemoveRange(await context.Articles.ToArrayAsync());
+                    await context.SaveChangesAsync();
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new ArticleDbService(context, _logger);
+
+                    var result = await service.GetByAsync(_predicate);
+
+                    result.Count().Should().Be(0);
+                }
+            }
+        }
+
+        [Test]
+        public async Task GetByAsync__At_least_one_Ticket_tariffs_found__Should_return_IEnumerable_for_this_tarifs()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    int expectedLength = context.Articles.ToArray().Length;
+                    var service = new ArticleDbService(context, _logger);
+
+                    // This predicate filters tariffs with CreatedAt after DateTime.MinValue. It will be all of tariffs.
+                    var result = await service.GetByAsync(_predicate);
+
+                    result.Count().Should().Be(expectedLength);
+                }
+            }
+        }
+
+        [Test]
+        public async Task GetByAsync__None_Ticket_tariffs_satisfy_predicate__Should_return_empty_IEnumerable()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new ArticleDbService(context, _logger);
+
+                    // This predicate filters tariffs with CreatedAt equals DateTime.MaxValue. It will none tariffs.
+                    var result = await service.GetByAsync(x => x.CreatedAt == DateTime.MaxValue);
+
+                    result.Count().Should().Be(0);
+                }
+            }
+        }
+
+        #endregion
+
+
         #region GetAsync(string id)
-        // nie istnieje tabela -> internal ex
-        // tabela jest nullem -> internal ex
-        // id jest nullem/pusty -> arg exc
-        // 0 znaleziono -> invalid oper exc
-        // zasob jest pusty -> invalid oper exc
-        // znalazlo -> zwraca tylko jeden element
+        // The 'Articles' table doesn't exist       -> throw InternalDbServiceException
+        // The 'Articles' table is null             -> throw InternalDbServiceException
+        // The 'Articles' resource is empty         -> throw InvalidOperationException
+        // The parameter 'id' is null or empty      -> throw ArgumentException
+        // One element found                        -> return this element
+        // None element found                       -> throw InvalidOperationException
 
         [Test]
         public async Task GetAsync__Resource_is_null__Should_throw_InternalDbServiceException()
@@ -100,7 +229,7 @@ namespace UnitTests.Services
         }
 
         [Test]
-        public async Task GetAsync__Found_zero_matching_Article__Should_throw_InvalidOperationException()
+        public async Task GetAsync__Found_zero_matching_article__Should_throw_InvalidOperationException()
         {
             using (var factory = new DbContextFactory())
             {
@@ -163,10 +292,11 @@ namespace UnitTests.Services
 
 
         #region GetAllAsync()
-        // tabela nie istnieje -> internal exc
-        // tabela jest nullem - > internal exc
-        // zasob jest pusty -> pusty ienumer
-        // znalazlo -> ienum<Article> dla wszystkich z zasobu
+        // The 'Articles' table doesn't exist       -> throw InternalDbServiceException
+        // The 'Articles' table is null             -> throw InternalDbServiceException
+        // The 'Articles' resource is empty         -> return an empty IEnumerable<Article>
+        // The parameter 'id' is null or empty      -> throw ArgumentException
+        // Elements found                           -> return those elements as IEnumerable<Article>
 
         [Test]
         public async Task GetAllAsync__Resource_is_null__Should_throw_InternalDbServiceException()
@@ -250,15 +380,15 @@ namespace UnitTests.Services
         #endregion
 
 
-        #region Add(Article Article)
-        // zasob nie istnieje -> exc z msg
-        // zasob jest nullem -> null ref exc
-        // problem z zapisaniem zmian -> inter | Nie mam pojecia jak to przetestowac xD
-        // arg jest nullem -> arg null exc
-        // istnieje w zasobie taki sam element jak ten, ktory chcemy dodac -> invalid oper exc
-        // dodawanie sie udalo -> zwraca dodany bilet
-        // dodawanie sie udalo -> zasob jest wiekszy o jeden
-        // dodawanie sie udalo -> istnieje w zasobie dodany bilet
+        #region Add(Article article)
+        // The 'Articles' table doesn't exist     -> throw InternalDbServiceException
+        // The 'Articles' table is null           -> throw InternalDbServiceException
+        // The 'Articles' resource is empty       -> return an empty IEnumerable<Article>
+        // The parameter 'artilce' is null        -> throw ArgumentNullException
+        // There is the same element in database  -> throw InvalidOperationException
+        // Add secceeded                          -> return added element
+        // Add succeeded                          -> the resource lenght is greater by 1
+        // Add succeeded                          -> the resource contains added element
 
         [Test]
         public async Task AddAsync__Resource_is_null__Should_throw_InternalDbServiceException()
@@ -310,9 +440,8 @@ namespace UnitTests.Services
             await result.Should().ThrowExactlyAsync<ArgumentNullException>("Because argument 'Article' is null.");
         }
 
-
         [Test]
-        public async Task AddAsync__In_resource_exists_the_same_Article_as_this_one_to_be_added__Should_throw_InvalidOperationException()
+        public async Task AddAsync__In_resource_exists_the_same_article_as_this_one_to_be_added__Should_throw_InvalidOperationException()
         {
             using (var factory = new DbContextFactory())
             {
@@ -385,16 +514,15 @@ namespace UnitTests.Services
 
         #endregion
 
-        #region RestrictedAddAsync(Article Article)
-        // zasob nie istnieje -> exc z msg
-        // zasob jest nullem -> null ref exc
-        // problem z zapisaniem zmian -> inter | Nie mam pojecia jak to przetestowac xD
-        // arg jest nullem -> arg null exc
-        // istnieje w zasobie taki sam element jak ten, ktory chcemy dodac (takie samo id, wartosci ) -> invalid oper exc
-        // dodawanie sie udalo -> zwraca dodany bilet
-        // dodawanie sie udalo -> zasob jest wiekszy o jeden
-        // dodawanie sie udalo -> istnieje w zasobie dodany bilet
-        // proba doda
+
+        #region RestrictedAddAsync(Article article)
+        // The 'Articles' table doesn't exist     -> throw InternalDbServiceException
+        // The 'Articles' table is null           -> throw InternalDbServiceException
+        // The parameter 'artilce' is null        -> throw ArgumentNullException
+        // There is the same element in database  -> throw InvalidOperationException
+        // Add secceeded                          -> return added element
+        // Add succeeded                          -> the resource lenght is greater by 1
+        // Add succeeded                          -> the resource contains added element
 
         [Test]
         public async Task RestrictedAddAsync__Resource_is_null__Should_throw_InternalDbServiceException()
@@ -445,7 +573,6 @@ namespace UnitTests.Services
 
             await result.Should().ThrowExactlyAsync<ArgumentNullException>("Because argument 'article' is null.");
         }
-
 
         [Test]
         public async Task RestrictedAddAsync__In_resource_exists_article_with_the_same_id_as_this_one_to_be_added__Should_throw_InvalidOperationException()
@@ -547,18 +674,18 @@ namespace UnitTests.Services
         #endregion
 
 
-        #region UpdateAsync(Article tariff)
-        // arg jest nullem -> arg null exc
-        // arg ma id ktore jest nullem albo pusty -> arg exc   
-        // zasob jest nullem -> inter exc
-        // zasob nie istnieje -> inter exc
-        // zasob jest pusty -> invalid oper exc
-        // nie znaleziono podanego biletu -> invalid oper exc
-        // update udal sie -> tyle samo biletow co przed operacja 
-        // update sie udal -> w zasobie istnieje zmodyfikowany bilet
-        // update sie udal -> w zasobie nie istnieje poprzednia wersja biletu
-        // update sie udal -> zwraca zmodyfikowany bilet
-        // update sie udal -> zmieniona data modyfikacji
+        #region UpdateAsync(Article article)
+        // The 'Articles' table doesn't exist           -> throw InternalDbServiceException
+        // The 'Articles' table is null                 -> throw InternalDbServiceException
+        // The 'Articles' resource is empty             -> throw InvalidOperationException
+        // The parameter 'artilce' is null              -> throw ArgumentNullException
+        // Element to be updated not found              -> throw InvalidOperationException
+        // Element to be updated has null or empty 'Id' -> throw ArgumentException
+        // Update secceeded                             -> return updated element
+        // Update succeeded                             -> the resource lenght unchanged
+        // Update succeeded                             -> the resource contains updated element
+        // Update succeeded                             -> the resource doesn't contain previous version of updated element
+        // Update succeeded                             -> updated element has changed date of update
 
         [Test]
         public async Task UpdateAsync__Resource_is_null__Should_throw_InternalDbServiceException()
@@ -832,9 +959,18 @@ namespace UnitTests.Services
 
 
         #region RestrictedUpdateAsync(Article article)
-        // wszystko co w normalnym update
-        // proba zmian readonly properties -> metoda niczego nie zmieni i zaloguje warny
-
+        // The 'Articles' table doesn't exist           -> throw InternalDbServiceException
+        // The 'Articles' table is null                 -> throw InternalDbServiceException
+        // The 'Articles' resource is empty             -> throw InvalidOperationException
+        // The parameter 'artilce' is null              -> throw ArgumentNullException
+        // Element to be updated not found              -> throw InvalidOperationException
+        // Element to be updated has null or empty 'Id' -> throw ArgumentException
+        // Attempt updating read-only properties        -> any changes will be ignored
+        // Update secceeded                             -> return updated element
+        // Update succeeded                             -> the resource lenght unchanged
+        // Update succeeded                             -> the resource contains updated element
+        // Update succeeded                             -> the resource doesn't contain previous version of updated element
+        // Update succeeded                             -> updated element has changed date of update
 
         [Test]
         public async Task RestrictedUpdateAsync__Resource_is_null__Should_throw_InternalDbServiceException()
@@ -1128,13 +1264,14 @@ namespace UnitTests.Services
 
 
         #region DeleteAsync(string id)
-        // zasob jest nullem -> internal
-        // zasob nie istnieje -> intern
-        // id jest nullem albo pusty -> arg exc
-        // zasob jest pusty -> invalid oper exc
-        // nie ma takiego biletu jak podany -> invalid oper exc
-        // usuwanie sie udalo -> nie w zasobie usunietego biletu
-        // usuwanie sie udalo -> rozmiar zasobu jest o jeden mniejszy
+        // The 'Articles' table doesn't exist           -> throw InternalDbServiceException
+        // The 'Articles' table is null                 -> throw InternalDbServiceException
+        // The 'Articles' resource is empty             -> throw InvalidOperationException
+        // The parameter 'id' is null or empty          -> throw ArgumentException
+        // Element to be deleted not found              -> throw InvalidOperationException
+        // Element to be updated has null or empty 'Id' -> throw ArgumentException
+        // Delete succeeded                             -> resource doesn't contain deleted element
+        // Delete succeeded                             -> resource lenght is less by 1
 
         [Test]
         public async Task DeleteAsync__Resource_is_null__Should_throw_InternalDbServiceException()
@@ -1274,14 +1411,14 @@ namespace UnitTests.Services
 
 
         #region GetWithPagination(int pageNumber, int pageSize)
-        // zasob jest nullem -> internal
-        // zasob nie istnieje -> internal
-        // page number/ size jest nullem -> argument null exc
-        // page nie moze byc < 1 -> arg out of range
-        // size nie moze byc < 0 -> arg out of range
-        // przypadek: jest 201 elementow, bierzemy nr 3 i size 100 el, to skip 200 i 1 el sie wyswietli -> zwracamy liste z tym jednym elementem
-        // jest 200 ele nr jest 3, size 100 -> pusta lista
-        // tabela jest pusta -> jw
+        // The 'Articles' table doesn't exist                               -> throw InternalDbServiceException
+        // The 'Articles' table is null                                     -> throw InternalDbServiceException
+        // The 'Articles' resource is empty                                 -> return an empty IEnumerable
+        // The parameter 'pageNumber' or 'pageSize' is null                 -> throw ArgumentNullException
+        // The parameter 'pageNumber' < 1                                   -> throw ArgumentOutOfRange
+        // The parameter 'pageSize' < 0                                     -> throw ArgumentOutOfRange
+        // Case: there is 201 elements, pageNumber is 3 and pageSize is 100 -> skip 200 elements, and only 1 element will be returned 
+        // Case: there is 200 elements, pageNumber is 3 and pageSize is 100 -> skip 200 elements, and return en empty IEnumerable
 
         [Test]
         public async Task GetWithPaginationAsync__Resource_is_null__Should_throw_InternalDbServiceException()

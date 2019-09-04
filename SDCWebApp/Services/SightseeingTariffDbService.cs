@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using SDCWebApp.Data;
 using SDCWebApp.Helpers.Extensions;
 using SDCWebApp.Models;
+using System.Linq.Expressions;
 
 namespace SDCWebApp.Services
 {
@@ -276,6 +277,48 @@ namespace SDCWebApp.Services
             _logger.LogInformation($"Starting method '{nameof(RestrictedUpdateAsync)}'.");
             // Call restricted update mode.
             return await UpdateBaseAsync(tariff, true);
+        }
+
+        /// <summary>
+        /// Filters set of data of type <see cref="SightseeingTariff"/>. Returns filtered data set. Throws an exception if <paramref name="predicate"/> is null, 
+        /// or if cannot filter data due to any internal problem.
+        /// </summary>
+        /// <typeparam name="T">The type of entity to set be filtered.</typeparam>
+        /// <param name="predicate">A function to test each element for a condition.</param>
+        /// <returns>Filterd <see cref="SightseeingTariff"/> set.</returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="predicate"/> is null.</exception>
+        /// <exception cref="InvalidOperationException">Cannot filter data.</exception>
+        /// <exception cref="InternalDbServiceException">The resource does not exist or has a null value or any
+        /// other problems with retrieving data from database occurred.</exception>        
+        public async Task<IEnumerable<SightseeingTariff>> GetByAsync(Expression<Func<SightseeingTariff, bool>> predicate)
+        {
+            _logger.LogInformation($"Starting method '{nameof(GetByAsync)}'.");
+
+            await EnsureDatabaseCreatedAsync();
+            _ = _context?.SightseeingTariffs ?? throw new InternalDbServiceException($"Table of type '{typeof(SightseeingTariff).Name}' is null.");
+
+            try
+            {
+                var result = GetByPredicate<SightseeingTariff>(predicate) as IEnumerable<SightseeingTariff>;
+                _logger.LogInformation($"Finished method '{nameof(GetByAsync)}'.");
+                return result;
+            }
+            catch (ArgumentNullException)
+            {
+                _logger.LogError($"Argument '{nameof(predicate)}' cannot be null.");
+                throw;
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogError($"{ex.GetType().Name} - {ex.Message} See the exception for more details.");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{ex.GetType().Name} - {ex.Message}");
+                var internalException = new InternalDbServiceException($"Encountered problem when retrieving sightseeing tariffs from database using {nameof(predicate)}. See the inner excpetion for more details.", ex);
+                throw internalException;
+            }
         }
 
 

@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 using SDCWebApp.Data;
@@ -68,5 +70,41 @@ namespace SDCWebApp.Services
         /// <param name="entity">The <see cref="BasicEntity"/> entity to check if there is the same entity in the database.</param>
         /// <returns></returns>
         protected abstract Task<bool> IsEntityAlreadyExistsAsync(BasicEntity entity);
+
+        /// <summary>
+        /// Filters set of data of type <typeparamref name="T"/>. Returns filterd data set. Throws <see cref="ArgumentNullException"/> if <paramref name="predicate"/> is null 
+        /// or <see cref="InvalidOperationException"/> if cannot filter data.
+        /// </summary>
+        /// <typeparam name="T">The type of entity to set be filtered.</typeparam>
+        /// <param name="predicate">A function to test each element for a condition.</param>
+        /// <returns>Filterd <see cref="IEnumerable{T}"/>.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="predicate"/> is null.</exception>
+        /// <exception cref="InvalidOperationException">If cannot filter data.</exception>
+        protected virtual IEnumerable<BasicEntity> GetByPredicate<T>(Expression<Func<T, bool>> predicate) where T : BasicEntity
+        {
+            _logger.LogDebug($"Starting method '{nameof(GetByPredicate)}'.");
+            if (predicate is null)
+            {
+                throw new ArgumentNullException(nameof(predicate), $"Argument '{nameof(predicate)}' cannot be null.");
+            }
+
+            try
+            {
+                var result = _context.Set<T>().Where(predicate).AsEnumerable();
+                _logger.LogDebug($"Finished method '{nameof(GetByPredicate)}'.");
+                return result;
+            }
+            catch (ArgumentNullException ex)
+            {
+                var exception = new InvalidOperationException($"Cannot apply '{nameof(predicate)}' to filter data. See the inner exception for more details.", ex);
+                _logger.LogError($"{exception.GetType().Name} - {exception.Message}", exception);
+                throw exception;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"{ex.GetType().Name} - {ex.Message}", ex);
+                throw;
+            }
+        }
     }
 }

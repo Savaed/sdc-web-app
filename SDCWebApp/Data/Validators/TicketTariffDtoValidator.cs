@@ -10,13 +10,13 @@ namespace SDCWebApp.Data.Validators
         {
             RuleFor(x => x.DefaultPrice)
                     .Cascade(CascadeMode.StopOnFirstFailure)
-                    .NotEmpty()
+                    .NotEmpty().WithMessage("{PropertyName is required.}")
                     .GreaterThan(0.0f).WithMessage("{PropertyName} should be greater than 0.")
                     .LessThanOrEqualTo(1000.0f).WithMessage("{PropertyName} should be less than 1000.");
 
             RuleFor(x => x.Description)
                     .Cascade(CascadeMode.StopOnFirstFailure)
-                    .NotEmpty()
+                    .NotEmpty().WithMessage("{PropertyName is required.}")
                     .MaximumLength(256);
         }
     }

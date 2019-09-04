@@ -1,21 +1,18 @@
 ﻿using FluentAssertions;
-using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using SDCWebApp.Data;
-using SDCWebApp.Data.Validators;
-using SDCWebApp.Models;
-using SDCWebApp.Services;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using UnitTests.Helpers;
+
+using SDCWebApp.Data;
+using SDCWebApp.Models;
+using SDCWebApp.Services;
 
 namespace UnitTests.Services
 {
@@ -24,12 +21,13 @@ namespace UnitTests.Services
     {
         private Mock<ApplicationDbContext> _dbContextMock;
         private ILogger<SightseeingTariffDbService> _logger;
+        private Expression<Func<SightseeingTariff, bool>> _predicate;
         private readonly SightseeingTariff _validTariff = new SightseeingTariff
         {
             Id = "1",
             Name = "Sample sightseeing tariff for unit tests."
         };
-        private static SightseeingTariff[] _tariffForRestrictedUpdateCases = new SightseeingTariff[]
+        private static readonly SightseeingTariff[] _tariffForRestrictedUpdateCases = new SightseeingTariff[]
         {
             new SightseeingTariff{ ConcurrencyToken = Encoding.ASCII.GetBytes("Updated ConcurrencyToken") },    // Attempt to change 'ConcurrencyToken' which is read-only property.
             new SightseeingTariff{ UpdatedAt = DateTime.Now.AddYears(100) }                                     // Attempt to change 'UpdatedAt' which is read-only property.
@@ -39,9 +37,134 @@ namespace UnitTests.Services
         [OneTimeSetUp]
         public void SetUp()
         {
+            _predicate = x => x.CreatedAt > DateTime.MinValue;
             _dbContextMock = new Mock<ApplicationDbContext>(Mock.Of<DbContextOptions<ApplicationDbContext>>(o => o.ContextType == typeof(ApplicationDbContext)));
             _logger = Mock.Of<ILogger<SightseeingTariffDbService>>();
         }
+
+
+        #region GetByAsync(predicate)
+        // tabela nie istnieje -> internal exc
+        // tabela jest nullem - > internal exc
+        // zasob jest pusty -> pusty ienumer
+        // predicate jest null -> arg null exc
+        // znalazlo -> ienum<SightseeingTariff> dla wszystkich znalezionych
+        // zaden ele nie spelnia war -> pusty ienum
+
+        [Test]
+        public async Task GetByAsync__Resource_is_null__Should_throw_InternalDbServiceException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.SightseeingTariffs = null as DbSet<SightseeingTariff>;
+                    var service = new SightseeingTariffDbService(context, _logger);
+
+                    Func<Task> action = async () => await service.GetByAsync(_predicate);
+
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource reference is set to null");
+                }
+            }
+        }
+
+        [Test]
+        public async Task GetByAsync__Argument_predicate_is_null__Should_throw_ArgumentNullException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new SightseeingTariffDbService(context, _logger);
+
+                    Func<Task> action = async () => await service.GetByAsync(null);
+
+                    await action.Should().ThrowExactlyAsync<ArgumentNullException>();
+                }
+            }
+        }
+
+        [Test]
+        public async Task GetByAsync__Resource_does_not_exist__Should_throw_InternalDbServiceException()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    // Drop SightseeingTariffs table.
+                    context.Database.ExecuteSqlCommand("DROP TABLE [SightseeingTariffs]");
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new SightseeingTariffDbService(context, _logger);
+
+                    Func<Task> action = async () => await service.GetByAsync(_predicate);
+
+                    await action.Should().ThrowExactlyAsync<InternalDbServiceException>("Because resource doesnt exist and cannot get single instance of SightseeingTariff. " +
+                         "NOTE Excaption actually is type of 'SqLiteError' only if database provider is SQLite.");
+                }
+            }
+        }
+
+        [Test]
+        public async Task GetByAsync__Resource_is_empty__Should_return_empty_IEnumerable()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.SightseeingTariffs.RemoveRange(await context.SightseeingTariffs.ToArrayAsync());
+                    await context.SaveChangesAsync();
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new SightseeingTariffDbService(context, _logger);
+
+                    var result = await service.GetByAsync(_predicate);
+
+                    result.Count().Should().Be(0);
+                }
+            }
+        }
+
+        [Test]
+        public async Task GetByAsync__At_least_one_sightseeing_tariffs_found__Should_return_IEnumerable_for_this_tarifs()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    int expectedLength = context.SightseeingTariffs.ToArray().Length;
+                    var service = new SightseeingTariffDbService(context, _logger);
+
+                    // This predicate filters tariffs with CreatedAt after DateTime.MinValue. It will be all of tariffs.
+                    var result = await service.GetByAsync(_predicate);
+
+                    result.Count().Should().Be(expectedLength);
+                }
+            }
+        }
+
+        [Test]
+        public async Task GetByAsync__None_sightseeing_tariffs_satisfy_predicate__Should_return_empty_IEnumerable()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new SightseeingTariffDbService(context, _logger);
+
+                    // This predicate filters tariffs with CreatedAt equals DateTime.MaxValue. It will none tariffs.
+                    var result = await service.GetByAsync(x => x.CreatedAt == DateTime.MaxValue);
+
+                    result.Count().Should().Be(0);
+                }
+            }
+        }
+
+        #endregion
 
 
         #region GetAsync(string id)
@@ -299,7 +422,7 @@ namespace UnitTests.Services
         #endregion
 
 
-        #region Add(SightseeingTariff SightseeingTariff)
+        #region Add(SightseeingTariff sightseeingTariff)
         // zasob nie istnieje -> exc z msg
         // zasob jest nullem -> null ref exc
         // problem z zapisaniem zmian -> inter | Nie mam pojecia jak to przetestowac xD
@@ -358,7 +481,6 @@ namespace UnitTests.Services
 
             await result.Should().ThrowExactlyAsync<ArgumentNullException>("Because argument 'SightseeingTariff' is null.");
         }
-
 
         [Test]
         public async Task AddAsync__In_resource_exists_sightseeing_tariff_with_the_same_id_as_this_one_to_be_added__Should_throw_InvalidOperationException()
@@ -458,7 +580,7 @@ namespace UnitTests.Services
         #endregion
 
 
-        #region RestrictedAddAsync(SightseeingTariff SightseeingTariff)
+        #region RestrictedAddAsync(SightseeingTariff sightseeingTariff)
         // zasob nie istnieje -> exc z msg
         // zasob jest nullem -> null ref exc
         // problem z zapisaniem zmian -> inter | Nie mam pojecia jak to przetestowac xD
@@ -518,7 +640,6 @@ namespace UnitTests.Services
 
             await result.Should().ThrowExactlyAsync<ArgumentNullException>("Because argument 'SightseeingTariff' is null.");
         }
-
 
         [Test]
         public async Task RestrictedAddAsync__In_resource_exists_sightseeing_tariff_with_the_same_id_as_this_one_to_be_added__Should_throw_InvalidOperationException()
@@ -904,7 +1025,6 @@ namespace UnitTests.Services
         #region RestrictedUpdateAsync(SightseeingTariff tariff)
         // wszystko co w normalnym update
         // proba zmian readonly properties -> metoda niczego nie zmieni i zaloguje warny
-
 
         [Test]
         public async Task RestrictedUpdateAsync__Resource_is_null__Should_throw_InternalDbServiceException()

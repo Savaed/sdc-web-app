@@ -213,7 +213,6 @@ namespace SDCWebApp.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-
         public async Task<IActionResult> UpdateArticleAsync(string id, [FromBody] ArticleDto article)
         {
             _logger.LogInformation($"Starting method '{nameof(UpdateArticleAsync)}'.");

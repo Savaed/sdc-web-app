@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 using SDCWebApp.Models;
@@ -8,6 +9,19 @@ namespace SDCWebApp.Services
 {
     public interface IArticleDbService
     {
+        /// <summary>
+        /// Filters set of data of type <see cref="Article"/>. Returns filtered data set. Throws an exception if <paramref name="predicate"/> is null, 
+        /// or if cannot filter data due to any internal problem.
+        /// </summary>
+        /// <typeparam name="T">The type of entity to set be filtered.</typeparam>
+        /// <param name="predicate">A function to test each element for a condition.</param>
+        /// <returns>Filterd <see cref="Article"/> set.</returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="predicate"/> is null.</exception>
+        /// <exception cref="InvalidOperationException">Cannot filter data.</exception>
+        /// <exception cref="InternalDbServiceException">The resource does not exist or has a null value or any
+        /// other problems with retrieving data from database occurred.</exception>        
+        Task<IEnumerable<Article>> GetByAsync(Expression<Func<Article, bool>> predicate);
+
         /// <summary>
         /// Asynchronously retrievs <see cref="Article"/> entity with given <paramref name="id"/> from the database. 
         /// Throws an exception if cannot found entity or any problem with retrieving occurred.
