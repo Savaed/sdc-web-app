@@ -21,6 +21,7 @@ namespace SDCWebApp.Data
         public virtual DbSet<SightseeingGroup> Groups { get; set; }
         public virtual DbSet<Customer> Customers { get; set; }
         public virtual DbSet<GeneralSightseeingInfo> GeneralSightseeingInfo { get; set; }
+        public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
 
 
         public ApplicationDbContext() { }

@@ -24,12 +24,12 @@ namespace SDCWebApp.Controllers
 
 
         /// <summary>
-        /// Logs an exception that caused <see cref="HttpStatusCode.NotFound"/> error. Creates and returns <see cref="NotFoundObjectResult"/>, which describes the error.
+        /// Logs message and exception if passed that caused <see cref="HttpStatusCode.NotFound"/> error. Creates and returns <see cref="NotFoundObjectResult"/>, which describes the error.
         /// </summary>
         /// <param name="exception">An exception that causes NotFoundError.</param>
         /// <param name="notFoundObject">An object that processing causes NotFoundError.</param>
         /// <returns>A <see cref="NotFoundObjectResult"/> described en NotFoundError.</returns>
-        protected virtual NotFoundObjectResult OnNotFoundError(string errorMessage, InvalidOperationException exception = null)
+        protected virtual NotFoundObjectResult OnNotFoundError(string errorMessage, Exception exception = null)
         {
            if (exception is null)
                 _logger.LogWarning($"{errorMessage}");
@@ -42,13 +42,13 @@ namespace SDCWebApp.Controllers
         }
 
         /// <summary>
-        /// Logs an exception that caused <see cref="InvalidParameterError"/> and as a result, <see cref="HttpStatusCode.BadRequest"/> error. 
+        /// Logs message and exception if passed that caused <see cref="InvalidParameterError"/> and as a result, <see cref="HttpStatusCode.BadRequest"/> error. 
         /// Creates and returns <see cref="BadRequestObjectResult"/>, which describes the error.
         /// </summary>
         /// <param name="exception">An exception that caused <see cref="HttpStatusCode.BadRequest"/>.</param>
         /// <param name="notFoundObject">An object that processing caused <see cref="HttpStatusCode.BadRequest"/>.</param>
         /// <returns>A <see cref="BadRequestObjectResult"/> described en <see cref="HttpStatusCode.BadRequest"/>.</returns>
-        protected virtual BadRequestObjectResult OnInvalidParameterError(string errorMessage, InvalidOperationException exception = null)
+        protected virtual BadRequestObjectResult OnInvalidParameterError(string errorMessage, Exception exception = null)
         {
             if (exception is null)
                 _logger.LogWarning($"{errorMessage}");
@@ -61,13 +61,13 @@ namespace SDCWebApp.Controllers
         }
 
         /// <summary>
-        /// Logs an exception that caused <see cref="MismatchParameterError"/> and as a result, <see cref="HttpStatusCode.BadRequest"/> error. 
+        /// Logs message and exception if passed that caused <see cref="MismatchParameterError"/> and as a result, <see cref="HttpStatusCode.BadRequest"/> error. 
         /// Creates and returns <see cref="BadRequestObjectResult"/>, which describes the error.
         /// </summary>
         /// <param name="exception">An exception that caused <see cref="HttpStatusCode.BadRequest"/>.</param>
         /// <param name="notFoundObject">An object that processing caused <see cref="HttpStatusCode.BadRequest"/>.</param>
         /// <returns>A <see cref="BadRequestObjectResult"/> described en <see cref="HttpStatusCode.BadRequest"/>.</returns>
-        protected virtual BadRequestObjectResult OnMismatchParameterError(string errorMessage, InvalidOperationException exception = null)
+        protected virtual BadRequestObjectResult OnMismatchParameterError(string errorMessage, Exception exception = null)
         {
             if (exception is null)
                 _logger.LogWarning($"{errorMessage}");

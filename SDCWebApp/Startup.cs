@@ -11,21 +11,24 @@ using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using SDCWebApp.Auth;
+using SDCWebApp.Helpers.Constants;
 using SDCWebApp.Data;
 using SDCWebApp.Helpers;
 using System;
 using System.Reflection;
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
+using System.Threading.Tasks;
 
 namespace SDCWebApp
 {
     public class Startup
     {
-        private const string AdminAuthorizationPolicyName = "OnlyForAdmin";
-        private const string DefaultCorsPolicyName = "EnableCors";
-        private const string DefautConnectionStringName = "DefaultConnection";
-
         public IConfiguration Configuration { get; }
 
 
@@ -38,6 +41,9 @@ namespace SDCWebApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
+            // Disable JWT claim name mapping.
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+
             // Add validation of antiforgery tokens for unsave methods.
             // See https://docs.microsoft.com/pl-pl/dotnet/api/microsoft.aspnetcore.mvc.autovalidateantiforgerytokenattribute?view=aspnetcore-2.2
             services.AddMvc(options =>
@@ -57,6 +63,7 @@ namespace SDCWebApp
             {
                 // Ignore reference loops in JSON responses.
                 options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+
                 // Convert any enum to its string representation.
                 options.SerializerSettings.Converters.Add(new StringEnumConverter());
                 options.SerializerSettings.Converters.Add(new IsoDateTimeConverter());
@@ -70,13 +77,13 @@ namespace SDCWebApp
 
             services.AddCors(config =>
             {
-                config.AddPolicy(DefaultCorsPolicyName, policy =>
+                config.AddPolicy(Strings.DefaultCorsPolicyName, policy =>
                 {
                     policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().AllowCredentials().Build();
                 });
             });
 
-            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString(DefautConnectionStringName)));
+            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString(Strings.DefaultConnectionStringName)));
 
             services.AddIdentity<IdentityUser, IdentityRole>(config =>
             {
@@ -95,26 +102,40 @@ namespace SDCWebApp
                 config.SignIn.RequireConfirmedEmail = false;
             }).AddEntityFrameworkStores<ApplicationDbContext>();
 
+            // Config JWT settings and set properties value from app settings file.
             var jwtSettingsSection = Configuration.GetSection(nameof(JwtSettings));
             services.Configure<JwtSettings>(jwtSettingsSection);
             var jwtSettings = jwtSettingsSection.Get<JwtSettings>();
 
-            // Adding authentication
+            // Add authentication
             services.AddAuthentication(config =>
             {
                 config.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 config.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 config.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
             })
-            .AddJwtBearer(config => config.TokenValidationParameters = JwtValidation.GetValidationParameters(jwtSettings));
+            .AddJwtBearer(config =>
+            {
+                config.TokenValidationParameters = jwtSettings.GetValidationParameters();
+                config.Events = new JwtBearerEvents
+                {
+                    OnAuthenticationFailed = context =>
+                    {
+                        if (context.Exception is SecurityTokenExpiredException)
+                        {
+                            context.Response.Headers.Add("Token-Expired", "true");
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
+            });
 
             services.AddAuthorization(options =>
             {
-                // TODO Move this policy to appsettings.json for future resusability.
-                options.AddPolicy(AdminAuthorizationPolicyName, config => config.RequireAuthenticatedUser().RequireRole("ADMIN"));
+                options.AddPolicy(Strings.ApiUserPolicyName, config => config.RequireAuthenticatedUser().RequireClaim(Strings.RoleClaimName, Strings.AdministratorRoleName, Strings.ModeratorRoleName));
             });
 
-            // Adding AutoMapper
+            // Add AutoMapper
             services.AddAutoMapper(Assembly.GetExecutingAssembly().GetTypes());
 
             // Replacement of built-in service container with Autofac.

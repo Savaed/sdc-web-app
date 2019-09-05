@@ -579,7 +579,6 @@ namespace UnitTests.Services
             await result.Should().ThrowExactlyAsync<ArgumentNullException>("Because argument 'TicketTariff' is null.");
         }
 
-
         [Test]
         public async Task RestrictedAddAsync__In_resource_exists_Ticket_tariff_with_the_same_id_as_this_one_to_be_added__Should_throw_InvalidOperationException()
         {

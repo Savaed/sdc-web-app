@@ -13,6 +13,7 @@ using System.Net;
 
 namespace SDCWebApp.Controllers
 {
+    [Route("api/[controller]")]
     [ApiController]
     public class TicketTariffsController : CustomApiController, ITicketTariffsController
     {
@@ -105,7 +106,7 @@ namespace SDCWebApp.Controllers
 
 
 
-                // TODO      JAKOS TO ZMIENIC ZEBY MIALO RECE I NOGI BO TERAZ TO TROCHE CHUJNIA
+                // TODO      JAKOS TO ZMIENIC ZEBY MIALO RECE I NOGI BO TERAZ TO TROCHE LIPA
 
 
 
@@ -217,24 +218,24 @@ namespace SDCWebApp.Controllers
 
             //_logger.LogInformation($"Starting method '{nameof(GetAllTicketTariffsAsync)}'.");
 
-            try
-            {
-                var ticketTariffs = await _ticketTariffDbService.GetAllAsync();
-                var ticketTariffDtos = MapToDtoEnumerable(ticketTariffs);
-                var response = new ResponseWrapper(ticketTariffDtos);
-                _logger.LogInformation($"Finished method '{nameof(GetAllTicketTariffsAsync)}'.");
-                return Ok(response);
-            }
-            catch (InternalDbServiceException ex)
-            {
-                LogInternalDbServiceException(_ticketTariffDbService.GetType(), ex);
-                throw;
-            }
-            catch (Exception ex)
-            {
-                LogUnexpectedException(ex);
-                throw;
-            }
+            //try
+            //{
+            //    var ticketTariffs = await _ticketTariffDbService.GetAllAsync();
+            //    var ticketTariffDtos = MapToDtoEnumerable(ticketTariffs);
+            //    var response = new ResponseWrapper(ticketTariffDtos);
+            //    _logger.LogInformation($"Finished method '{nameof(GetAllTicketTariffsAsync)}'.");
+            //    return Ok(response);
+            //}
+            //catch (InternalDbServiceException ex)
+            //{
+            //    LogInternalDbServiceException(_ticketTariffDbService.GetType(), ex);
+            //    throw;
+            //}
+            //catch (Exception ex)
+            //{
+            //    LogUnexpectedException(ex);
+            //    throw;
+            //}
         }
 
         /// <summary>

@@ -34,7 +34,7 @@ namespace SDCWebApp.Data.Validators
                 {
                     var dbRoles = dbContext.Roles.ToList();
                     bool isRoleExist = dbRoles.Any(x => x.NormalizedName.Equals(role.ToUpper()));
-                    if (isRoleExist == false)
+                    if (!isRoleExist)
                     {
                         string roles = "";
 
@@ -42,7 +42,7 @@ namespace SDCWebApp.Data.Validators
                         {
                             roles = $"{roles},{dbRole.NormalizedName}";
                         }
-                        context.AddFailure($"{{PropertyName}} '{{PropertyValue}}' doesnt exist. Available roles: {roles}");
+                        context.AddFailure($"{nameof(RegisterViewModel.Role)}: '{role}' does not exist. Available roles: '{roles}'");
                     }
                 });
         }

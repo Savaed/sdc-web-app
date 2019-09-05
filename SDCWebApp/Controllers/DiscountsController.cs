@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using SDCWebApp.Models;
 using SDCWebApp.Models.Dtos;
 using SDCWebApp.Services;
+using Microsoft.AspNetCore.Authorization;
+using SDCWebApp.Helpers.Constants;
 
 namespace SDCWebApp.Controllers
 {
@@ -17,6 +19,7 @@ namespace SDCWebApp.Controllers
     /// Provides methods to Http verbs proccessing on <see cref="Discount"/> entities.
     /// </summary>
     [Route("api/[controller]")]
+    [Authorize(Strings.ApiUserPolicyName)]
     [ApiController]
     public class DiscountsController : CustomApiController, IDiscountsController
     {
@@ -129,6 +132,7 @@ namespace SDCWebApp.Controllers
         /// </summary>
         /// <returns><see cref="IEnumerable{Discount}"/>.</returns>
         [HttpGet]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllDiscountsAsync()
         {
@@ -164,6 +168,7 @@ namespace SDCWebApp.Controllers
         /// <param name="id">The id of searching <see cref="Discount"/>. Cannot be null or empty.</param>
         /// <returns>An specified <see cref="Discount"/>.</returns>
         [HttpGet("{id}")]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -212,7 +217,6 @@ namespace SDCWebApp.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-
         public async Task<IActionResult> UpdateDiscountAsync(string id, [FromBody] DiscountDto discount)
         {
             _logger.LogInformation($"Starting method '{nameof(UpdateDiscountAsync)}'.");

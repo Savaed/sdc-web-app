@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SDCWebApp.Data;
 
 namespace SDCWebApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190904211208_add-refresh-token-table")]
+    partial class addrefreshtokentable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -210,9 +212,9 @@ namespace SDCWebApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "3584f443-33fc-45bd-a0a5-d1b972c93f98",
-                            CreatedAt = new DateTime(2019, 9, 5, 14, 15, 44, 868, DateTimeKind.Utc).AddTicks(5071),
-                            Date = new DateTime(2019, 9, 5, 16, 15, 44, 866, DateTimeKind.Local).AddTicks(8821),
+                            Id = "d847c03e-0d34-4f2f-90ba-57c0d3804895",
+                            CreatedAt = new DateTime(2019, 9, 4, 21, 12, 7, 651, DateTimeKind.Utc).AddTicks(7819),
+                            Date = new DateTime(2019, 9, 4, 23, 12, 7, 650, DateTimeKind.Local).AddTicks(931),
                             Description = "Attempt to steal the Dead Man's Chest",
                             Type = "LogIn",
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -220,9 +222,9 @@ namespace SDCWebApp.Migrations
                         },
                         new
                         {
-                            Id = "d0399544-4e41-4070-991e-3107617e4524",
-                            CreatedAt = new DateTime(2019, 9, 5, 14, 15, 44, 868, DateTimeKind.Utc).AddTicks(7033),
-                            Date = new DateTime(2019, 9, 5, 16, 15, 44, 868, DateTimeKind.Local).AddTicks(7019),
+                            Id = "bfd81277-f058-4f4c-8be4-23593ae74aa6",
+                            CreatedAt = new DateTime(2019, 9, 4, 21, 12, 7, 652, DateTimeKind.Utc).AddTicks(96),
+                            Date = new DateTime(2019, 9, 4, 23, 12, 7, 652, DateTimeKind.Local).AddTicks(81),
                             Description = "Revolting on a black pearl",
                             Type = "LogOut",
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -256,18 +258,18 @@ namespace SDCWebApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "27d8fa7a-7d5f-4dcb-a51c-9d49eddf7784",
+                            Id = "88d77ac1-3ea5-480d-b9bd-53ea136a57bf",
                             Author = "Jack Sparrow",
-                            CreatedAt = new DateTime(2019, 9, 5, 14, 15, 44, 868, DateTimeKind.Utc).AddTicks(9998),
+                            CreatedAt = new DateTime(2019, 9, 4, 21, 12, 7, 652, DateTimeKind.Utc).AddTicks(2943),
                             Text = "BlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearl",
                             Title = "The bast pirate i'v every seen",
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
-                            Id = "04650c0c-7c5e-405b-9a50-c99d90808d09",
+                            Id = "7572a3fc-1013-4266-ac70-7e4b4b6ed52b",
                             Author = "Hektor Barbossa",
-                            CreatedAt = new DateTime(2019, 9, 5, 14, 15, 44, 869, DateTimeKind.Utc).AddTicks(1302),
+                            CreatedAt = new DateTime(2019, 9, 4, 21, 12, 7, 652, DateTimeKind.Utc).AddTicks(4262),
                             Text = "BlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearl",
                             Title = "The captain of Black Pearl",
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -305,9 +307,9 @@ namespace SDCWebApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "61fcf266-c009-4228-ad0b-2fd3c79595ba",
-                            CreatedAt = new DateTime(2019, 9, 5, 14, 15, 44, 872, DateTimeKind.Utc).AddTicks(1982),
-                            DateOfBirth = new DateTime(1996, 9, 5, 16, 15, 44, 872, DateTimeKind.Local).AddTicks(1992),
+                            Id = "9635d8ee-77fb-42d0-a540-7ab2b13f788f",
+                            CreatedAt = new DateTime(2019, 9, 4, 21, 12, 7, 655, DateTimeKind.Utc).AddTicks(6697),
+                            DateOfBirth = new DateTime(1996, 9, 4, 23, 12, 7, 655, DateTimeKind.Local).AddTicks(6708),
                             EmailAddress = "example@mail.com",
                             HasFamilyCard = false,
                             IsChild = false,
@@ -316,9 +318,9 @@ namespace SDCWebApp.Migrations
                         },
                         new
                         {
-                            Id = "14727643-9141-4474-bbd8-da9bc77c736b",
-                            CreatedAt = new DateTime(2019, 9, 5, 14, 15, 44, 872, DateTimeKind.Utc).AddTicks(3314),
-                            DateOfBirth = new DateTime(2015, 9, 5, 16, 15, 44, 872, DateTimeKind.Local).AddTicks(3323),
+                            Id = "f9a1cb76-5e02-4080-ab15-22ace523e7e1",
+                            CreatedAt = new DateTime(2019, 9, 4, 21, 12, 7, 655, DateTimeKind.Utc).AddTicks(8065),
+                            DateOfBirth = new DateTime(2015, 9, 4, 23, 12, 7, 655, DateTimeKind.Local).AddTicks(8075),
                             EmailAddress = " example2@mail.uk",
                             HasFamilyCard = true,
                             IsChild = false,
@@ -356,8 +358,8 @@ namespace SDCWebApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "9bb34393-981b-48cf-9686-52c19f674dd8",
-                            CreatedAt = new DateTime(2019, 9, 5, 14, 15, 44, 869, DateTimeKind.Utc).AddTicks(3992),
+                            Id = "fb11ebc4-5993-4085-96ca-bd357e30b47d",
+                            CreatedAt = new DateTime(2019, 9, 4, 21, 12, 7, 652, DateTimeKind.Utc).AddTicks(7389),
                             Description = "Discount for groups",
                             DiscountValueInPercentage = 15,
                             GroupSizeForDiscount = 20,
@@ -366,8 +368,8 @@ namespace SDCWebApp.Migrations
                         },
                         new
                         {
-                            Id = "8ea64c3e-9030-4835-92fa-cdd373ba8711",
-                            CreatedAt = new DateTime(2019, 9, 5, 14, 15, 44, 869, DateTimeKind.Utc).AddTicks(5680),
+                            Id = "15864a68-da0d-4f5c-a4ef-f509d2cb55e4",
+                            CreatedAt = new DateTime(2019, 9, 4, 21, 12, 7, 652, DateTimeKind.Utc).AddTicks(9241),
                             Description = "Discount for people with Family Card",
                             DiscountValueInPercentage = 15,
                             Type = "ForFamily",
@@ -375,8 +377,8 @@ namespace SDCWebApp.Migrations
                         },
                         new
                         {
-                            Id = "b439511d-d239-479a-944b-306c3bd5c690",
-                            CreatedAt = new DateTime(2019, 9, 5, 14, 15, 44, 869, DateTimeKind.Utc).AddTicks(5698),
+                            Id = "293193eb-66c7-4861-b065-6b52ad356ce9",
+                            CreatedAt = new DateTime(2019, 9, 4, 21, 12, 7, 652, DateTimeKind.Utc).AddTicks(9389),
                             Description = "Discount for disabled people.",
                             DiscountValueInPercentage = 50,
                             Type = "ForDisabled",
@@ -384,8 +386,8 @@ namespace SDCWebApp.Migrations
                         },
                         new
                         {
-                            Id = "0ed93a76-da73-4b92-92ef-5cfd4ad73e54",
-                            CreatedAt = new DateTime(2019, 9, 5, 14, 15, 44, 869, DateTimeKind.Utc).AddTicks(5702),
+                            Id = "15ad0247-2913-472f-9a07-252a3e2adb89",
+                            CreatedAt = new DateTime(2019, 9, 4, 21, 12, 7, 652, DateTimeKind.Utc).AddTicks(9392),
                             Description = "Discount only for kids under specific age.",
                             DiscountValueInPercentage = 100,
                             Type = "ForChild",
@@ -423,9 +425,9 @@ namespace SDCWebApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "5cb885fe-dd67-4747-8669-87087aa23e68",
+                            Id = "33256280-fa2a-4712-9365-08ed680f493e",
                             ClosingHour = 17f,
-                            CreatedAt = new DateTime(2019, 9, 5, 14, 15, 44, 871, DateTimeKind.Utc).AddTicks(8711),
+                            CreatedAt = new DateTime(2019, 9, 4, 21, 12, 7, 655, DateTimeKind.Utc).AddTicks(3674),
                             Description = "TL;DR",
                             MaxAllowedGroupSize = 35,
                             MaxChildAge = 5,
@@ -444,8 +446,6 @@ namespace SDCWebApp.Migrations
                         .ValueGeneratedOnAddOrUpdate();
 
                     b.Property<DateTime>("CreatedAt");
-
-                    b.Property<int>("ExpiryIn");
 
                     b.Property<string>("Token");
 
@@ -485,22 +485,22 @@ namespace SDCWebApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "5cf29df4-7c37-4537-8182-20c47581dea8",
-                            CreatedAt = new DateTime(2019, 9, 5, 14, 15, 44, 871, DateTimeKind.Utc).AddTicks(6990),
+                            Id = "a10f917d-1c24-4a1d-ba14-ddf4ad454efe",
+                            CreatedAt = new DateTime(2019, 9, 4, 21, 12, 7, 655, DateTimeKind.Utc).AddTicks(1945),
                             CurrentGroupSize = 0,
                             IsAvailablePlace = true,
                             MaxGroupSize = 30,
-                            SightseeingDate = new DateTime(2019, 9, 12, 16, 15, 44, 871, DateTimeKind.Local).AddTicks(7001),
+                            SightseeingDate = new DateTime(2019, 9, 11, 23, 12, 7, 655, DateTimeKind.Local).AddTicks(1956),
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
-                            Id = "f75f9aa4-e2d4-4b2e-b2dc-bfcbfe72b2b0",
-                            CreatedAt = new DateTime(2019, 9, 5, 14, 15, 44, 871, DateTimeKind.Utc).AddTicks(7949),
+                            Id = "07aa8ea0-86f3-4ab3-9458-cf58badbcf13",
+                            CreatedAt = new DateTime(2019, 9, 4, 21, 12, 7, 655, DateTimeKind.Utc).AddTicks(2917),
                             CurrentGroupSize = 0,
                             IsAvailablePlace = true,
                             MaxGroupSize = 25,
-                            SightseeingDate = new DateTime(2019, 9, 7, 16, 15, 44, 871, DateTimeKind.Local).AddTicks(7958),
+                            SightseeingDate = new DateTime(2019, 9, 6, 23, 12, 7, 655, DateTimeKind.Local).AddTicks(2932),
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
                 });
@@ -527,8 +527,8 @@ namespace SDCWebApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "3e973817-585e-4cfc-acba-2cd1fa812bc3",
-                            CreatedAt = new DateTime(2019, 9, 5, 14, 15, 44, 871, DateTimeKind.Utc).AddTicks(5650),
+                            Id = "cf1cafb3-7493-4252-adae-4c91c56f93a5",
+                            CreatedAt = new DateTime(2019, 9, 4, 21, 12, 7, 655, DateTimeKind.Utc).AddTicks(582),
                             Name = "BasicTickets",
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
@@ -580,23 +580,23 @@ namespace SDCWebApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "5d436cd2-d41e-4354-b576-8e0776f7bf95",
-                            CreatedAt = new DateTime(2019, 9, 5, 14, 15, 44, 869, DateTimeKind.Utc).AddTicks(2280),
+                            Id = "71017e93-c0f6-4473-bd22-714f563bf56e",
+                            CreatedAt = new DateTime(2019, 9, 4, 21, 12, 7, 652, DateTimeKind.Utc).AddTicks(5369),
                             Price = 0f,
-                            PurchaseDate = new DateTime(2019, 9, 5, 16, 15, 44, 869, DateTimeKind.Local).AddTicks(2272),
-                            TicketUniqueId = "a236c022-d193-4d65-974f-8249b24e6feb",
+                            PurchaseDate = new DateTime(2019, 9, 4, 23, 12, 7, 652, DateTimeKind.Local).AddTicks(5360),
+                            TicketUniqueId = "dff38be2-9753-4c5b-9a0f-7d2a2b2c40da",
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            ValidFor = new DateTime(2019, 9, 12, 16, 15, 44, 869, DateTimeKind.Local).AddTicks(2731)
+                            ValidFor = new DateTime(2019, 9, 11, 23, 12, 7, 652, DateTimeKind.Local).AddTicks(5823)
                         },
                         new
                         {
-                            Id = "97cf000f-4c03-4b86-a526-0ed9364968bb",
-                            CreatedAt = new DateTime(2019, 9, 5, 14, 15, 44, 869, DateTimeKind.Utc).AddTicks(3198),
+                            Id = "28da433a-0577-4a69-8b29-c2f567fc4ae7",
+                            CreatedAt = new DateTime(2019, 9, 4, 21, 12, 7, 652, DateTimeKind.Utc).AddTicks(6453),
                             Price = 0f,
-                            PurchaseDate = new DateTime(2019, 9, 5, 16, 15, 44, 869, DateTimeKind.Local).AddTicks(3191),
-                            TicketUniqueId = "93271c21-90c8-4b8c-89e9-43377b1d71f7",
+                            PurchaseDate = new DateTime(2019, 9, 4, 23, 12, 7, 652, DateTimeKind.Local).AddTicks(6446),
+                            TicketUniqueId = "0502bbb3-7aa8-4ee9-b6e0-96028ea32a09",
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            ValidFor = new DateTime(2019, 9, 26, 16, 15, 44, 869, DateTimeKind.Local).AddTicks(3212)
+                            ValidFor = new DateTime(2019, 9, 25, 23, 12, 7, 652, DateTimeKind.Local).AddTicks(6470)
                         });
                 });
 
@@ -632,8 +632,8 @@ namespace SDCWebApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "a1e6d592-6b14-4d3b-b91a-d30645df1edd",
-                            CreatedAt = new DateTime(2019, 9, 5, 14, 15, 44, 869, DateTimeKind.Utc).AddTicks(6497),
+                            Id = "e5f2033f-7477-49c7-be97-1f3b9cc1de84",
+                            CreatedAt = new DateTime(2019, 9, 4, 21, 12, 7, 653, DateTimeKind.Utc).AddTicks(208),
                             DefaultPrice = 28f,
                             Description = "Centrum Dziedzictwa Szkła i Piwnice Przedprożne.",
                             IsPerHour = false,
@@ -642,8 +642,8 @@ namespace SDCWebApp.Migrations
                         },
                         new
                         {
-                            Id = "5d47ad2a-24b8-485a-9331-04b5a16cc181",
-                            CreatedAt = new DateTime(2019, 9, 5, 14, 15, 44, 869, DateTimeKind.Utc).AddTicks(7421),
+                            Id = "fcd9a2fe-a65f-4381-bfd8-410b912765bd",
+                            CreatedAt = new DateTime(2019, 9, 4, 21, 12, 7, 653, DateTimeKind.Utc).AddTicks(1048),
                             DefaultPrice = 22f,
                             Description = "Centrum Dziedzictwa Szkła.",
                             IsPerHour = false,
@@ -652,8 +652,8 @@ namespace SDCWebApp.Migrations
                         },
                         new
                         {
-                            Id = "c017b24e-2330-4cbe-95cf-20a2388b992d",
-                            CreatedAt = new DateTime(2019, 9, 5, 14, 15, 44, 869, DateTimeKind.Utc).AddTicks(7442),
+                            Id = "c738cfff-6dc7-40af-a312-f551c7205659",
+                            CreatedAt = new DateTime(2019, 9, 4, 21, 12, 7, 653, DateTimeKind.Utc).AddTicks(1065),
                             DefaultPrice = 10f,
                             Description = "Piwnice Przedprożne.",
                             IsPerHour = false,
