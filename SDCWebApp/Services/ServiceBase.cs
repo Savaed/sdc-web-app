@@ -17,12 +17,12 @@ namespace SDCWebApp.Services
     {
         private readonly string[] _readOnlyPropertiesNames = new string[] { "Id", "CreatedAt", "ConcurrencyToken", "UpdatedAt" };
         private readonly ILogger _logger;
-        private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext _dbContext;
 
 
         public ServiceBase(ApplicationDbContext context, ILogger logger)
         {
-            _context = context;
+            _dbContext = context;
             _logger = logger;
         }
 
@@ -38,7 +38,7 @@ namespace SDCWebApp.Services
         {
             _logger.LogInformation($"Starting method '{nameof(BasicRestrictedUpdate)}'.");
 
-            _context.Attach(originalEntity);
+            _dbContext.Attach(originalEntity);
             var properties = originalEntity.GetType().GetProperties();
 
             foreach (var property in properties)
@@ -60,8 +60,8 @@ namespace SDCWebApp.Services
         /// </summary>
         protected virtual async Task EnsureDatabaseCreatedAsync()
         {
-            if (await _context.Database.EnsureCreatedAsync() == false)
-                _logger.LogWarning($"Database with provider '{_context.Database.ProviderName}' does not exist. It will be created but not using migrations so it cannot be updating using migrations later.");
+            if (await _dbContext.Database.EnsureCreatedAsync() == false)
+                _logger.LogWarning($"Database with provider '{_dbContext.Database.ProviderName}' does not exist. It will be created but not using migrations so it cannot be updating using migrations later.");
         }
 
         /// <summary>
@@ -83,6 +83,7 @@ namespace SDCWebApp.Services
         protected virtual IEnumerable<BasicEntity> GetByPredicate<T>(Expression<Func<T, bool>> predicate) where T : BasicEntity
         {
             _logger.LogDebug($"Starting method '{nameof(GetByPredicate)}'.");
+
             if (predicate is null)
             {
                 throw new ArgumentNullException(nameof(predicate), $"Argument '{nameof(predicate)}' cannot be null.");
@@ -90,7 +91,7 @@ namespace SDCWebApp.Services
 
             try
             {
-                var result = _context.Set<T>().Where(predicate).AsEnumerable();
+                var result = _dbContext.Set<T>().Where(predicate).AsEnumerable();
                 _logger.LogDebug($"Finished method '{nameof(GetByPredicate)}'.");
                 return result;
             }

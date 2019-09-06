@@ -349,11 +349,7 @@ namespace SDCWebApp.Services
             _ = _context?.Customers ?? throw new InternalDbServiceException($"Table of type '{typeof(Customer).Name}' is null.");
 
             try
-            {
-                if (_context.Customers.Contains(customer))
-                    throw new InvalidOperationException($"There is already the same element in the database as the one to be added. Id of this element: '{customer.Id}'.");
-
-                Customer addedCustomer = null;
+            {              
 
                 if (isRestrict)
                 {
@@ -371,7 +367,7 @@ namespace SDCWebApp.Services
                 }
 
                 _logger.LogDebug($"Starting add customer with id '{customer.Id}'.");
-                addedCustomer = _context.Customers.Add(customer).Entity;
+                var addedCustomer = _context.Customers.Add(customer).Entity;
                 await _context.TrySaveChangesAsync();
                 _logger.LogDebug("Add data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(AddBaseAsync)}'.");

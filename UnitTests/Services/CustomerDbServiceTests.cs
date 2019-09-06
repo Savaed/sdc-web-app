@@ -200,7 +200,7 @@ namespace UnitTests.Services
         }
 
         [Test]
-        public async Task GetAsync__Resource_doesnt_exit__Should_throw_InternalDbServiceException()
+        public async Task GetAsync__Resource_doesnt_exist__Should_throw_InternalDbServiceException()
         {
             using (var factory = new DbContextFactory())
             {
@@ -344,7 +344,7 @@ namespace UnitTests.Services
         }
 
         [Test]
-        public async Task GetAllAsync__Resource_doesnt_exit__Should_throw_InternalDbServiceException()
+        public async Task GetAllAsync__Resource_doesnt_exist__Should_throw_InternalDbServiceException()
         {
             using (var factory = new DbContextFactory())
             {

@@ -208,7 +208,7 @@ namespace UnitTests.Services
         }
 
         [Test]
-        public async Task GetSavedRefreshToken__Resource_does_not_exit__Should_throw_InternalDbServiceException()
+        public async Task GetSavedRefreshToken__Resource_does_not_exist__Should_throw_InternalDbServiceException()
         {
             using (var factory = new DbContextFactory())
             {

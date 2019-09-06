@@ -31,7 +31,6 @@ namespace SDCWebApp.Services
         /// Filters set of data of type <see cref="TicketTariff"/>. Returns filtered data set. Throws an exception if <paramref name="predicate"/> is null, 
         /// or if cannot filter data due to any internal problem.
         /// </summary>
-        /// <typeparam name="T">The type of entity to set be filtered.</typeparam>
         /// <param name="predicate">A function to test each element for a condition.</param>
         /// <returns>Filterd <see cref="TicketTariff"/> set.</returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="predicate"/> is null.</exception>

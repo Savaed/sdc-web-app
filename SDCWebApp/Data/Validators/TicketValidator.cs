@@ -26,6 +26,8 @@ namespace SDCWebApp.Data.Validators
                 .Cascade(CascadeMode.StopOnFirstFailure)
                 .NotEmpty()
                 .BeGuid();
+
+            // TODO Add validation for navigation properties.
         }
     }
 }

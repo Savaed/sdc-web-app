@@ -56,7 +56,7 @@ namespace SDCWebApp.Controllers
 
             try
             {
-                _logger.LogDebug($"Getting principal from access token.");
+                _logger.LogDebug($"Getting principal from passed access token.");
                 var claims = _jwtTokenHandler.GetPrincipalFromJwtToken(refreshTokenData.AccessToken, true);
 
                 // Get expiry date of the access token. If it's not before UtcNow then return 400 BadRequest.
@@ -67,6 +67,7 @@ namespace SDCWebApp.Controllers
                 }
 
                 // Check if passed refresh token matches any saved refresh token.
+                _logger.LogDebug("Checking refresh token correctness.");
                 var savedRefreshToken = await _refreshTokenManager.GetSavedRefreshTokenAsync(refreshTokenData.RefreshToken);
 
                 // Check if refresh token expired.
@@ -86,13 +87,16 @@ namespace SDCWebApp.Controllers
                 string[] userRoles = new string[] { claims.FindFirstValue(Strings.RoleClaimName) };
 
                 // Generate new access and refresh tokens.
+                _logger.LogDebug("Generating new access and refresh tokens.");
                 var newJwtToken = _jwtTokenHandler.CreateJwtToken(tempUser, userRoles);
                 string newAccessToken = _jwtTokenHandler.WriteJwtToken(newJwtToken);
                 var newRefreshToken = _refreshTokenManager.GenerateRefreshToken();
 
                 // Add new refresh token to the database for future tokens exchange.
                 // Delete the saved token to prevent the use of the refresh token more than once.
+                _logger.LogDebug("Adding new refresh token to the database.");
                 await _refreshTokenManager.AddRefreshTokenAsync(newRefreshToken);
+                _logger.LogDebug("Deleting saved refresh token from the database.");
                 await _refreshTokenManager.DeleteRefreshTokenAsync(savedRefreshToken);
 
                 var response = new ResponseWrapper(new RefreshTokensResponseDto
@@ -101,6 +105,7 @@ namespace SDCWebApp.Controllers
                     RefreshToken = MapToDto(newRefreshToken)
                 });
 
+                _logger.LogInformation($"Finished method '{nameof(RefreshTokenExchangeAsync)}'.");
                 return Ok(response);
             }
             catch (InvalidOperationException ex)
