@@ -27,7 +27,16 @@ namespace SDCWebApp.Controllers
         private readonly ILogger<DiscountsController> _logger;
         private readonly IDiscountDbService _discountDbService;
         private readonly IMapper _mapper;
+        private readonly IUserActivityLogger _activityLogger;
 
+
+        public DiscountsController(IDiscountDbService discountDbService, ILogger<DiscountsController> logger, IMapper mapper, IUserActivityLogger activityLogger) : base(logger)
+        {
+            _mapper = mapper;
+            _logger = logger;
+            _discountDbService = discountDbService;
+            _activityLogger = activityLogger;
+        }
 
         public DiscountsController(IDiscountDbService discountDbService, ILogger<DiscountsController> logger, IMapper mapper) : base(logger)
         {
@@ -65,6 +74,7 @@ namespace SDCWebApp.Controllers
                 var response = new ResponseWrapper(addedTariffDto);
                 string addedDiscountUrl = $"{ControllerPrefix}/{addedDiscount.Id}";
                 _logger.LogInformation($"Finished method '{nameof(addedDiscount)}'.");
+                 await _activityLogger.LoggActivity("test", "test message", ActivityLog.ActivityType.CreateResource);
                 return Created(addedDiscountUrl, response);
             }
             catch (InvalidOperationException ex)

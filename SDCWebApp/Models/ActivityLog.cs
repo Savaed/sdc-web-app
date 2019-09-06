@@ -16,18 +16,10 @@ namespace SDCWebApp.Models
             DeleteAccount,  // Restricted for admins.
 
             // Data operations e.g. change, create...
-            ArticleEdit,
-            ArticleCreate,
-            ArticleDelete,
-            TicketsTarifffEdit,
-            TicketsTariffCreate,
-            TicketsTariffDelete,
-            SightseeingGroupEdit,
-            SightseeingGroupCreate,
-            SightseeingGroupDelete,
-            DiscountEdit,
-            DiscountCreate,
-            DiscountDelete,
+            CreateResource,
+            EditResource,
+            GetResource,
+            DeleteResource,
 
             // Statistics activities.
             StatisticCreate,

@@ -216,7 +216,7 @@ namespace SDCWebApp.Services
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageSize"/> is a negative number or <paramref name="pageNumber"/> is less than 1.</exception>
         /// <exception cref="InternalDbServiceException">The resource does not exist or has a null value or any
         /// other problems with retrieving data from database occurred.</exception>
-        public async Task<IEnumerable<GeneralSightseeingInfo>> GetWithPaginationAsync(int pageNumber, int pageSize)
+        public async Task<IEnumerable<GeneralSightseeingInfo>> GetWithPaginationAsync(int pageNumber = 1, int pageSize = 30)
         {
             _logger.LogInformation($"Starting method '{nameof(GetWithPaginationAsync)}'.");
 

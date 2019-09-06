@@ -1,19 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using NUnit.Framework;
-using Moq;
+﻿using AutoMapper;
 using FluentAssertions;
-using SDCWebApp.Services;
-using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Moq;
+using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+using SDCWebApp.ApiErrors;
 using SDCWebApp.Controllers;
 using SDCWebApp.Models;
 using SDCWebApp.Models.Dtos;
-using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using System.Linq;
-using SDCWebApp.ApiErrors;
+using SDCWebApp.Services;
 
 namespace UnitTests.Controllers
 {
@@ -26,7 +26,7 @@ namespace UnitTests.Controllers
         private Article _validArticle;
         private Article[] _articles;
         private ArticleDto[] _articleDtos;
-        public Article[] articles { get => _articles; set => _articles = value; }
+
 
         [OneTimeSetUp]
         public void SetUp()
@@ -61,7 +61,7 @@ namespace UnitTests.Controllers
                  }
             };
 
-            articles = new Article[]
+            _articles = new Article[]
             {
                  new Article
                  {
@@ -199,7 +199,7 @@ namespace UnitTests.Controllers
         [Test]
         public async Task GetAllArticleAsync__At_least_one_element_found__Should_return_200OK_response_with_not_empty_IEnumerable()
         {
-            _articleDbServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(articles);
+            _articleDbServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(_articles);
             _mapperMock.Setup(x => x.Map<IEnumerable<ArticleDto>>(It.IsNotNull<IEnumerable<Article>>())).Returns(_articleDtos.AsEnumerable());
             var controller = new ArticlesController(_articleDbServiceMock.Object, _logger, _mapperMock.Object);
 
@@ -250,8 +250,8 @@ namespace UnitTests.Controllers
         [Test]
         public async Task AddArticleAsync__Already_there_is_the_same_element_in_database__Should_return_400BadRequest_response()
         {
-            var ArticleDto = CreateArticleDto(articles[0]);
-            _mapperMock.Setup(x => x.Map<Article>(ArticleDto)).Returns(articles[0]);
+            var ArticleDto = CreateArticleDto(_articles[0]);
+            _mapperMock.Setup(x => x.Map<Article>(ArticleDto)).Returns(_articles[0]);
             _articleDbServiceMock.Setup(x => x.AddAsync(It.IsNotNull<Article>())).ThrowsAsync(new InvalidOperationException());
             _articleDbServiceMock.Setup(x => x.RestrictedAddAsync(It.IsNotNull<Article>())).ThrowsAsync(new InvalidOperationException());
             var controller = new ArticlesController(_articleDbServiceMock.Object, _logger, _mapperMock.Object);
