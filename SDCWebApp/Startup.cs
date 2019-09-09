@@ -24,6 +24,8 @@ using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using System.Threading.Tasks;
+using Autofac.Features.Indexed;
+using SDCWebApp.Services;
 
 namespace SDCWebApp
 {
@@ -147,7 +149,9 @@ namespace SDCWebApp
             containerBuilder.Populate(services);
             var container = containerBuilder.Build();
 
-            //var test = container.Resolve<IArticleValidator>();
+            //var test = container.ResolveKeyed<ServiceBase>(nameof(TicketDbService));
+
+            //var test2 = container.Resolve<Controllers.IArticlesController>();
 
             return new AutofacServiceProvider(container);
         }

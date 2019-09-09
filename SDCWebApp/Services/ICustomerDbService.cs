@@ -7,7 +7,7 @@ using SDCWebApp.Models;
 
 namespace SDCWebApp.Services
 {
-    public interface ICustomerDbService
+    public interface ICustomerDbService : IServiceBase
     {
         /// <summary>
         /// Filters set of data of type <see cref="Customer"/>. Returns filtered data set. Throws an exception if <paramref name="predicate"/> is null, 
@@ -115,5 +115,13 @@ namespace SDCWebApp.Services
         /// <exception cref="InternalDbServiceException">The table with <see cref="Customer"/> entities does not exist or it is null or 
         /// cannot save properly any changes made by add operation.</exception>
         Task<Customer> RestrictedAddAsync(Customer customer);
+
+        /// <summary>
+        /// Asynchronously lookups if <see cref="Customer"/> with passed id exist in the database. Throws exception if resource does not exist.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>True if <see cref="Customer"/> with passed id exist. Otherwise false.</returns>
+        /// <exception cref="InternalDbServiceException">Resource with <see cref="Customer"/> entities does not exist.</exception>
+        Task<bool> IsCustomerExistAsync(Customer customer);
     }
 }

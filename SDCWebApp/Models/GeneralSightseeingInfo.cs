@@ -1,20 +1,29 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SDCWebApp.Models
 {
     public class GeneralSightseeingInfo : BasicEntity, ICloneable, IEquatable<GeneralSightseeingInfo>
     {
         public string Description { get; set; }
-        // 0-18
         public int MaxChildAge { get; set; }
-
-        // 0-iles tam
         public int MaxAllowedGroupSize { get; set; }
+        [DataType("time(0)")]
+        public TimeSpan OpeningHour { get; set; }
+        [DataType("time(0)")]
+        public TimeSpan ClosingHour { get; set; }
+        public int MaxTicketOrderInterval { get; set; } // In weeks.
 
-        // pelna lub polowa
-        public float OpeningHour { get; set; }
-        // jw
-        public float ClosingHour { get; set; }
+
+        [NotMapped]
+        public DateTime OpeningDateTime { get => new DateTime(OpeningHour.Ticks); }
+
+        [NotMapped]
+        public DateTime ClosingDateTime { get => new DateTime(ClosingHour.Ticks); }
+
+
+        #region Helper methods
 
         public object Clone()
         {
@@ -48,7 +57,9 @@ namespace SDCWebApp.Models
             if (Description is null)
                 return base.GetHashCode();
 
-            return (Description.GetHashCode() + (int)ClosingHour + (int)OpeningHour + MaxAllowedGroupSize + MaxChildAge) * 0x00010000;
+            return (Description.GetHashCode() + ClosingHour.GetHashCode() + OpeningHour.GetHashCode() + MaxAllowedGroupSize + MaxChildAge) * 0x00010000;
         }
+
+        #endregion
     }
 }

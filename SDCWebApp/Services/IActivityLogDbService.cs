@@ -5,7 +5,7 @@ using System;
 
 namespace SDCWebApp.Services
 {
-    public interface IActivityLogDbService
+    public interface IActivityLogDbService : IServiceBase
     {
         /// <summary>
         /// Asynchronously retrieves <see cref="ActivityLog"/> entity with given <paramref name="id"/> from the database. 

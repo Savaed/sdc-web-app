@@ -172,9 +172,10 @@ namespace SDCWebApp.Data
             {
                 Id = Guid.NewGuid().ToString(),
                 MaxChildAge = 5,
-                OpeningHour = 9,
-                ClosingHour = 17,
+                OpeningHour = new TimeSpan(10, 0, 0),
+                ClosingHour = new TimeSpan(18, 0, 0),
                 MaxAllowedGroupSize = 35,
+                MaxTicketOrderInterval = 4,
                 Description = "TL;DR"
             });
 

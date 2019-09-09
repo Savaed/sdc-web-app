@@ -7,7 +7,7 @@ using SDCWebApp.Models;
 
 namespace SDCWebApp.Services
 {
-    public interface ISightseeingGroupDbService
+    public interface ISightseeingGroupDbService : IServiceBase
     {        
         /// <summary>
         /// Filters set of data of type <see cref="SightseeingGroup"/>. Returns filtered data set. Throws an exception if <paramref name="predicate"/> is null, 

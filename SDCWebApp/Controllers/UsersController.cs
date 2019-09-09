@@ -43,6 +43,22 @@ namespace SDCWebApp.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> LoginAsync([FromBody] LoginViewModel loginData)
         {
+
+            Ticket _validTicket = new Ticket
+            {
+                Id = "1",
+                Customer = new Customer { Id = "1", EmailAddress = "samplecustomer@mail.com" },
+                Discount = new Discount { Id = "1", Description = "discount description", DiscountValueInPercentage = 25, Type = Discount.DiscountType.ForChild },
+                Group = new SightseeingGroup { Id = "1", MaxGroupSize = 30, SightseeingDate = DateTime.Now.AddDays(1) },
+                Tariff = new TicketTariff { Id = "1", DefaultPrice = 30, Description = "ticket price list description" },
+                PurchaseDate = DateTime.Now.AddDays(-1),
+                TicketUniqueId = Guid.NewGuid().ToString()
+            };
+
+            var dto = _mapper.Map<TicketDto>(_validTicket);
+
+
+
             _logger.LogInformation($"Starting method '{nameof(LoginAsync)}'.");
 
             var user = await _userManager.FindByNameAsync(loginData.UserName);
@@ -64,7 +80,7 @@ namespace SDCWebApp.Controllers
                         User = new UserDto { Id = user.Id, UserName = user.UserName, LoggedOn = DateTime.UtcNow },
                         AccessToken = new AccessToken(accessToken, (int)jwtToken.Payload.Exp),
                         RefreshToken = MapToDto(newRefreshToken)
-                    };                  
+                    };
                     var response = new ResponseWrapper(loginInfo);
                     _logger.LogInformation($"Finished method '{nameof(LoginAsync)}'.");
                     return Ok(response);

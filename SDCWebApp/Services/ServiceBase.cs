@@ -15,7 +15,15 @@ namespace SDCWebApp.Services
     /// </summary>
     public abstract class ServiceBase
     {
-        private readonly string[] _readOnlyPropertiesNames = new string[] { "Id", "CreatedAt", "ConcurrencyToken", "UpdatedAt" };
+        private readonly string[] _readOnlyPropertiesNames = new string[] 
+        {
+            $"{nameof(BasicEntity.Id)}",
+            $"{nameof(BasicEntity.CreatedAt)}",
+            $"{nameof(BasicEntity.ConcurrencyToken)}",
+            $"{nameof(BasicEntity.UpdatedAt)}",
+            $"{nameof(GeneralSightseeingInfo.ClosingDateTime)}",
+            $"{nameof(GeneralSightseeingInfo.OpeningDateTime)}"
+        };
         private readonly ILogger _logger;
         private readonly ApplicationDbContext _dbContext;
 

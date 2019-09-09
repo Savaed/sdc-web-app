@@ -139,7 +139,13 @@ namespace SDCWebApp.Services
             try
             {
                 _logger.LogDebug($"Starting retrieve ticket with id: '{id}' from the database.");
-                var ticket = await _dbContext.Tickets.SingleAsync(x => x.Id.Equals(id));
+                var ticket = await _dbContext.Tickets
+                    .Include(x => x.Discount)
+                    .Include(x => x.Customer)
+                    .Include(x => x.Group)
+                    .Include(x => x.Tariff)
+                    .SingleAsync(x => x.Id.Equals(id));
+
                 _logger.LogDebug("Retrieve data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(GetAsync)}'.");
                 return ticket;

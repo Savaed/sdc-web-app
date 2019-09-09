@@ -7,7 +7,7 @@ using SDCWebApp.Models;
 
 namespace SDCWebApp.Services
 {
-    public interface IDiscountDbService
+    public interface IDiscountDbService : IServiceBase
     {
         /// <summary>
         /// Filters set of data of type <see cref="Discount"/>. Returns filtered data set. Throws an exception if <paramref name="predicate"/> is null, 

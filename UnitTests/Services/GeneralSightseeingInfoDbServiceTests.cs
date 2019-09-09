@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SDCWebApp.Data;
-using SDCWebApp.Data.Validators;
+using SDCWebApp.Data.Validation;
 using SDCWebApp.Models;
 using SDCWebApp.Services;
 using System;
@@ -33,8 +33,8 @@ namespace UnitTests.Services
         private readonly GeneralSightseeingInfo _validInfo = new GeneralSightseeingInfo
         {
             Id = "1",
-            ClosingHour = 18,
-            OpeningHour = 10,
+            OpeningHour = new TimeSpan(10, 0, 0),
+            ClosingHour = new TimeSpan(18, 0, 0),
             MaxChildAge = 5,
             Description = "Sample info",
             MaxAllowedGroupSize = 35,
@@ -801,8 +801,8 @@ namespace UnitTests.Services
                 Description = "sample",
                 MaxAllowedGroupSize = 12,
                 MaxChildAge = 3,
-                OpeningHour = 8,
-                ClosingHour = 16,
+                OpeningHour = new TimeSpan(10, 0, 0),
+                ClosingHour = new TimeSpan(18, 0, 0),
                 UpdatedAt = DateTime.Now.AddHours(-3)
             };
 

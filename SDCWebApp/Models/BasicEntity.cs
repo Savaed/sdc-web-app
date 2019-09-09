@@ -16,10 +16,6 @@ namespace SDCWebApp.Models
         [Required]
         public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
 
-        public DateTime? UpdatedAt { get; set; } = DateTime.MinValue;
-
-
-
-      
+        public DateTime? UpdatedAt { get; set; } = DateTime.MinValue;      
     }
 }

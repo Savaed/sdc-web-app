@@ -10,7 +10,7 @@ namespace SDCWebApp.Controllers
     /// </summary>
     [Route("[controller]")]
     [ApiController]
-    public class ErrorsController : ControllerBase
+    public class ErrorsController : CustomApiController
     {
         // These messages will only be used for generic errors, when no specific message is available.
         private const string InternalServerErrorMessage = "An unexpected internal error occurred. Will be logged.";

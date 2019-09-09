@@ -320,7 +320,27 @@ namespace SDCWebApp.Services
             // Call restricted update mode.
             return await UpdateBaseAsync(customer, true);
         }
-     
+
+        /// <summary>
+        /// Asynchronously lookups if <see cref="Customer"/> with passed id exist in the database. Throws exception if resource does not exist.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>True if <see cref="Customer"/> with passed id exist. Otherwise false.</returns>
+        /// <exception cref="InternalDbServiceException">Resource with <see cref="Customer"/> entities does not exist.</exception>
+        public async Task<bool> IsCustomerExistAsync(Customer customer)
+        {
+            try
+            {
+                return await _context.Customers.ContainsAsync(customer);
+            }
+            catch (ArgumentNullException ex)
+            {
+                _logger.LogError($"Resource '{nameof(_context.Customers)}' does not exist.");
+                var exception = new InternalDbServiceException($"Resource '{nameof(_context.Customers)}' does not exist.", ex);
+                throw exception;
+            }
+        }
+
 
         #region Privates       
 
@@ -349,7 +369,7 @@ namespace SDCWebApp.Services
             _ = _context?.Customers ?? throw new InternalDbServiceException($"Table of type '{typeof(Customer).Name}' is null.");
 
             try
-            {              
+            {
 
                 if (isRestrict)
                 {

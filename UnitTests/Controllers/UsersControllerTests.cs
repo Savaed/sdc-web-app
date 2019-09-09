@@ -244,8 +244,8 @@ namespace UnitTests.Controllers
                 }
             };
             var options = Mock.Of<IOptions<IdentityOptions>>(o => o.Value == identityOptions);
-            var userValidators = new List<IUserValidator<IdentityUser>> { Mock.Of<IUserValidator<IdentityUser>>() };
-            var passwordValidators = new List<IPasswordValidator<IdentityUser>> { Mock.Of<IPasswordValidator<IdentityUser>>() };
+            var userValidation = new List<IUserValidator<IdentityUser>> { Mock.Of<IUserValidator<IdentityUser>>() };
+            var passwordValidation = new List<IPasswordValidator<IdentityUser>> { Mock.Of<IPasswordValidator<IdentityUser>>() };
             var passworHasher = Mock.Of<IPasswordHasher<IdentityUser>>();
             var upperInvariantLookupNormalizer = Mock.Of<ILookupNormalizer>();
             var identityErrorDescriber = Mock.Of<IdentityErrorDescriber>();
@@ -255,8 +255,8 @@ namespace UnitTests.Controllers
             var userManager = new Mock<UserManager<IdentityUser>>(userPasswordStore,
                                                                   options,
                                                                   passworHasher,
-                                                                  userValidators,
-                                                                  passwordValidators,
+                                                                  userValidation,
+                                                                  passwordValidation,
                                                                   upperInvariantLookupNormalizer,
                                                                   identityErrorDescriber,
                                                                   serviceProvider,

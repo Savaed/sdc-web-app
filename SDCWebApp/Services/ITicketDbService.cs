@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SDCWebApp.Services
 {
-    public interface ITicketDbService
+    public interface ITicketDbService : IServiceBase
     {
         /// <summary>
         /// Asynchronously adds <see cref="Ticket"/> entity to the database. Throws an exception if 

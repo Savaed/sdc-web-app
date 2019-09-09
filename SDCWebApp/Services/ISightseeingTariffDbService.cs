@@ -7,7 +7,7 @@ using SDCWebApp.Models;
 
 namespace SDCWebApp.Services
 {
-    public interface ISightseeingTariffDbService
+    public interface ISightseeingTariffDbService : IServiceBase
     {
         /// <summary>
         /// Asynchronously retrievs <see cref="SightseeingTariff"/> entity with given <paramref name="id"/> from the database. 

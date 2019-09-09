@@ -17,6 +17,8 @@ namespace SDCWebApp.Controllers
         private readonly ILogger _logger;
 
 
+        public CustomApiController() { }
+
         public CustomApiController(ILogger logger)
         {
             _logger = logger;
@@ -31,9 +33,9 @@ namespace SDCWebApp.Controllers
         /// <returns>A <see cref="NotFoundObjectResult"/> described en NotFoundError.</returns>
         protected virtual NotFoundObjectResult OnNotFoundError(string errorMessage, Exception exception = null)
         {
-           if (exception is null)
+            if (exception is null)
                 _logger.LogWarning($"{errorMessage}");
-           else
+            else
                 _logger.LogWarning(exception, $"{exception.GetType().Name} - {errorMessage}");
 
             var error = new NotFoundError(errorMessage);

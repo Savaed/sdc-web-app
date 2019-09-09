@@ -95,22 +95,6 @@ namespace UnitTests.Controllers
         }
 
 
-
-
-
-
-
-       
-
-        // DeleteTicketTariffFromSightseeingTariffAsync(string sightseeingTariffId, string ticketTariffId);    
-
-
-        // ;
-
-
-
-
-
         #region GetTicketTariffFromSightseeingTariffAsync(string sightseeingTariffId, string ticketTariffId)
         // brak s-t -> 404
         // istnieje s-t, ale wgl brak t-t -> 404

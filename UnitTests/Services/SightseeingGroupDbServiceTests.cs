@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SDCWebApp.Data;
-using SDCWebApp.Data.Validators;
 using SDCWebApp.Models;
 using SDCWebApp.Services;
 using System;

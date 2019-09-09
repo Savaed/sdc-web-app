@@ -84,6 +84,7 @@ namespace UnitTests.Services
         }
 
         [Test]
+
         public async Task GetByAsync__Resource_does_not_exist__Should_throw_InternalDbServiceException()
         {
             using (var factory = new DbContextFactory())

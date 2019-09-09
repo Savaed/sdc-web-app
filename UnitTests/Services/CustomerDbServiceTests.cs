@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SDCWebApp.Data;
-using SDCWebApp.Data.Validators;
+using SDCWebApp.Data.Validation;
 using SDCWebApp.Models;
 using SDCWebApp.Services;
 using System;
@@ -23,10 +23,10 @@ namespace UnitTests.Services
     public class CustomerDbServiceTests
     {
         private static Customer[] _CustomerForRestrictedUpdateCases = new Customer[]
-       {
+        {
             new Customer { ConcurrencyToken = Encoding.ASCII.GetBytes("Updated ConcurrencyToken") },    // Attempt to change 'ConcurrencyToken' which is read-only property.
             new Customer { UpdatedAt = DateTime.Now.AddYears(100) }                                     // Attempt to change 'UpdatedAt' which is read-only property.
-       };
+        };
         private Mock<ApplicationDbContext> _dbContextMock;
         private ILogger<CustomerDbService> _logger;
         private Expression<Func<Customer, bool>> _predicate;
@@ -41,6 +41,7 @@ namespace UnitTests.Services
             UpdatedAt = DateTime.Now.AddDays(-2)
         };
 
+
         [OneTimeSetUp]
         public void SetUp()
         {
@@ -48,6 +49,56 @@ namespace UnitTests.Services
             _dbContextMock = new Mock<ApplicationDbContext>(Mock.Of<DbContextOptions<ApplicationDbContext>>(o => o.ContextType == typeof(ApplicationDbContext)));
             _logger = Mock.Of<ILogger<CustomerDbService>>();
         }
+
+
+        #region IsCustomerExistAsync(string id)
+
+        [Test]
+        public async Task IsCustomerExistAsync__In_resource_exists_the_same_Customer_as_this_one_to_be_added__Should_return_true()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.Customers.Add(_validCustomer);
+                    await context.SaveChangesAsync();
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new CustomerDbService(context, _logger);
+
+                    bool result = await service.IsCustomerExistAsync(_validCustomer.Id);
+
+                    result.Should().BeTrue();
+                }
+            }
+        }
+
+        [Test]
+        public async Task IsCustomerExistAsync__In_resource_not_exist_the_same_Customer_as_this_one_to_be_added__Should_return_false()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.Customers.Add(_validCustomer);
+                    await context.SaveChangesAsync();
+                }
+
+                using (var context = await factory.CreateContextAsync())
+                {
+                    var service = new CustomerDbService(context, _logger);
+
+                    bool result = await service.IsCustomerExistAsync("-1");
+
+                    result.Should().BeFalse();
+                }
+            }
+        }
+
+        #endregion
+
 
         #region GetByAsync(predicate)
         // tabela nie istnieje -> internal exc
