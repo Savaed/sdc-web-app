@@ -162,6 +162,7 @@ namespace UnitTests.Controllers
 
         #endregion
 
+
         #region GetAllDiscountsAsync();
         // pusty zasob -> 200 ok, pusta lista
         // znalazlo min 1 element -> 200 ok i niepusta lista
@@ -220,6 +221,7 @@ namespace UnitTests.Controllers
 
         #endregion
 
+
         #region AddDiscountAsync(Discount discount);
         // istnieje juz taki sam cennik w bazie -> 400 bad request instance already exists, details 'objname', 'id'
         // discount jest nullem -> 400 bad request, arg nie moze byc nullem, id nie moze byc puste
@@ -235,9 +237,10 @@ namespace UnitTests.Controllers
 
             _discountDbServiceMock.Setup(x => x.AddAsync(It.IsAny<Discount>())).ThrowsAsync(new InternalDbServiceException());
             _discountDbServiceMock.Setup(x => x.RestrictedAddAsync(It.IsAny<Discount>())).ThrowsAsync(new InternalDbServiceException());
+            var discount = new DiscountDto { Id = "1", Description = "test" };
             var controller = new DiscountsController(_discountDbServiceMock.Object, _logger, _mapperMock.Object);
 
-            Func<Task> result = async () => await controller.AddDiscountAsync(_discountDtos[0]);
+            Func<Task> result = async () => await controller.AddDiscountAsync(discount);
 
             await result.Should().ThrowExactlyAsync<InternalDbServiceException>();
         }
@@ -248,8 +251,9 @@ namespace UnitTests.Controllers
             _discountDbServiceMock.Setup(x => x.AddAsync(It.IsAny<Discount>())).ThrowsAsync(new Exception());
             _discountDbServiceMock.Setup(x => x.RestrictedAddAsync(It.IsAny<Discount>())).ThrowsAsync(new Exception());
             var controller = new DiscountsController(_discountDbServiceMock.Object, _logger, _mapperMock.Object);
+            var discount = new DiscountDto { Id = "1", Description = "test" };
 
-            Func<Task> result = async () => await controller.AddDiscountAsync(_discountDtos[0]);
+            Func<Task> result = async () => await controller.AddDiscountAsync(discount);
 
             await result.Should().ThrowExactlyAsync<Exception>();
         }
@@ -288,6 +292,7 @@ namespace UnitTests.Controllers
 
         #endregion
 
+
         #region UpdateDiscountAsync(string id, Discount discount);
         // nie ma takiego elementu o podanym id -> 404 not found
         // id w url i id w body sie nie zgadzaja -> 400 bad request, mismatch
@@ -303,6 +308,7 @@ namespace UnitTests.Controllers
 
             _discountDbServiceMock.Setup(x => x.UpdateAsync(It.IsAny<Discount>())).ThrowsAsync(new InternalDbServiceException());
             _discountDbServiceMock.Setup(x => x.RestrictedUpdateAsync(It.IsAny<Discount>())).ThrowsAsync(new InternalDbServiceException());
+            _mapperMock.Setup(x => x.Map<Discount>(It.IsNotNull<Discount>())).Returns(_validDiscount);
             var controller = new DiscountsController(_discountDbServiceMock.Object, _logger, _mapperMock.Object);
 
             Func<Task> result = async () => await controller.UpdateDiscountAsync(_discountDtos[0].Id, _discountDtos[0]);
@@ -315,6 +321,7 @@ namespace UnitTests.Controllers
         {
             _discountDbServiceMock.Setup(x => x.UpdateAsync(It.IsAny<Discount>())).ThrowsAsync(new Exception());
             _discountDbServiceMock.Setup(x => x.RestrictedUpdateAsync(It.IsAny<Discount>())).ThrowsAsync(new Exception());
+            _mapperMock.Setup(x => x.Map<Discount>(It.IsNotNull<Discount>())).Returns(_validDiscount);
             var controller = new DiscountsController(_discountDbServiceMock.Object, _logger, _mapperMock.Object);
 
             Func<Task> result = async () => await controller.UpdateDiscountAsync(_discountDtos[0].Id, _discountDtos[0]);
@@ -383,6 +390,7 @@ namespace UnitTests.Controllers
         }
 
         #endregion
+
 
         #region DeleteDiscountAsync(string id);
         // nie ma takiego elementu o podanym id -> 404 not found

@@ -70,11 +70,11 @@ namespace SDCWebApp.Controllers
                 var addedDiscount = await _discountDbService.RestrictedAddAsync(discountToBeAdded);
 
                 // Reverse map only for response to the client.
-                var addedTariffDto = MapToDto(addedDiscount);
-                var response = new ResponseWrapper(addedTariffDto);
+                var addedDiscountDto = MapToDto(addedDiscount);
+                var response = new ResponseWrapper(addedDiscountDto);
                 string addedDiscountUrl = $"{ControllerPrefix}/{addedDiscount.Id}";
                 _logger.LogInformation($"Finished method '{nameof(addedDiscount)}'.");
-                 await _activityLogger.LoggActivity("test", "test message", ActivityLog.ActivityType.CreateResource);
+                //await _activityLogger.LoggActivity("test", "test message", ActivityLog.ActivityType.CreateResource);
                 return Created(addedDiscountUrl, response);
             }
             catch (InvalidOperationException ex)

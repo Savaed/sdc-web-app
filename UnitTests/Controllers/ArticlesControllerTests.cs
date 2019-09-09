@@ -227,9 +227,9 @@ namespace UnitTests.Controllers
             _articleDbServiceMock.Setup(x => x.AddAsync(It.IsAny<Article>())).ThrowsAsync(new InternalDbServiceException());
             _articleDbServiceMock.Setup(x => x.RestrictedAddAsync(It.IsAny<Article>())).ThrowsAsync(new InternalDbServiceException());
             var controller = new ArticlesController(_articleDbServiceMock.Object, _logger, _mapperMock.Object);
+            var article = new ArticleDto { Id = "1" };
 
-
-            Func<Task> result = async () => await controller.AddArticleAsync(_articleDtos[0]);
+            Func<Task> result = async () => await controller.AddArticleAsync(article);
 
             await result.Should().ThrowExactlyAsync<InternalDbServiceException>();
         }
@@ -239,10 +239,10 @@ namespace UnitTests.Controllers
         {
             _articleDbServiceMock.Setup(x => x.AddAsync(It.IsAny<Article>())).ThrowsAsync(new Exception());
             _articleDbServiceMock.Setup(x => x.RestrictedAddAsync(It.IsAny<Article>())).ThrowsAsync(new Exception());
-
+            var article = new ArticleDto { Id = "1" };
             var controller = new ArticlesController(_articleDbServiceMock.Object, _logger, _mapperMock.Object);
 
-            Func<Task> result = async () => await controller.AddArticleAsync(_articleDtos[0]);
+            Func<Task> result = async () => await controller.AddArticleAsync(article);
 
             await result.Should().ThrowExactlyAsync<Exception>();
         }

@@ -290,10 +290,10 @@ namespace UnitTests.Controllers
 
             _tariffDbServiceMock.Setup(x => x.AddAsync(It.IsAny<SightseeingTariff>())).ThrowsAsync(new InternalDbServiceException());
             _tariffDbServiceMock.Setup(x => x.RestrictedAddAsync(It.IsAny<SightseeingTariff>())).ThrowsAsync(new InternalDbServiceException());
-
+            var tariff = new SightseeingTariffDto { Id = "1", Name = "test" };
             var controller = new SightseeingTariffsController(_tariffDbServiceMock.Object, _logger, _mapperMock.Object);
 
-            Func<Task> result = async () => await controller.AddTariffAsync(_tariffDtos[0]);
+            Func<Task> result = async () => await controller.AddTariffAsync(tariff);
 
             await result.Should().ThrowExactlyAsync<InternalDbServiceException>();
         }
@@ -303,9 +303,10 @@ namespace UnitTests.Controllers
         {
             _tariffDbServiceMock.Setup(x => x.AddAsync(It.IsAny<SightseeingTariff>())).ThrowsAsync(new Exception());
             _tariffDbServiceMock.Setup(x => x.RestrictedAddAsync(It.IsAny<SightseeingTariff>())).ThrowsAsync(new Exception());
+            var tariff = new SightseeingTariffDto { Id = "1", Name = "test" };
             var controller = new SightseeingTariffsController(_tariffDbServiceMock.Object, _logger, _mapperMock.Object);
 
-            Func<Task> result = async () => await controller.AddTariffAsync(_tariffDtos[0]);
+            Func<Task> result = async () => await controller.AddTariffAsync(tariff);
 
             await result.Should().ThrowExactlyAsync<Exception>();
         }
