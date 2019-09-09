@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 
 using SDCWebApp.Data;
 using SDCWebApp.Models;
+using Microsoft.EntityFrameworkCore;
+using SDCWebApp.Helpers.Extensions;
 
 namespace SDCWebApp.Services
 {
@@ -15,7 +17,7 @@ namespace SDCWebApp.Services
     /// </summary>
     public abstract class ServiceBase
     {
-        private readonly string[] _readOnlyPropertiesNames = new string[] 
+        private readonly string[] _readOnlyPropertiesNames = new string[]
         {
             $"{nameof(BasicEntity.Id)}",
             $"{nameof(BasicEntity.CreatedAt)}",
@@ -99,7 +101,17 @@ namespace SDCWebApp.Services
 
             try
             {
-                var result = _dbContext.Set<T>().Where(predicate).AsEnumerable();
+                IEnumerable<T> result;
+
+                if (typeof(T) == typeof(Ticket))
+                {
+                    result = (IEnumerable<T>)_dbContext.Tickets.IncludeDetails().Where(predicate as Expression<Func<Ticket, bool>>).AsEnumerable();
+                }
+                else
+                {
+                    result = _dbContext.Set<T>().Where(predicate).AsEnumerable();
+                }
+
                 _logger.LogDebug($"Finished method '{nameof(GetByPredicate)}'.");
                 return result;
             }

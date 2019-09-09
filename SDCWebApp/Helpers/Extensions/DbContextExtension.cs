@@ -1,12 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using NLog;
+using SDCWebApp.Models;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SDCWebApp.Helpers.Extensions
 {
     /// <summary>
-    /// Provides extension method for resolving database concurrency conflicts.
+    /// Provides extension methods for database operations.
     /// </summary>
     public static class DbContextExtension
     {
@@ -64,6 +67,16 @@ namespace SDCWebApp.Helpers.Extensions
             }
             while (maxResolveAttempts-- > 0);
             return 0;
+        }
+
+        /// <summary>
+        /// Includes detailed information about <see cref="Ticket"/> entity.
+        /// </summary>
+        /// <param name="tickets">The <see cref="Ticket"/> entity.</param>
+        /// <returns><see cref="IIncludableQueryable{Ticket, BasicEntity}"/> type.</returns>
+        public static IIncludableQueryable<Ticket, BasicEntity> IncludeDetails(this DbSet<Ticket> tickets)
+        {
+            return tickets.Include(x => x.Customer).Include(x => x.Discount).Include(x => x.Group).Include(x => x.Tariff);
         }
     }
 }

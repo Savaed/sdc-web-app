@@ -103,7 +103,7 @@ namespace SDCWebApp.Services
             try
             {
                 _logger.LogDebug($"Starting retrieve all tickets from the database.");
-                var tickets = await _dbContext.Tickets.ToArrayAsync();
+                var tickets = await _dbContext.Tickets.IncludeDetails().ToArrayAsync();
                 _logger.LogDebug("Retrieve data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(GetAllAsync)}'. Returning {tickets.Count()} elements.");
                 return tickets.AsEnumerable();
@@ -139,13 +139,7 @@ namespace SDCWebApp.Services
             try
             {
                 _logger.LogDebug($"Starting retrieve ticket with id: '{id}' from the database.");
-                var ticket = await _dbContext.Tickets
-                    .Include(x => x.Discount)
-                    .Include(x => x.Customer)
-                    .Include(x => x.Group)
-                    .Include(x => x.Tariff)
-                    .SingleAsync(x => x.Id.Equals(id));
-
+                var ticket = await _dbContext.Tickets.IncludeDetails().SingleAsync(x => x.Id.Equals(id));
                 _logger.LogDebug("Retrieve data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(GetAsync)}'.");
                 return ticket;
@@ -253,7 +247,7 @@ namespace SDCWebApp.Services
                 }
 
                 _logger.LogDebug($"Starting retrieve data. '{nameof(pageNumber)}': {pageNumber.ToString()}, '{nameof(pageSize)}': {pageSize.ToString()}.");
-                tickets = _dbContext.Tickets.Skip(pageSize * (pageNumber - 1)).Take(pageSize);
+                tickets = _dbContext.Tickets.IncludeDetails().Skip(pageSize * (pageNumber - 1)).Take(pageSize);
                 _logger.LogDebug("Retrieve data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(GetWithPaginationAsync)}'.");
                 return tickets;
