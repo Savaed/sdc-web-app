@@ -31,6 +31,9 @@ namespace UnitTests.Controllers
         private SightseeingTariff _parentSightseeingTariff;
 
 
+        // TODO Redesign all tests and controller.
+
+
         [OneTimeSetUp]
         public void SetUp()
         {

@@ -50,6 +50,8 @@ namespace UnitTests.Controllers
         }
 
 
+        // TODO Add login, register and logout test
+
         //#region LoginAsync()    
         //// zly login albo haslo -> 200 ok z errorem
         //// znaleziono usera i haslo sie zgadza -> 200 ok, bez errorw

@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using SDCWebApp.Models;
 using SDCWebApp.Models.Dtos;
 using SDCWebApp.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SDCWebApp.Controllers
 {
@@ -18,6 +19,7 @@ namespace SDCWebApp.Controllers
     /// Provides methods to Http verbs proccessing on <see cref="SightseeingTariff"/> entities.
     /// </summary>
     [Route("api/sightseeing-tariffs")]
+    [Authorize(Helpers.Constants.Strings.ApiUserPolicyName)]
     [ApiController]
     public class SightseeingTariffsController : CustomApiController, ISightseeingTariffsController
     {
@@ -75,6 +77,7 @@ namespace SDCWebApp.Controllers
         /// </summary>
         /// <returns>The most recent <see cref="SightseeingTariff"/>.</returns>
         [HttpGet("current")]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetCurrentTariffAsync()
@@ -254,7 +257,6 @@ namespace SDCWebApp.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-
         public async Task<IActionResult> UpdateTariffAsync(string id, [FromBody] SightseeingTariffDto tariff)
         {
             _logger.LogInformation($"Starting method '{nameof(UpdateTariffAsync)}'.");

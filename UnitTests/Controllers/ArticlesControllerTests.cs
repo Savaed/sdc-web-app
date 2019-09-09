@@ -451,7 +451,6 @@ namespace UnitTests.Controllers
 
 
         #region Privates
-
         private ArticleDto CreateArticleDto(Article article)
         {
             return new ArticleDto

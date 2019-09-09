@@ -45,7 +45,7 @@ namespace UnitTests.Controllers
                 new ActivityLogDto { Id = "1", User = "user1", Type = ActivityLog.ActivityType.CreateResource, Description = "log message " },
                 new ActivityLogDto { Id = "2", User = "user2", Type = ActivityLog.ActivityType.DeleteResource, Description = "log message 2" }
             };
-        }            
+        }
 
 
         #region GetLogAsync(string id);
@@ -121,14 +121,14 @@ namespace UnitTests.Controllers
         #endregion
 
 
-        #region GetAllActivityLogsAsync();
+        #region GetAllLogsAsync();
         // pusty zasob -> 200 ok, pusta lista
         // znalazlo min 1 element -> 200 ok i niepusta lista
         // any internal error refferd to the db occurred -> throws internal db service exc
         // any unexpected internal error occurred -> throws exc
 
         [Test]
-        public async Task GetWithPaginationAsync__An_internal_error_reffered_to_the_database_occurred__Should_throw_InternalDbServiceException()
+        public async Task GetLogsAsync__An_internal_error_reffered_to_the_database_occurred__Should_throw_InternalDbServiceException()
         {
             // Example of these errors: database does not exist, table does not exist etc.
 
@@ -141,7 +141,7 @@ namespace UnitTests.Controllers
         }
 
         [Test]
-        public async Task GetWithPaginationAsync__An_unexpected_internal_error_occurred__Should_throw_Exception()
+        public async Task GetLogsAsync__An_unexpected_internal_error_occurred__Should_throw_Exception()
         {
             _logDbServiceMock.Setup(x => x.GetWithPaginationAsync(It.IsAny<int>(), It.IsAny<int>())).ThrowsAsync(new Exception());
             var controller = new LogsController(_logDbServiceMock.Object, _logger, _mapperMock.Object);
@@ -152,7 +152,7 @@ namespace UnitTests.Controllers
         }
 
         [Test]
-        public async Task GetWithPaginationAsync__Resource_is_empty__Should_return_200OK_response_with_empty_IEnumerable()
+        public async Task GetLogsAsync__Resource_is_empty__Should_return_200OK_response_with_empty_IEnumerable()
         {
             _logDbServiceMock.Setup(x => x.GetWithPaginationAsync(It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(Enumerable.Empty<ActivityLog>());
             _mapperMock.Setup(x => x.Map<IEnumerable<ActivityLogDto>>(It.IsNotNull<IEnumerable<ActivityLog>>())).Returns(Enumerable.Empty<ActivityLogDto>());
@@ -165,7 +165,7 @@ namespace UnitTests.Controllers
         }
 
         [Test]
-        public async Task GetWithPaginationAsync__At_least_one_element_found__Should_return_200OK_response_with_not_empty_IEnumerable()
+        public async Task GetLogsAsync__At_least_one_element_found__Should_return_200OK_response_with_not_empty_IEnumerable()
         {
             _logDbServiceMock.Setup(x => x.GetWithPaginationAsync(It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(_activityLogs);
             _mapperMock.Setup(x => x.Map<IEnumerable<ActivityLogDto>>(It.IsNotNull<IEnumerable<ActivityLog>>())).Returns(_activityLogsDto.AsEnumerable());

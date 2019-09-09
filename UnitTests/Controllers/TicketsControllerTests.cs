@@ -45,7 +45,7 @@ namespace UnitTests.Controllers
 
             _dbServiceFactoryMock = new Mock<IIndex<string, IServiceBase>>();
 
-            _dbServiceFactoryMock.Setup(x => x[It.Is<string>(s => s == nameof(ITicketDbService))]).Returns(_ticketDbServiceMock.Object as ServiceBase);
+            // _dbServiceFactoryMock.Setup(x => x[It.Is<string>(s => s == nameof(ITicketDbService))]).Returns(_ticketDbServiceMock.Object as ServiceBase);
             //_dbServiceFactoryMock.Setup(x => x[nameof(ICustomerDbService)]).Returns(_customerDbSerivce.Object as ServiceBase);
             //_dbServiceFactoryMock.Setup(x => x[nameof(ITicketTariffDbService)]).Returns(_ticketTariffDbSerivce.Object as ServiceBase);
             //_dbServiceFactoryMock.Setup(x => x[nameof(ISightseeingGroupDbService)]).Returns(_groupDbSerivce.Object as ServiceBase);
@@ -53,16 +53,16 @@ namespace UnitTests.Controllers
 
             _validTicketDto = new TicketDto
             {
-                Id = "1",
-                Customer = new CustomerDto { Id = "1", EmailAddress = "samplecustomer@mail.com" },
-                Links = new ApiLink[]
-                {
-                    new ApiLink("discount", "discounts/1", "GET"),
-                    new ApiLink("ticketTariff", "ticket-tariffs/1", "GET"),
-                    new ApiLink("sightseeingGroup", "groups/1", "GET")
-                },
-                PurchaseDate = DateTime.Now.AddDays(-1),
-                TicketUniqueId = Guid.NewGuid().ToString()
+                //Id = "1",
+                //customer = new CustomerDto { Id = "1", EmailAddress = "samplecustomer@mail.com" },
+                //Links = new ApiLink[]
+                //{
+                //    new ApiLink("discount", "discounts/1", "GET"),
+                //    new ApiLink("ticketTariff", "ticket-tariffs/1", "GET"),
+                //    new ApiLink("sightseeingGroup", "groups/1", "GET")
+                //},
+                //PurchaseDate = DateTime.Now.AddDays(-1),
+                //TicketUniqueId = Guid.NewGuid().ToString()
             };
             _validTicket = new Ticket
             {
@@ -215,48 +215,12 @@ namespace UnitTests.Controllers
         #endregion
 
 
-        #region AddTicketAsync
-        // Internal error refferd to the db -> throw InternalDbServiceException
-        // Unexpected internal error -> throw Exception
-        // Already there is the same ticket in the database -> 400BadRequest
-        // Argument 'ticket' is null -> 400BadRequest
-        // Any of parent entities, expect Customer, not found (eg. TicketTariff etc) -> 404NotFound
-        // Add suceeded -> 201Created, return added ticket, and 'Location' header
+        #region GetCustomerTicket(string customerId, string ticketId)
 
-        [Test]
-        public async Task AddTicketAsync__An_internal_error_reffered_to_the_database_occurred__Should_throw_InternalDbServiceException()
-        {
-            // Example of these errors: database does not exist, table does not exist etc.
+        #endregion
 
-            _ticketDbServiceMock.Setup(x => x.AddAsync(It.IsAny<Ticket>())).ThrowsAsync(new InternalDbServiceException());
-            var controller = new TicketsController(_dbServiceFactoryMock.Object, _logger, _mapperMock.Object);
 
-            Func<Task> result = async () => await controller.AddTicketAsync(_validTicketDto);
-
-            await result.Should().ThrowExactlyAsync<InternalDbServiceException>();
-        }
-
-        [Test]
-        public async Task AddTicketAsync__An_unexpected_internal_error_occurred__Should_throw_Exception()
-        {
-            _ticketDbServiceMock.Setup(x => x.AddAsync(It.IsAny<Ticket>())).ThrowsAsync(new Exception());
-            var controller = new TicketsController(_dbServiceFactoryMock.Object, _logger, _mapperMock.Object);
-
-            Func<Task> result = async () => await controller.AddTicketAsync(_validTicketDto);
-
-            await result.Should().ThrowExactlyAsync<Exception>();
-        }
-
-        [Test]
-        public async Task AddTicketAsync__Already_there_is_the_same_ticket_in_the_db__Should_return_400BadRequest_response()
-        {
-            _ticketDbServiceMock.Setup(x => x.AddAsync(It.IsAny<Ticket>())).ThrowsAsync(new InvalidOperationException());
-            var controller = new TicketsController(_dbServiceFactoryMock.Object, _logger, _mapperMock.Object);
-
-            Func<Task> result = async () => await controller.AddTicketAsync(_validTicketDto);
-
-            await result.Should().ThrowExactlyAsync<Exception>();
-        }
+        #region GetCustomerTickets(string customerId)
 
         #endregion
 

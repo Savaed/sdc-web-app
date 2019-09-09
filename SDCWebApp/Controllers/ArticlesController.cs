@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using SDCWebApp.Models;
 using SDCWebApp.Models.Dtos;
 using SDCWebApp.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SDCWebApp.Controllers
 {
@@ -17,6 +18,7 @@ namespace SDCWebApp.Controllers
     /// Provides methods to Http verbs proccessing on <see cref="Article"/> entities.
     /// </summary>
     [Route("api/[controller]")]
+    [Authorize(Helpers.Constants.Strings.ApiUserPolicyName)]
     [ApiController]
     public class ArticlesController : CustomApiController, IArticlesController
     {
@@ -47,7 +49,6 @@ namespace SDCWebApp.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> AddArticleAsync([FromBody] ArticleDto article)
         {
-
             _logger.LogInformation($"Starting method '{nameof(AddArticleAsync)}'.");
 
             try
@@ -130,6 +131,7 @@ namespace SDCWebApp.Controllers
         /// </summary>
         /// <returns><see cref="IEnumerable{Article}"/>.</returns>
         [HttpGet]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllArticlesAsync()
         {
@@ -165,6 +167,7 @@ namespace SDCWebApp.Controllers
         /// <param name="id">The id of searching <see cref="Article"/>. Cannot be null or empty.</param>
         /// <returns>An specified <see cref="Article"/>.</returns>
         [HttpGet("{id}")]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

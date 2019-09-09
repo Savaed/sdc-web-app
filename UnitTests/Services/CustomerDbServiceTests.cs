@@ -68,7 +68,7 @@ namespace UnitTests.Services
                 {
                     var service = new CustomerDbService(context, _logger);
 
-                    bool result = await service.IsCustomerExistAsync(_validCustomer.Id);
+                    bool result = await service.IsCustomerExistAsync(_validCustomer);
 
                     result.Should().BeTrue();
                 }
@@ -90,7 +90,7 @@ namespace UnitTests.Services
                 {
                     var service = new CustomerDbService(context, _logger);
 
-                    bool result = await service.IsCustomerExistAsync("-1");
+                    bool result = await service.IsCustomerExistAsync(new Customer { Id = "-1", EmailAddress = "sample@mail" });
 
                     result.Should().BeFalse();
                 }
