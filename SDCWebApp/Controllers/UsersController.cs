@@ -88,14 +88,14 @@ namespace SDCWebApp.Controllers
             }
             else
             {
-                // TODO Add better approach to failed login.
                 var response = new ResponseWrapper(new LoginError("Invalid username or password."));
+                _logger.LogInformation($"Finished method '{nameof(LoginAsync)}'.");
                 return Ok(response);
             }
         }
 
         [HttpPost("logout")]
-        [Authorize(ApiConstants.ApiUserPolicyName)]
+        [Authorize(ApiConstants.ApiUserPolicy)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> LogoutAsync()
@@ -127,7 +127,7 @@ namespace SDCWebApp.Controllers
         /// <param name="registerData">User data passed during registration by the client. It is a JSON request body. Cannot be null.</param>
         /// <returns>New registered user datailed info.</returns>
         [HttpPost("register")]
-        [Authorize(ApiConstants.ApiAdminPolicyName)]
+        [Authorize(ApiConstants.ApiAdminPolicy)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

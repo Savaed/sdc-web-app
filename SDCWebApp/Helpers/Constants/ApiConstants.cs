@@ -7,37 +7,37 @@
     {
         #region CustomJwtClaimNames
 
-        public const string RoleClaimName = "role";
+        public const string RoleClaim = "role";
 
         #endregion
 
 
         #region Api roles
 
-        public const string AdministratorRoleName = "admin";
-        public const string ModeratorRoleName = "mod";
+        public const string AdministratorRole = "admin";
+        public const string ModeratorRole = "mod";
 
         #endregion
 
 
         #region Api authorization policy
 
-        public const string ApiUserPolicyName = "ApiUser";
-        public const string ApiAdminPolicyName = "ApiAdmin";
+        public const string ApiUserPolicy = "ApiUser";
+        public const string ApiAdminPolicy = "ApiAdmin";
 
         #endregion
 
 
         #region Db conections
 
-        public const string DefaultConnectionStringName = "DefaultConnection";
+        public const string DefaultConnectionString = "DefaultConnection";
 
         #endregion
 
 
         #region CORS policy
 
-        public const string DefaultCorsPolicyName = "EnableCors";
+        public const string DefaultCorsPolicy = "EnableCors";
 
         #endregion
 

@@ -84,7 +84,7 @@ namespace SDCWebApp.Controllers
                     Email = claims.FindFirstValue(JwtRegisteredClaimNames.Email)
                 };
 
-                string[] userRoles = new string[] { claims.FindFirstValue(ApiConstants.RoleClaimName) };
+                string[] userRoles = new string[] { claims.FindFirstValue(ApiConstants.RoleClaim) };
 
                 // Generate new access and refresh tokens.
                 _logger.LogDebug("Generating new access and refresh tokens.");

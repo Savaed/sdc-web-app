@@ -11,27 +11,21 @@ using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Reflection;
+using System.Threading.Tasks;
+
 using SDCWebApp.Auth;
-using SDCWebApp.Helpers.Constants;
 using SDCWebApp.Data;
 using SDCWebApp.Helpers;
-using System;
-using System.Reflection;
-using System.Security.Claims;
-using System.IdentityModel.Tokens.Jwt;
-using Microsoft.IdentityModel.Tokens;
-using System.Threading.Tasks;
-using Autofac.Features.Indexed;
-using SDCWebApp.Services;
+using SDCWebApp.Helpers.Constants;
 
 namespace SDCWebApp
 {
-
-    // TODO Refactor this class for better future managament. And for sugar code xD
-
     public class Startup
     {
         public IConfiguration Configuration { get; }
@@ -46,7 +40,8 @@ namespace SDCWebApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            // Disable JWT claim name mapping.
+            // Disable JWT inbound claim name mapping. This behaviour by default maps JWT claim names to their much longer counterparts.
+            // See https://mderriey.com/2019/06/23/where-are-my-jwt-claims/
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
             // Add validation of antiforgery tokens for unsave methods.
@@ -60,6 +55,7 @@ namespace SDCWebApp
             {
                 config.InvalidModelStateResponseFactory = context =>
                 {
+                    // Add custom validation error response.
                     var validationError = new CustomValidationProblemDetails(context);
                     return new ObjectResult(validationError);
                 };
@@ -69,9 +65,11 @@ namespace SDCWebApp
                 // Ignore reference loops in JSON responses.
                 options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
 
-                // Convert any enum to its string representation.
+                // Convert each enum to its string representation.
                 options.SerializerSettings.Converters.Add(new StringEnumConverter());
-                options.SerializerSettings.Converters.Add(new IsoDateTimeConverter());
+
+                // Set DateTime format in JSON, eg. "2019-12-12T23:12:56Z"
+                options.SerializerSettings.DateFormatString = "yyyy'-'MM'-'dd'T'HH':'mm':'ss";
             });
 
             // In production, the Angular files will be served from this directory.
@@ -80,16 +78,19 @@ namespace SDCWebApp
                 configuration.RootPath = "ClientApp/dist";
             });
 
+            // Add default CORS policy.
             services.AddCors(config =>
             {
-                config.AddPolicy(ApiConstants.DefaultCorsPolicyName, policy =>
+                config.AddPolicy(ApiConstants.DefaultCorsPolicy, policy =>
                 {
                     policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().AllowCredentials().Build();
                 });
             });
 
-            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString(ApiConstants.DefaultConnectionStringName)));
+            // Set DbContext for app.
+            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString(ApiConstants.DefaultConnectionString)));
 
+            // Set user requirements.
             services.AddIdentity<IdentityUser, IdentityRole>(config =>
             {
                 config.Password.RequireDigit = true;
@@ -112,7 +113,7 @@ namespace SDCWebApp
             services.Configure<JwtSettings>(jwtSettingsSection);
             var jwtSettings = jwtSettingsSection.Get<JwtSettings>();
 
-            // Add authentication
+            // Add JWT Bearer authentication.
             services.AddAuthentication(config =>
             {
                 config.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -126,6 +127,7 @@ namespace SDCWebApp
                 {
                     OnAuthenticationFailed = context =>
                     {
+                        // Set the 'Token-Expired: true' header for each request that has provided an expired access token.
                         if (context.Exception is SecurityTokenExpiredException)
                         {
                             context.Response.Headers.Add("Token-Expired", "true");
@@ -135,28 +137,21 @@ namespace SDCWebApp
                 };
             });
 
+            // Add authorization policies.
             services.AddAuthorization(options =>
             {
-                options.AddPolicy(ApiConstants.ApiUserPolicyName, config => config.RequireAuthenticatedUser().RequireClaim(ApiConstants.RoleClaimName, ApiConstants.AdministratorRoleName, ApiConstants.ModeratorRoleName));
-                options.AddPolicy(ApiConstants.ApiAdminPolicyName, config => config.RequireAuthenticatedUser().RequireClaim(ApiConstants.RoleClaimName, ApiConstants.AdministratorRoleName));
+                options.AddPolicy(ApiConstants.ApiAdminPolicy, config => config.RequireAuthenticatedUser().RequireClaim(ApiConstants.RoleClaim, ApiConstants.AdministratorRole));
+                options.AddPolicy(ApiConstants.ApiUserPolicy, config => config.RequireAuthenticatedUser().RequireClaim(ApiConstants.RoleClaim, ApiConstants.AdministratorRole, ApiConstants.ModeratorRole));
             });
 
-            // Add AutoMapper
+            // Add AutoMapper.
             services.AddAutoMapper(Assembly.GetExecutingAssembly().GetTypes());
 
-            // Replacement of built-in service container with Autofac.
-            // TODO Wrap following code in private method for future reusability.
+            // Replacement of built-in service container with Autofac.            
             var containerBuilder = new ContainerBuilder();
-
-            // First register services/modules and then populate them.
             containerBuilder.RegisterModule<ApplicationModule>();
             containerBuilder.Populate(services);
-            var container = containerBuilder.Build();
-
-            //var test = container.ResolveKeyed<ServiceBase>(nameof(TicketDbService));
-
-            //var test2 = container.Resolve<IRefreshTokenManager>();
-
+            var container = containerBuilder.Build();        
             return new AutofacServiceProvider(container);
         }
 
@@ -171,14 +166,13 @@ namespace SDCWebApp
             else
             {
                 app.UseExceptionHandler("/errors/500");
+
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
             app.UseStatusCodePagesWithReExecute("/errors/{0}");
-
-            // Enabling CORS.
             app.UseCors();
-
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();

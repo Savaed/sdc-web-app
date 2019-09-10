@@ -121,7 +121,7 @@ namespace SDCWebApp.Auth
                         new Claim(JwtRegisteredClaimNames.NameId, user.Id),
 
                         // In this project only one user role will be used.
-                        new Claim(ApiConstants.RoleClaimName, userRoles.FirstOrDefault()),
+                        new Claim(ApiConstants.RoleClaim, userRoles.FirstOrDefault()),
                     }),
                 Audience = _jwtOptions.Value.Audience,
                 Issuer = _jwtOptions.Value.Issuer,

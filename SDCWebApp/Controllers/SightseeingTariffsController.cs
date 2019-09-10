@@ -19,7 +19,7 @@ namespace SDCWebApp.Controllers
     /// Provides methods to Http verbs proccessing on <see cref="SightseeingTariff"/> entities.
     /// </summary>
     [Route("api/sightseeing-tariffs")]
-    [Authorize(Helpers.Constants.ApiConstants.ApiUserPolicyName)]
+    [Authorize(Helpers.Constants.ApiConstants.ApiUserPolicy)]
     [ApiController]
     public class SightseeingTariffsController : CustomApiController, ISightseeingTariffsController
     {
