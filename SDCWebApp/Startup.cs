@@ -23,6 +23,7 @@ using SDCWebApp.Auth;
 using SDCWebApp.Data;
 using SDCWebApp.Helpers;
 using SDCWebApp.Helpers.Constants;
+using System.Data.SqlClient;
 
 namespace SDCWebApp
 {
@@ -88,7 +89,7 @@ namespace SDCWebApp
             });
 
             // Set DbContext for app.
-            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString(ApiConstants.DefaultConnectionString)));
+            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(GetConnectionString(ApiConstants.DefaultConnectionString)));
 
             // Set user requirements.
             services.AddIdentity<IdentityUser, IdentityRole>(config =>
@@ -108,10 +109,8 @@ namespace SDCWebApp
                 config.SignIn.RequireConfirmedEmail = false;
             }).AddEntityFrameworkStores<ApplicationDbContext>();
 
-            // Config JWT settings and set properties value from app settings file.
-            var jwtSettingsSection = Configuration.GetSection(nameof(JwtSettings));
-            services.Configure<JwtSettings>(jwtSettingsSection);
-            var jwtSettings = jwtSettingsSection.Get<JwtSettings>();
+            // Get JWT settings.
+            var jwtSettings = GetJwtSettings(services);
 
             // Add JWT Bearer authentication.
             services.AddAuthentication(config =>
@@ -151,7 +150,7 @@ namespace SDCWebApp
             var containerBuilder = new ContainerBuilder();
             containerBuilder.RegisterModule<ApplicationModule>();
             containerBuilder.Populate(services);
-            var container = containerBuilder.Build();        
+            var container = containerBuilder.Build();
             return new AutofacServiceProvider(container);
         }
 
@@ -198,5 +197,25 @@ namespace SDCWebApp
                 }
             });
         }
+
+
+        #region Privates
+
+        private JwtSettings GetJwtSettings(IServiceCollection services)
+        {
+            var jwtSettingsSection = Configuration.GetSection(nameof(JwtSettings));
+            services.Configure<JwtSettings>(jwtSettingsSection);
+            return jwtSettingsSection.Get<JwtSettings>();
+        }
+
+        private string GetConnectionString(string connectionStringName)
+        {
+            var builder = new SqlConnectionStringBuilder(Configuration.GetConnectionString(connectionStringName));
+            builder.Password = Configuration["DbPassword"];
+            return builder.ConnectionString;
+        }
+
+        #endregion
+
     }
 }
