@@ -2,21 +2,24 @@
 using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Threading.Tasks;
+using UnitTests.Helpers;
+
 using SDCWebApp.ApiErrors;
 using SDCWebApp.Auth;
 using SDCWebApp.Controllers;
 using SDCWebApp.Models.Dtos;
 using SDCWebApp.Models.ViewModels;
 using SDCWebApp.Services;
-using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace UnitTests.Controllers
 {
@@ -27,7 +30,7 @@ namespace UnitTests.Controllers
         private Mock<IMapper> _mapperMock;
         private Mock<IJwtTokenHandler> _jwtTokenHandlerMock;
         private ILogger<UsersController> _logger;
-        private IRefreshTokenManager _refreshTokenManager;  
+        private IRefreshTokenManager _refreshTokenManager;
 
 
         [OneTimeSetUp]
@@ -50,172 +53,170 @@ namespace UnitTests.Controllers
         }
 
 
-        // TODO Add login, register and logout test
+        #region LoginAsync()    
+        // zly login albo haslo -> 200 ok z errorem
+        // znaleziono usera i haslo sie zgadza -> 200 ok, bez errorw
+        // znaleziono usera i haslo sie zgadza -> 200 ok, z danymi usera (token, id)
+        // znaleziono user -> wysylalamy access token i refresh token
 
-        //#region LoginAsync()    
-        //// zly login albo haslo -> 200 ok z errorem
-        //// znaleziono usera i haslo sie zgadza -> 200 ok, bez errorw
-        //// znaleziono usera i haslo sie zgadza -> 200 ok, z danymi usera (token, id)
-        //// znaleziono user -> wysylalamy access token i refresh token
+        [Test]
+        public async Task LoginAsync__User_not_found_or_password_is_incorrect__Should_return_200OK_with_error_and_without_data()
+        {
+            SetUpManagerForFailedLogin();
+            var loginData = new LoginViewModel { Password = "passwordA1_", UserName = "username" };
+            _jwtTokenHandlerMock.Setup(x => x.CreateJwtToken(It.IsNotNull<IdentityUser>(), It.IsNotNull<string[]>())).Returns(new JwtSecurityToken(issuer: "google.com", expires: new DateTime(2020, 1, 1)));
+            _jwtTokenHandlerMock.Setup(x => x.WriteJwtToken(It.IsNotNull<JwtSecurityToken>())).Returns(Guid.NewGuid().ToString());
+            var usersController = new UsersController(_userManagerMock.Object, _jwtTokenHandlerMock.Object, _refreshTokenManager, _logger, _mapperMock.Object);
 
-        //[Test]
-        //public async Task LoginAsync__User_not_found_or_password_is_incorrect__Should_return_200OK_with_error_and_without_data()
-        //{
-        //    SetUpManagerForFailedLogin();
-        //    var loginData = new LoginViewModel { Password = "passwordA1_", UserName = "username" };
-        //    _jwtTokenHandlerMock.Setup(x => x.CreateJwtToken(It.IsNotNull<IdentityUser>(), It.IsNotNull<string[]>())).Returns(new JwtSecurityToken(issuer: "google.com", expires: new DateTime(2020, 1, 1)));
-        //    _jwtTokenHandlerMock.Setup(x => x.WriteJwtToken(It.IsNotNull<JwtSecurityToken>())).Returns(Guid.NewGuid().ToString());
-        //    var usersController = new UsersController(_userManagerMock.Object, _jwtTokenHandlerMock.Object, _refreshTokenManager, _options, _logger, _mapperMock.Object);
+            var result = await usersController.LoginAsync(loginData);
 
-        //    var result = await usersController.LoginAsync(loginData);
+            (result as OkObjectResult).StatusCode.Should().Be(200);
+            ((result as OkObjectResult).Value as ResponseWrapper).Error.Should().BeEquivalentTo(new ApiError());
+        }
 
-        //    (result as OkObjectResult).StatusCode.Should().Be(200);
-        //    ((result as OkObjectResult).Value as ResponseWrapper).Error.Should().BeEquivalentTo(new ApiError());
-        //}
+        [Test]
+        public async Task LoginAsync__User_found__Should_return_200OK_without_error()
+        {
+            SetUpManagerForSuccessedLogin();
+            var loginData = new LoginViewModel { Password = "passwordA1_", UserName = "username" };
+            _jwtTokenHandlerMock.Setup(x => x.CreateJwtToken(It.IsNotNull<IdentityUser>(), It.IsNotNull<string[]>())).Returns(new JwtSecurityToken(issuer: "google.com", expires: new DateTime(2020, 1, 1)));
+            _jwtTokenHandlerMock.Setup(x => x.WriteJwtToken(It.IsNotNull<JwtSecurityToken>())).Returns(Guid.NewGuid().ToString());
+            var usersController = new UsersController(_userManagerMock.Object, _jwtTokenHandlerMock.Object, _refreshTokenManager, _logger, _mapperMock.Object);
 
-        //[Test]
-        //public async Task LoginAsync__User_found__Should_return_200OK_without_error()
-        //{
-        //    SetUpManagerForSuccessedLogin();
-        //    var loginData = new LoginViewModel { Password = "passwordA1_", UserName = "username" };
-        //    _jwtTokenHandlerMock.Setup(x => x.CreateJwtToken(It.IsNotNull<IdentityUser>(), It.IsNotNull<string[]>())).Returns(new JwtSecurityToken(issuer: "google.com", expires: new DateTime(2020, 1, 1)));
-        //    _jwtTokenHandlerMock.Setup(x => x.WriteJwtToken(It.IsNotNull<JwtSecurityToken>())).Returns(Guid.NewGuid().ToString());
-        //    var usersController = new UsersController(_userManagerMock.Object, _jwtTokenHandlerMock.Object, _refreshTokenManager, _options, _logger, _mapperMock.Object);
+            var result = await usersController.LoginAsync(loginData);
 
-        //    var result = await usersController.LoginAsync(loginData);
+            result.Should().BeOfType<OkObjectResult>();
+            (result as OkObjectResult).StatusCode.Should().Be(200);
+            ((result as OkObjectResult).Value as ResponseWrapper).Error.Should().BeEquivalentTo(new ApiError());
+        }
 
-        //    result.Should().BeOfType<OkObjectResult>();
-        //    (result as OkObjectResult).StatusCode.Should().Be(200);
-        //    ((result as OkObjectResult).Value as ResponseWrapper).Error.Should().BeEquivalentTo(new ApiError());
-        //}
+        [Test]
+        public async Task LoginAsync__User_found__Should_return_200OK_with_user_data()
+        {
+            SetUpManagerForSuccessedLogin();
+            var loginData = new LoginViewModel { Password = "passwordA1_", UserName = "username" };
+            _jwtTokenHandlerMock.Setup(x => x.CreateJwtToken(It.IsNotNull<IdentityUser>(), It.IsNotNull<string[]>())).Returns(new JwtSecurityToken(issuer: "google.com", expires: new DateTime(2020, 1, 1)));
+            _jwtTokenHandlerMock.Setup(x => x.WriteJwtToken(It.IsNotNull<JwtSecurityToken>())).Returns(Guid.NewGuid().ToString());
+            var usersController = new UsersController(_userManagerMock.Object, _jwtTokenHandlerMock.Object, _refreshTokenManager, _logger, _mapperMock.Object);
 
-        //[Test]
-        //public async Task LoginAsync__User_found__Should_return_200OK_with_user_data()
-        //{
-        //    SetUpManagerForSuccessedLogin();
-        //    var loginData = new LoginViewModel { Password = "passwordA1_", UserName = "username" };
-        //    _jwtTokenHandlerMock.Setup(x => x.CreateJwtToken(It.IsNotNull<IdentityUser>(), It.IsNotNull<string[]>())).Returns(new JwtSecurityToken(issuer: "google.com", expires: new DateTime(2020, 1, 1)));
-        //    _jwtTokenHandlerMock.Setup(x => x.WriteJwtToken(It.IsNotNull<JwtSecurityToken>())).Returns(Guid.NewGuid().ToString());
-        //    var usersController = new UsersController(_userManagerMock.Object, _jwtTokenHandlerMock.Object, _refreshTokenManager, _options, _logger, _mapperMock.Object);
+            var result = await usersController.LoginAsync(loginData);
 
-        //    var result = await usersController.LoginAsync(loginData);
+            result.Should().BeOfType<OkObjectResult>();
+            (result as OkObjectResult).StatusCode.Should().Be(200);
+            ((result as OkObjectResult).Value as ResponseWrapper).Error.Should().BeEquivalentTo(new ApiError());
+        }
 
-        //    result.Should().BeOfType<OkObjectResult>();
-        //    (result as OkObjectResult).StatusCode.Should().Be(200);
-        //    ((result as OkObjectResult).Value as ResponseWrapper).Error.Should().BeEquivalentTo(new ApiError());
-        //}
+        #endregion
 
-        //#endregion
 
-        //#region RegisterAsync()
-        //// nie ma takiej roli w bazie jak podana -> 200 ok, error
-        //// zajety login/haslo -> 200 ok, error
-        //// udalo sie dodac user -> 200 ok, brak bledow
-        //// jw -> 200 ok, zwraca dane usera (id, username)  
+        #region RegisterAsync()
+        // nie ma takiej roli w bazie jak podana -> 200 ok, error
+        // zajety login/haslo -> 200 ok, error
+        // udalo sie dodac user -> 200 ok, brak bledow
+        // jw -> 200 ok, zwraca dane usera (id, username)  
 
-        //[Test]
-        //public async Task RegisterAsync__Passed_role_doesnt_exist__Should_return_200OK_with_error()
-        //{
-        //    SetUpManagerForFailedRegister();
-        //    using (var factory = new DbContextFactory())
-        //    {
-        //        using (var context = await factory.CreateContextAsync())
-        //        {
-        //            context.Users.RemoveRange(await context.Users.ToArrayAsync());
-        //            context.Roles.RemoveRange(await context.Roles.ToArrayAsync());
-        //            await context.SaveChangesAsync();
-        //        }
-        //    }
-        //    var registerData = new RegisterViewModel { EmailAddress = "sample@mail.com", Password = "abcABC123_", UserName = "username", Role = "role" };
-        //    var controller = new UsersController(_userManagerMock.Object, _options, _mapperMock.Object);
+        [Test]
+        public async Task RegisterAsync__Passed_role_does_not_exist__Should_return_200OK_with_error()
+        {
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.Users.RemoveRange(await context.Users.ToArrayAsync());
+                    context.Roles.RemoveRange(await context.Roles.ToArrayAsync());
+                    await context.SaveChangesAsync();
+                }
+            }
+            var registerData = new RegisterViewModel { EmailAddress = "sample@mail.com", Password = "abcABC123_", UserName = "username", Role = "invalid_role" };
+            SetUpManagerForFailedRegister();
+            var controller = new UsersController(_userManagerMock.Object, _jwtTokenHandlerMock.Object, _refreshTokenManager, _logger, _mapperMock.Object);
 
-        //    var result = await controller.RegisterAsync(registerData);
+            var result = await controller.RegisterAsync(registerData);
 
-        //    result.Should().BeOfType<OkObjectResult>();
-        //    (result as OkObjectResult).StatusCode.Should().Be(200);
-        //    ((result as OkObjectResult).Value as CommonWrapper).Errors.Should().NotBeEmpty();
-        //}
+            (result as OkObjectResult).StatusCode.Should().Be(200);
+            ((result as OkObjectResult).Value as ResponseWrapper).Error.Should().NotBeEquivalentTo(new ApiError());
+        }
 
-        //[Test]
-        //public async Task RegisterAsync__Login_or_email_already_taken__Should_return_200OK_with_error()
-        //{
-        //    SetUpManagerForFailedRegister();
-        //    string role = "role";
-        //    string email = "sample@mail.com";
-        //    string userName = "username";
-        //    using (var factory = new DbContextFactory())
-        //    {
-        //        using (var context = await factory.CreateContextAsync())
-        //        {
-        //            context.Users.Add(new IdentityUser
-        //            {
-        //                Email = email,
-        //                UserName = userName
-        //            });
-        //            context.Roles.Add(new IdentityRole(role));
-        //            await context.SaveChangesAsync();
-        //        }
-        //    }
-        //    var registerData = new RegisterViewModel { EmailAddress = email, Password = "abcABC123_", UserName = userName, Role = role };
-        //    var controller = new UsersController(_userManagerMock.Object, _options, _mapperMock.Object);
+        [Test]
+        public async Task RegisterAsync__Login_or_email_already_taken__Should_return_200OK_with_error()
+        {
+            string role = "role";
+            string email = "sample@mail.com";
+            string userName = "username";
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.Users.Add(new IdentityUser
+                    {
+                        Email = email,
+                        UserName = userName
+                    });
+                    context.Roles.Add(new IdentityRole(role));
+                    await context.SaveChangesAsync();
+                }
+            }
+            var registerData = new RegisterViewModel { EmailAddress = email, Password = "abcABC123_", UserName = userName, Role = role };
+            SetUpManagerForFailedRegister();
+            var controller = new UsersController(_userManagerMock.Object, _jwtTokenHandlerMock.Object, _refreshTokenManager, _logger, _mapperMock.Object);
 
-        //    var result = await controller.RegisterAsync(registerData);
+            var result = await controller.RegisterAsync(registerData);
 
-        //    result.Should().BeOfType<OkObjectResult>();
-        //    (result as OkObjectResult).StatusCode.Should().Be(200);
-        //    ((result as OkObjectResult).Value as CommonWrapper).Errors.Should().NotBeEmpty();
-        //}
+            result.Should().BeOfType<OkObjectResult>();
+            (result as OkObjectResult).StatusCode.Should().Be(200);
+            ((result as OkObjectResult).Value as ResponseWrapper).Error.Should().NotBeEquivalentTo(new ApiError());
+        }
 
-        //[Test]
-        //public async Task RegisterAsync__Register_successful__Should_return_201Created_without_error()
-        //{
-        //    SetUpManagerForSuccessedRegister();
-        //    string role = "role";
-        //    using (var factory = new DbContextFactory())
-        //    {
-        //        using (var context = await factory.CreateContextAsync())
-        //        {
-        //            context.Users.RemoveRange(await context.Users.ToArrayAsync());
-        //            context.Roles.Add(new IdentityRole(role));
-        //            await context.SaveChangesAsync();
-        //        }
-        //    }
-        //    var registerData = new RegisterViewModel { EmailAddress = "sample@mail.com", Password = "abcABC123_", UserName = "username", Role = role };
-        //    var controller = new UsersController(_userManagerMock.Object, _options, _mapperMock.Object);
+        [Test]
+        public async Task RegisterAsync__Register_successful__Should_return_201Created_without_error()
+        {
+            string role = "role";
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.Users.RemoveRange(await context.Users.ToArrayAsync());
+                    context.Roles.Add(new IdentityRole(role));
+                    await context.SaveChangesAsync();
+                }
+            }
+            var registerData = new RegisterViewModel { EmailAddress = "sample@mail.com", Password = "abcABC123_", UserName = "username", Role = role };
+            SetUpManagerForSuccessedRegister();
+            var controller = new UsersController(_userManagerMock.Object, _jwtTokenHandlerMock.Object, _refreshTokenManager, _logger, _mapperMock.Object);
 
-        //    var result = await controller.RegisterAsync(registerData);
+            var result = await controller.RegisterAsync(registerData);
 
-        //    result.Should().BeOfType<CreatedResult>();
-        //    (result as CreatedResult).StatusCode.Should().Be(201);
-        //    ((result as CreatedResult).Value as CommonWrapper).Errors.Should().BeNull();
-        //}
+            result.Should().BeOfType<CreatedResult>();
+            (result as CreatedResult).StatusCode.Should().Be(201);
+            ((result as CreatedResult).Value as ResponseWrapper).Error.Should().BeEquivalentTo(new ApiError());
+        }
 
-        //[Test]
-        //public async Task RegisterAsync__Register_successful__Should_return_201Created_with_user_data()
-        //{
-        //    SetUpManagerForSuccessedRegister();
-        //    string role = "role";
-        //    using (var factory = new DbContextFactory())
-        //    {
-        //        using (var context = await factory.CreateContextAsync())
-        //        {
-        //            context.Users.RemoveRange(await context.Users.ToArrayAsync());
-        //            context.Roles.Add(new IdentityRole(role));
-        //            await context.SaveChangesAsync();
-        //        }
-        //    }
-        //    var registerData = new RegisterViewModel { EmailAddress = "sample@mail.com", Password = "abcABC123_", UserName = "username", Role = role };
-        //    var controller = new UsersController(_userManagerMock.Object, _options, _mapperMock.Object);
+        [Test]
+        public async Task RegisterAsync__Register_successful__Should_return_201Created_with_user_data()
+        {
+            string role = "role";
+            using (var factory = new DbContextFactory())
+            {
+                using (var context = await factory.CreateContextAsync())
+                {
+                    context.Users.RemoveRange(await context.Users.ToArrayAsync());
+                    context.Roles.Add(new IdentityRole(role));
+                    await context.SaveChangesAsync();
+                }
+            }
+            var registerData = new RegisterViewModel { EmailAddress = "sample@mail.com", Password = "abcABC123_", UserName = "username", Role = role };
+            SetUpManagerForSuccessedRegister();
+            var controller = new UsersController(_userManagerMock.Object, _jwtTokenHandlerMock.Object, _refreshTokenManager, _logger, _mapperMock.Object);
 
-        //    var result = await controller.RegisterAsync(registerData);
+            var result = await controller.RegisterAsync(registerData);
 
-        //    result.Should().BeOfType<CreatedResult>();
-        //    (result as CreatedResult).StatusCode.Should().Be(201);
-        //    //((result as CreatedResult).Value as CommonWrapper).Data.Should().BeOfType<UserDto>();
-        //    ((result as CreatedResult).Value as CommonWrapper).Data.Should().NotBeNull();
-        //}
+            (result as CreatedResult).StatusCode.Should().Be(201);
+            ((result as CreatedResult).Value as ResponseWrapper).Data.Should().BeOfType<UserDto>();
+            ((result as CreatedResult).Value as ResponseWrapper).Data.Should().NotBeEquivalentTo(new UserDto());
+        }
 
-        //#endregion
+        #endregion
+
 
         #region Privates
 

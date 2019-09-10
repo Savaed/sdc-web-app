@@ -19,7 +19,7 @@ namespace SDCWebApp.Controllers
     /// Provides methods to Http verbs proccessing on <see cref="Discount"/> entities.
     /// </summary>
     [Route("api/[controller]")]
-    [Authorize(Strings.ApiUserPolicyName)]
+    [Authorize(ApiConstants.ApiUserPolicyName)]
     [ApiController]
     public class DiscountsController : CustomApiController, IDiscountsController
     {

@@ -32,7 +32,7 @@ namespace SDCWebApp.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-
+                       
             builder.Entity<SightseeingGroup>(entity =>
             {
                 entity.Property(s => s.CurrentGroupSize).HasField("_currentGroupSize").UsePropertyAccessMode(PropertyAccessMode.FieldDuringConstruction);

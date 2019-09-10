@@ -1,8 +1,9 @@
 ﻿using Autofac;
-using SDCWebApp.Controllers;
-using SDCWebApp.Services;
 using System.Linq;
 using System.Reflection;
+
+using SDCWebApp.Controllers;
+using SDCWebApp.Services;
 
 namespace SDCWebApp.Helpers
 {
@@ -13,8 +14,6 @@ namespace SDCWebApp.Helpers
             base.Load(builder);
 
             var assembly = Assembly.GetExecutingAssembly();
-
-            builder.RegisterAssemblyTypes(assembly);
 
             // Register services that inherit directly from the ServiceBase class.
             RegisterServices(builder, assembly);
@@ -28,7 +27,7 @@ namespace SDCWebApp.Helpers
 
 
         #region Privates
-        
+
         private void RegisterServices(ContainerBuilder builder, Assembly assembly)
         {
             builder.RegisterAssemblyTypes(assembly)
@@ -51,8 +50,7 @@ namespace SDCWebApp.Helpers
 
         private void RegisterOtherTypes(ContainerBuilder builder, Assembly assembly)
         {
-            builder.RegisterAssemblyTypes(assembly)
-               .Where(t => t.IsClass && t.BaseType != typeof(ServiceBase) && t.BaseType != typeof(CustomApiController))
+            builder.RegisterAssemblyTypes(assembly)             
                .AsSelf()
                .AsImplementedInterfaces()
                .InstancePerDependency();

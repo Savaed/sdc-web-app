@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace SDCWebApp.Helpers.Constants
+﻿namespace SDCWebApp.Helpers.Constants
 {
     /// <summary>
     /// Contains constants strings used accros entire application.
     /// </summary>
-    public static class Strings
+    public static class ApiConstants
     {
         #region CustomJwtClaimNames
 
@@ -28,6 +23,7 @@ namespace SDCWebApp.Helpers.Constants
         #region Api authorization policy
 
         public const string ApiUserPolicyName = "ApiUser";
+        public const string ApiAdminPolicyName = "ApiAdmin";
 
         #endregion
 

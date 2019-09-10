@@ -29,6 +29,9 @@ using SDCWebApp.Services;
 
 namespace SDCWebApp
 {
+
+    // TODO Refactor this class for better future managament. And for sugar code xD
+
     public class Startup
     {
         public IConfiguration Configuration { get; }
@@ -79,13 +82,13 @@ namespace SDCWebApp
 
             services.AddCors(config =>
             {
-                config.AddPolicy(Strings.DefaultCorsPolicyName, policy =>
+                config.AddPolicy(ApiConstants.DefaultCorsPolicyName, policy =>
                 {
                     policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().AllowCredentials().Build();
                 });
             });
 
-            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString(Strings.DefaultConnectionStringName)));
+            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString(ApiConstants.DefaultConnectionStringName)));
 
             services.AddIdentity<IdentityUser, IdentityRole>(config =>
             {
@@ -134,7 +137,8 @@ namespace SDCWebApp
 
             services.AddAuthorization(options =>
             {
-                options.AddPolicy(Strings.ApiUserPolicyName, config => config.RequireAuthenticatedUser().RequireClaim(Strings.RoleClaimName, Strings.AdministratorRoleName, Strings.ModeratorRoleName));
+                options.AddPolicy(ApiConstants.ApiUserPolicyName, config => config.RequireAuthenticatedUser().RequireClaim(ApiConstants.RoleClaimName, ApiConstants.AdministratorRoleName, ApiConstants.ModeratorRoleName));
+                options.AddPolicy(ApiConstants.ApiAdminPolicyName, config => config.RequireAuthenticatedUser().RequireClaim(ApiConstants.RoleClaimName, ApiConstants.AdministratorRoleName));
             });
 
             // Add AutoMapper
@@ -151,7 +155,7 @@ namespace SDCWebApp
 
             //var test = container.ResolveKeyed<ServiceBase>(nameof(TicketDbService));
 
-            //var test2 = container.Resolve<Controllers.IArticlesController>();
+            //var test2 = container.Resolve<IRefreshTokenManager>();
 
             return new AutofacServiceProvider(container);
         }

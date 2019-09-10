@@ -25,7 +25,7 @@ namespace SDCWebApp.Services
         /// <param name="userName">Username which activity to be logged.</param>
         /// <param name="message">Activity log description.</param>
         /// <param name="activityType">Activity log type.</param>
-        public async Task LoggActivity(string userName, string message, ActivityLog.ActivityType activityType)
+        public async Task LoggActivityAsync(string userName, string message, ActivityLog.ActivityType activityType)
         {
             try
             {

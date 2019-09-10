@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using SDCWebApp.Models;
 using SDCWebApp.Models.Dtos;
 using SDCWebApp.Services;
+using SDCWebApp.Helpers.Constants;
 
 namespace SDCWebApp.Controllers
 {
@@ -18,7 +19,7 @@ namespace SDCWebApp.Controllers
     /// Provides methods to Http verbs proccessing on <see cref="Customer"/> entities.
     /// </summary>
     [Route("api/[controller]")]
-    [Authorize(Helpers.Constants.Strings.ApiUserPolicyName)]
+    [Authorize(ApiConstants.ApiUserPolicyName)]
     [ApiController]
     public class CustomersController : CustomApiController, ICustomersController
     {

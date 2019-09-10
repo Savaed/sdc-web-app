@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using NLog;
-using SDCWebApp.Models;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
+
+using SDCWebApp.Models;
 
 namespace SDCWebApp.Helpers.Extensions
 {

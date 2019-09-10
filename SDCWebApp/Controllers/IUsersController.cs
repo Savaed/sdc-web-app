@@ -9,6 +9,6 @@ namespace SDCWebApp.Controllers
     {
         Task<IActionResult> RegisterAsync(RegisterViewModel registerData);
         Task<IActionResult> LoginAsync(LoginViewModel loginData);
-        Task<IActionResult> LogoutAsync(LogoutViewModel logoutData);
+        //Task<IActionResult> LogoutAsync(LogoutViewModel logoutData);
     }
 }

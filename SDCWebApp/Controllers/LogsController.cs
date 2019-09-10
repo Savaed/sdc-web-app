@@ -16,7 +16,7 @@ using SDCWebApp.Services;
 namespace SDCWebApp.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize(Strings.ApiUserPolicyName)]
+    [Authorize(ApiConstants.ApiAdminPolicyName)]
     [ApiController]
     public class LogsController : CustomApiController, ILogsController
     {

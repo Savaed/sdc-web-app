@@ -1,64 +1,58 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using System;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+
+using SDCWebApp.ApiErrors;
 using SDCWebApp.Auth;
+using SDCWebApp.Helpers.Constants;
 using SDCWebApp.Models;
 using SDCWebApp.Models.Dtos;
 using SDCWebApp.Models.ViewModels;
 using SDCWebApp.Services;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace SDCWebApp.Controllers
 {
+    /// <summary>
+    /// Supports registration, login and logout operations.
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    public class UsersController : CustomApiController//, IUsersController
+    public class UsersController : CustomApiController, IUsersController
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly ILogger<UsersController> _logger;
-        private readonly IOptions<JwtSettings> _jwtOptions;
         private readonly IJwtTokenHandler _jwtTokenHandler;
         private readonly IRefreshTokenManager _refreshTokenMananger;
         private readonly IMapper _mapper;
 
 
-        public UsersController(UserManager<IdentityUser> userManager, IJwtTokenHandler jwtTokenHandler, IRefreshTokenManager refreshTokenManager, IOptions<JwtSettings> options, ILogger<UsersController> logger, IMapper mapper) : base(logger)
+        public UsersController(UserManager<IdentityUser> userManager, IJwtTokenHandler jwtTokenHandler, IRefreshTokenManager refreshTokenManager, ILogger<UsersController> logger, IMapper mapper) : base(logger)
         {
             _jwtTokenHandler = jwtTokenHandler;
             _logger = logger;
             _userManager = userManager;
-            _jwtOptions = options;
             _mapper = mapper;
             _refreshTokenMananger = refreshTokenManager;
         }
 
 
+        /// <summary>
+        /// Asynchronously logs a registered user. Returns <see cref="HttpStatusCode.BadRequest"/> if request is malformed, otherwise <see cref="HttpStatusCode.OK"/>.
+        /// </summary>
+        /// <param name="loginData">User data passed during login by the client. It is a JSON request body. Cannot be null.</param>
+        /// <returns>Loged user datailed info.</returns>
         [HttpPost("login")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> LoginAsync([FromBody] LoginViewModel loginData)
         {
-
-            Ticket _validTicket = new Ticket
-            {
-                Id = "1",
-                Customer = new Customer { Id = "1", EmailAddress = "samplecustomer@mail.com" },
-                Discount = new Discount { Id = "1", Description = "discount description", DiscountValueInPercentage = 25, Type = Discount.DiscountType.ForChild },
-                Group = new SightseeingGroup { Id = "1", MaxGroupSize = 30, SightseeingDate = DateTime.Now.AddDays(1) },
-                Tariff = new TicketTariff { Id = "1", DefaultPrice = 30, Description = "ticket price list description" },
-                PurchaseDate = DateTime.Now.AddDays(-1),
-                TicketUniqueId = Guid.NewGuid().ToString()
-            };
-
-            var dto = _mapper.Map<TicketDto>(_validTicket);
-
-
-
             _logger.LogInformation($"Starting method '{nameof(LoginAsync)}'.");
 
             var user = await _userManager.FindByNameAsync(loginData.UserName);
@@ -67,6 +61,7 @@ namespace SDCWebApp.Controllers
             {
                 try
                 {
+                    _logger.LogDebug("User found.");
                     var userRoles = await _userManager.GetRolesAsync(user);
                     var jwtToken = _jwtTokenHandler.CreateJwtToken(user, userRoles.ToArray());
                     string accessToken = _jwtTokenHandler.WriteJwtToken(jwtToken);
@@ -94,64 +89,98 @@ namespace SDCWebApp.Controllers
             else
             {
                 // TODO Add better approach to failed login.
-                var response = new ResponseWrapper();
+                var response = new ResponseWrapper(new LoginError("Invalid username or password."));
                 return Ok(response);
             }
         }
 
-        //// [POST] users/logout
-        //[HttpPost("logout")]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
-        // public Task<IActionResult> LogoutAsync([FromBody] LogoutViewModel logoutData)
-        // {
-        //     throw new NotImplementedException();
-        // }
+        [HttpPost("logout")]
+        [Authorize(ApiConstants.ApiUserPolicyName)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> LogoutAsync()
+        {
+            //Microsoft.Extensions.Primitives.StringValues authorizationHeaderValue;
 
-        ////[POST] users/register
-        //[HttpPost("register")]
-        ////[Authorize(Policy = "OnlyForAdmin")]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(StatusCodes.Status201Created)]
-        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
-        //[ProducesResponseType(StatusCodes.Status403Forbidden)]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //public async Task<IActionResult> RegisterAsync([FromBody] RegisterViewModel registerData)
-        //{
-        //    var user = new IdentityUser
-        //    {
-        //        Id = Guid.NewGuid().ToString(),
-        //        UserName = registerData.UserName,
-        //        Email = registerData.EmailAddress
-        //    };
+            //if (Request.Headers.TryGetValue("Authorization", out authorizationHeaderValue))
+            //{
+            //    // ok, mamy token
+            //    string accessToken = authorizationHeaderValue.ToString();
+            //    var userPrincipal = _jwtTokenHandler.GetPrincipalFromJwtToken(accessToken);
 
-        //    var createdResult = await _userManager.CreateAsync(user, registerData.Password);
+            //    string userId = userPrincipal.FindFirstValue(JwtRegisteredClaimNames.NameId);
+            //    string username = userPrincipal.FindFirstValue(JwtRegisteredClaimNames.Sub);
 
-        //    if (createdResult.Succeeded)
-        //    {
-        //        await _userManager.AddToRoleAsync(user, "admin");
+            //    var activityLogger = new UserActivityLogger(null, null);
+            //    await activityLogger.LoggActivityAsync(username, "User logout", ActivityLog.ActivityType.LogOut);
+            //}
 
-        //        // TODO Send confirmation email.
+            // badrequest
 
-        //        var registerInfo = new
-        //        {
-        //            userName = registerData.UserName,
-        //            id = user.Id
-        //        };
-        //        var response = new ResponseWrapper(registerInfo);
-        //        return Ok(response);
-        //    }
-        //    else
-        //    {
-        //        return Ok(new ResponseWrapper());
-        //    }
-        //}
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Asynchronously register a new user. Returns <see cref="HttpStatusCode.BadRequest"/> if request is malformed 
+        /// and <see cref="HttpStatusCode.Created"/> if registration succeeded. Otherwise returns <see cref="HttpStatusCode.OK"/>.
+        /// </summary>
+        /// <param name="registerData">User data passed during registration by the client. It is a JSON request body. Cannot be null.</param>
+        /// <returns>New registered user datailed info.</returns>
+        [HttpPost("register")]
+        [Authorize(ApiConstants.ApiAdminPolicyName)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> RegisterAsync([FromBody] RegisterViewModel registerData)
+        {
+            _logger.LogInformation($"Starting method '{nameof(RegisterAsync)}'.");
+
+            var user = CreateUser(registerData);
+            var createdResult = await _userManager.CreateAsync(user, registerData.Password);
+
+            if (createdResult.Succeeded)
+            {
+                var addToRoleResult = await _userManager.AddToRoleAsync(user, registerData.Role);
+
+                if (addToRoleResult.Succeeded)
+                {
+                    _logger.LogDebug("User register succeeded.");
+
+                    // TODO Send confirmation email.
+
+                    var registerInfo = new UserDto { Id = user.Id, UserName = user.UserName, LoggedOn = DateTime.MinValue };
+                    string userUrl = $"users/{user.Id}";
+                    var response = new ResponseWrapper(registerInfo);
+                    _logger.LogInformation($"Finished method '{nameof(RegisterAsync)}'.");
+                    return Created(userUrl, response);
+                }
+                else
+                {
+                    return Ok(new ResponseWrapper(new RegistrationError($"Registration failed. {addToRoleResult.Errors.ToList().First().Description}")));
+                }
+            }
+            else
+            {
+                return Ok(new ResponseWrapper(new RegistrationError($"Registration failed. {createdResult.Errors.First().Description}")));
+            }
+        }
 
 
         #region Privates
 
+        private IdentityUser CreateUser(RegisterViewModel registerData)
+        {
+            return new IdentityUser
+            {
+                Id = Guid.NewGuid().ToString(),
+                UserName = registerData.UserName,
+                Email = registerData.EmailAddress
+            };
+        }
+
         private RefreshTokenDto MapToDto(RefreshToken refreshToken) => _mapper.Map<RefreshTokenDto>(refreshToken);
 
         #endregion
+
     }
 }
