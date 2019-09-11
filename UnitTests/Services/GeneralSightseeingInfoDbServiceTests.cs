@@ -30,20 +30,13 @@ namespace UnitTests.Services
         private Expression<Func<GeneralSightseeingInfo, bool>> _predicate;
         private Mock<ApplicationDbContext> _dbContextMock;
         private ILogger<GeneralSightseeingInfoDbService> _logger;
-        private readonly GeneralSightseeingInfo _validInfo = new GeneralSightseeingInfo
-        {
-            Id = "1",
-            OpeningHour = new TimeSpan(10, 0, 0),
-            ClosingHour = new TimeSpan(18, 0, 0),
-            MaxChildAge = 5,
-            Description = "Sample info",
-            MaxAllowedGroupSize = 35,
-            UpdatedAt = DateTime.Now.AddDays(-1)
-        };
+        private GeneralSightseeingInfo _validInfo;
+
 
         [OneTimeSetUp]
         public void SetUp()
         {
+            _validInfo = CreateInfo();
             _predicate = x => x.CreatedAt > DateTime.MinValue;
             _dbContextMock = new Mock<ApplicationDbContext>(Mock.Of<DbContextOptions<ApplicationDbContext>>(o => o.ContextType == typeof(ApplicationDbContext)));
             _logger = Mock.Of<ILogger<GeneralSightseeingInfoDbService>>();
@@ -795,16 +788,7 @@ namespace UnitTests.Services
         [Test]
         public async Task UpdateAsync__Matching_general_sightseeing_info_not_found__Should_throw_InvalidOperationException()
         {
-            GeneralSightseeingInfo generalSightseeingInfo = new GeneralSightseeingInfo
-            {
-                Id = "0",
-                Description = "sample",
-                MaxAllowedGroupSize = 12,
-                MaxChildAge = 3,
-                OpeningHour = new TimeSpan(10, 0, 0),
-                ClosingHour = new TimeSpan(18, 0, 0),
-                UpdatedAt = DateTime.Now.AddHours(-3)
-            };
+            GeneralSightseeingInfo generalSightseeingInfo = CreateInfo();
 
             using (var factory = new DbContextFactory())
             {
@@ -1556,6 +1540,39 @@ namespace UnitTests.Services
                 }
             }
         }
+
+        #endregion
+
+
+        #region Privates
+
+        private GeneralSightseeingInfo CreateInfo(string id = "1", string description = "test", int maxChildAge = 5, int maxAllowedGroupSize = 30, int maxTicketOrderInterval = 4, int sightseeingDuration = 2)
+        {        
+            return new GeneralSightseeingInfo
+            {
+                Id = id,
+                Description = description,
+                MaxAllowedGroupSize = maxAllowedGroupSize,
+                MaxChildAge = maxChildAge,
+                MaxTicketOrderInterval = maxTicketOrderInterval,
+                SightseeingDuration = sightseeingDuration,
+                OpeningHours = CreateOpenigHoursInWeek()
+            };
+        }
+
+        private OpeningHours[] CreateOpenigHoursInWeek()
+        {
+            return new OpeningHours[]
+            {
+                new OpeningHours{ ClosingHour = new TimeSpan(18,0,0), OpeningHour = new TimeSpan(10,0,0) ,DayOfWeek = DayOfWeek.Monday },
+                new OpeningHours{ ClosingHour = new TimeSpan(18,0,0), OpeningHour = new TimeSpan(10,0,0) ,DayOfWeek = DayOfWeek.Tuesday },
+                new OpeningHours{ ClosingHour = new TimeSpan(18,0,0), OpeningHour = new TimeSpan(10,0,0) ,DayOfWeek = DayOfWeek.Wednesday },
+                new OpeningHours{ ClosingHour = new TimeSpan(18,0,0), OpeningHour = new TimeSpan(10,0,0) ,DayOfWeek = DayOfWeek.Thursday },
+                new OpeningHours{ ClosingHour = new TimeSpan(18,0,0), OpeningHour = new TimeSpan(10,0,0) ,DayOfWeek = DayOfWeek.Friday },
+                new OpeningHours{ ClosingHour = new TimeSpan(16,0,0), OpeningHour = new TimeSpan(10,0,0) ,DayOfWeek = DayOfWeek.Saturday },
+                new OpeningHours{ ClosingHour = new TimeSpan(16,0,0), OpeningHour = new TimeSpan(10,0,0) ,DayOfWeek = DayOfWeek.Sunday }
+            };
+        }       
 
         #endregion
 

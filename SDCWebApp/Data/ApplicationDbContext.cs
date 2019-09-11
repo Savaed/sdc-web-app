@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SDCWebApp.Models;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SDCWebApp.Data
 {
@@ -22,6 +24,7 @@ namespace SDCWebApp.Data
         public virtual DbSet<Customer> Customers { get; set; }
         public virtual DbSet<GeneralSightseeingInfo> GeneralSightseeingInfo { get; set; }
         public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
+        public virtual DbSet<OpeningHours> OpeningDates { get; set; }
 
 
         public ApplicationDbContext() { }
@@ -31,8 +34,8 @@ namespace SDCWebApp.Data
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            base.OnModelCreating(builder);
-                       
+            base.OnModelCreating(builder);        
+
             builder.Entity<SightseeingGroup>(entity =>
             {
                 entity.Property(s => s.CurrentGroupSize).HasField("_currentGroupSize").UsePropertyAccessMode(PropertyAccessMode.FieldDuringConstruction);
@@ -40,12 +43,39 @@ namespace SDCWebApp.Data
             });
 
             builder.Entity<Ticket>(entity =>
-            {              
+            {
                 entity.Property(t => t.Price).HasField("_price").UsePropertyAccessMode(PropertyAccessMode.FieldDuringConstruction);
-            });                            
+            });
 
             builder.Entity<ActivityLog>().Property(a => a.Type).HasConversion<string>();
             builder.Entity<Discount>().Property(d => d.Type).HasConversion<string>();
+            builder.Entity<OpeningHours>().Property(d => d.DayOfWeek).HasConversion<string>();            
+
+            builder.Entity<OpeningHours>().HasData(
+                new OpeningHours
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    ClosingHour = new TimeSpan(18, 0, 0),
+                    OpeningHour = new TimeSpan(10, 0, 0)
+                });
+
+            builder.Entity<OpeningHours>().HasData(
+             new OpeningHours
+             {
+                 Id = Guid.NewGuid().ToString(),
+                 ClosingHour = new TimeSpan(10, 0, 0),
+                 OpeningHour = new TimeSpan(16, 0, 0),
+                 DayOfWeek = DayOfWeek.Saturday
+             });
+
+            builder.Entity<OpeningHours>().HasData(
+            new OpeningHours
+            {
+                Id = Guid.NewGuid().ToString(),
+                ClosingHour = new TimeSpan(10, 0, 0),
+                OpeningHour = new TimeSpan(18, 0, 0),
+                DayOfWeek = DayOfWeek.Monday
+            });
 
             builder.Entity<ActivityLog>().HasData(
                 new ActivityLog
@@ -152,7 +182,7 @@ namespace SDCWebApp.Data
                       .OnDelete(DeleteBehavior.SetNull);
 
                 entity.HasData(new SightseeingTariff { Id = Guid.NewGuid().ToString(), Name = "BasicTickets" });
-            });                   
+            });
 
             builder.Entity<SightseeingGroup>().HasData(
                 new SightseeingGroup
@@ -172,8 +202,6 @@ namespace SDCWebApp.Data
             {
                 Id = Guid.NewGuid().ToString(),
                 MaxChildAge = 5,
-                OpeningHour = new TimeSpan(10, 0, 0),
-                ClosingHour = new TimeSpan(18, 0, 0),
                 MaxAllowedGroupSize = 35,
                 MaxTicketOrderInterval = 4,
                 Description = "TL;DR"
@@ -194,6 +222,24 @@ namespace SDCWebApp.Data
                     HasFamilyCard = true,
                     EmailAddress = " example2@mail.uk"
                 });
+
+            //builder.Entity<OpeningDate>().HasData(
+            //    new OpeningDate
+            //    {
+            //        Id = "1",
+            //        OpeningDays = new CustomDayOfWeek[]
+            //        {
+            //            new CustomDayOfWeek { Id = "1", DayOfWeek = DayOfWeek.Monday },
+            //            new CustomDayOfWeek { Id = "2", DayOfWeek = DayOfWeek.Tuesday },
+            //            new CustomDayOfWeek { Id = "3", DayOfWeek = DayOfWeek.Wednesday},
+            //            new CustomDayOfWeek { Id = "4", DayOfWeek = DayOfWeek.Thursday },
+            //            new CustomDayOfWeek { Id = "5", DayOfWeek = DayOfWeek.Friday },
+            //            new CustomDayOfWeek { Id = "6", DayOfWeek = DayOfWeek.Saturday },
+            //            new CustomDayOfWeek { Id = "7", DayOfWeek = DayOfWeek.Sunday}
+            //        },
+            //        OpeningHour = new TimeSpan(10, 0, 0),
+            //        ClosingHour = new TimeSpan(18, 0, 0)
+            //    });
         }
     }
 }

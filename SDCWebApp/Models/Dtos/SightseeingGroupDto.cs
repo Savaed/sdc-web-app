@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
+﻿using System;
 
 namespace SDCWebApp.Models.Dtos
 {
@@ -10,8 +8,5 @@ namespace SDCWebApp.Models.Dtos
         public int MaxGroupSize { get; set; }
         public int CurrentGroupSize { get; set; }
         public bool IsAvailablePlace { get; set; }
- 
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public virtual ICollection<Ticket> Tickets { get; set; }
     }
 }

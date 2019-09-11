@@ -43,7 +43,7 @@ namespace SDCWebApp.Data.Validation
                         {
                             roles += $"{dbRole.NormalizedName},";
                         }
-                        roles = roles.Remove(roles.Length - 1, 1);
+                        roles = roles.Length > 0 ? roles.Remove(roles.Length - 1, 1) : "";
                         context.AddFailure($"{nameof(RegisterViewModel.Role)}: '{role}' does not exist. Available roles: '{roles}'");
                     }
                 });

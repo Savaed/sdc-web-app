@@ -1,34 +1,42 @@
 ﻿using FluentAssertions;
 using NUnit.Framework;
-using SDCWebApp.Models;
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Linq;
+using UnitTests.Helpers;
+
+using SDCWebApp.Models;
 
 namespace UnitTests.Models
 {
     [TestFixture]
     public class GeneralSightseeingInfoTests
     {
+        private GeneralSightseeingInfo _info;
+
+
+        [OneTimeSetUp]
+        public void SetUp()
+        {
+            _info = CreateModel.CreateInfo();
+        }
+
+
         [Test]
         public void Equals__One_info_is_reffered_to_second__Should_be_the_same()
         {
-            var info1 = new GeneralSightseeingInfo { Id = "1", Description = "description", MaxChildAge = 5, MaxAllowedGroupSize = 30, OpeningHour = new TimeSpan(10, 0, 0), ClosingHour = new TimeSpan(18, 0, 0) };
-            var info2 = info1;
+            var info2 = _info;
 
-            bool isEqual = info1.Equals(info2);
+            bool isEqual = _info.Equals(info2);
 
             isEqual.Should().BeTrue();
         }
 
-        // For equality Id, Description, MaxChildAge, MacAllowedGroupSize, OpeningHour, ClosingHour
         [Test]
-        public void Equals__Two_info_with_the_same_properties_value__Should_be_the_same()
+        public void Equals__Two_info_with_the_same_properties_value_except_opening_hours__Should_be_the_same()
         {
-            var info1 = new GeneralSightseeingInfo { Id = "1", Description = "description", MaxChildAge = 5, MaxAllowedGroupSize = 30, OpeningHour = new TimeSpan(10, 0, 0), ClosingHour = new TimeSpan(18, 0, 0) };
-            var info2 = new GeneralSightseeingInfo { Id = "1", Description = "description", MaxChildAge = 5, MaxAllowedGroupSize = 30, OpeningHour = new TimeSpan(10, 0, 0), ClosingHour = new TimeSpan(18, 0, 0) };
+            var info2 = CreateModel.CreateInfo();
 
-            bool isEqual = info1.Equals(info2);
+            bool isEqual = _info.Equals(info2);
 
             isEqual.Should().BeTrue();
         }
@@ -36,10 +44,10 @@ namespace UnitTests.Models
         [Test]
         public void Equals__At_least_one_property_value_is_different__Should_not_be_the_same()
         {
-            var info1 = new GeneralSightseeingInfo { Id = "1", Description = "description", MaxChildAge = 5, MaxAllowedGroupSize = 30, OpeningHour = new TimeSpan(10, 0, 0), ClosingHour = new TimeSpan(18, 0, 0) };
-            var info2 = new GeneralSightseeingInfo { Id = "1", Description = "other description", MaxChildAge = 5, MaxAllowedGroupSize = 30, OpeningHour = new TimeSpan(10, 0, 0), ClosingHour = new TimeSpan(18, 0, 0) };
+            // Different Description and MaxAllowedGroupSize.
+            var info2 = CreateModel.CreateInfo(description: "other_test", maxAllowedGroupSize: 20);
 
-            bool isEqual = info1.Equals(info2);
+            bool isEqual = _info.Equals(info2);
 
             isEqual.Should().BeFalse();
         }
@@ -47,8 +55,8 @@ namespace UnitTests.Models
         [Test]
         public void Equals__One_info_is_null__Should_not_be_the_same()
         {
-            Discount info1 = null;
-            var info2 = new GeneralSightseeingInfo { Id = "1", Description = "other description", MaxChildAge = 5, MaxAllowedGroupSize = 30, OpeningHour = new TimeSpan(10, 0, 0), ClosingHour = new TimeSpan(18, 0, 0) };
+            GeneralSightseeingInfo info1 = null;
+            var info2 = _info;
 
             bool isEqual = info2.Equals(info1);
 
@@ -59,7 +67,7 @@ namespace UnitTests.Models
         public void Equals__Check_equality_of_two_different_types__Should_not_be_the_same()
         {
             DateTime? date = null;
-            var info2 = new GeneralSightseeingInfo { Id = "1", Description = "other description", MaxChildAge = 5, MaxAllowedGroupSize = 30, OpeningHour = new TimeSpan(10, 0, 0), ClosingHour = new TimeSpan(18, 0, 0) };
+            var info2 = _info;
 
             bool isEqual = info2.Equals(date);
 
@@ -69,41 +77,39 @@ namespace UnitTests.Models
         [Test]
         public void Equals__Check_equality_the_same_single_discount__Should_be_the_same()
         {
-            var info1 = new GeneralSightseeingInfo { Id = "1", Description = "other description", MaxChildAge = 5, MaxAllowedGroupSize = 30, OpeningHour = new TimeSpan(10, 0, 0), ClosingHour = new TimeSpan(18, 0, 0) };
-
-            bool isEqual = info1.Equals(info1);
+            bool isEqual = _info.Equals(_info);
 
             isEqual.Should().BeTrue();
         }
-
-        //ClosingDateTime
 
         [Test]
         public void OpeningDateTime__OpeningHour_is_10_30__Should_return_date_time_with_hour_equals_10_30()
         {
             int hour = 10;
             int minute = 30;
+            var now = DateTime.Now;
+            _info.OpeningHours.ToArray().First(x => x.DayOfWeek == now.DayOfWeek).OpeningHour = new TimeSpan(hour, minute, 0);
 
-            var info = new GeneralSightseeingInfo { OpeningHour = new TimeSpan(hour, minute, 0) };
-
-            var datetime = info.OpeningDateTime;
+            var datetime = _info.GetOpeningDateTime(now);
 
             datetime.Hour.Should().Be(hour);
             datetime.Minute.Should().Be(minute);
+            datetime.Date.Should().BeSameDateAs(now.Date);
         }
 
         [Test]
         public void ClosingDateTime__ClosingHour_is_18_00__Should_return_date_time_with_hour_equals_18_00()
         {
             int hour = 18;
-            int minute = 30;
+            int minute = 0;
+            var now = DateTime.Now;
+            _info.OpeningHours.ToArray().First(x => x.DayOfWeek == now.DayOfWeek).ClosingHour = new TimeSpan(hour, minute, 0);
 
-            var info = new GeneralSightseeingInfo { ClosingHour = new TimeSpan(hour, minute, 0) };
-
-            var datetime = info.ClosingDateTime;
+            var datetime = _info.GetClosingDateTime(now);
 
             datetime.Hour.Should().Be(hour);
             datetime.Minute.Should().Be(minute);
+            datetime.Date.Should().BeSameDateAs(now.Date);
         }
     }
 }

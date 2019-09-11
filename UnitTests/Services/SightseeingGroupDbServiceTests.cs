@@ -95,7 +95,7 @@ namespace UnitTests.Services
                 using (var context = await factory.CreateContextAsync())
                 {
                     // Drop SightseeingGroups table.
-                    context.Database.ExecuteSqlCommand("DROP TABLE [SightseeingGroups]");
+                    context.Database.ExecuteSqlCommand("DROP TABLE [Groups]");
                 }
 
                 using (var context = await factory.CreateContextAsync())
@@ -398,25 +398,6 @@ namespace UnitTests.Services
             }
         }
 
-        [Test]
-        public async Task GetAllAsync__All_SightseeingGroups_found__Should_return_IEnumerable_for_all_sightseeing_groups_with_not_null_tickets_list()
-        {
-            using (var factory = new DbContextFactory())
-            {
-                using (var context = await factory.CreateContextAsync())
-                {
-                    int expectedLength = context.Groups.ToArray().Length;
-                    var service = new SightseeingGroupDbService(context, _logger);
-
-                    var result = await service.GetAllAsync();
-
-                    foreach (var group in result)
-                    {
-                        group.Tickets.Should().NotBeNull();
-                    }
-                }
-            }
-        }
 
         #endregion
 
@@ -1137,7 +1118,7 @@ namespace UnitTests.Services
         #endregion
 
 
-  #region RestrictedAddAsync(SightseeingGroup SightseeingGroup)
+        #region RestrictedAddAsync(SightseeingGroup SightseeingGroup)
         // zasob nie istnieje -> exc z msg
         // zasob jest nullem -> null ref exc
         // problem z zapisaniem zmian -> inter | Nie mam pojecia jak to przetestowac xD
@@ -1492,7 +1473,7 @@ namespace UnitTests.Services
                         "NOTE Excaption actually is type of 'SqLiteError' only if database provider is SQLite.");
                 }
             }
-        }       
+        }
 
         [Test]
         public async Task GetWithPaginationAsync__Page_number_is_less_than_1__Should_throw_ArgumentOutOfRangeException()
@@ -1527,7 +1508,7 @@ namespace UnitTests.Services
 
                 using (var context = await factory.CreateContextAsync())
                 {
-                    for(int i=0; i<10; i++)
+                    for (int i = 0; i < 10; i++)
                     {
                         await context.Groups.AddAsync(new SightseeingGroup { Id = i.ToString() });
                     }
@@ -1596,10 +1577,10 @@ namespace UnitTests.Services
         }
 
         [Test]
-        public async Task GetWithPaginationAsync__Customers_found__Should_return_customers_with_not_null_tickets_list()
+        public async Task GetWithPaginationAsync__Customers_found__Should_return_customers()
         {
             using (var factory = new DbContextFactory())
-            {              
+            {
                 using (var context = await factory.CreateContextAsync())
                 {
                     var service = new SightseeingGroupDbService(context, _logger);
@@ -1607,10 +1588,7 @@ namespace UnitTests.Services
 
                     var result = await service.GetWithPaginationAsync(1, elementsCount);
 
-                    foreach (var group in result)
-                    {
-                        group.Tickets.Should().NotBeNull();
-                    }
+                    result.Should().NotBeEmpty();
                 }
             }
         }

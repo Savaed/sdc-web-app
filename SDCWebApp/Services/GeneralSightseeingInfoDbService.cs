@@ -357,7 +357,7 @@ namespace SDCWebApp.Services
                     // Check if exist in db disount with the same properties as adding.
                     if (await IsEntityAlreadyExistsAsync(info))
                         throw new InvalidOperationException($"There is already the same element in the database as the one to be added. " +
-                            $"The value of '{nameof(info.Description)}', '{nameof(info.MaxChildAge)}', '{nameof(info.OpeningHour)}', '{nameof(info.ClosingHour)}' and " +
+                            $"The value of '{nameof(info.Description)}', '{nameof(info.MaxChildAge)}', '{nameof(info.OpeningHours)}'" +
                             $"'{nameof(info.MaxAllowedGroupSize)}' are not unique.");
                 }
                 else

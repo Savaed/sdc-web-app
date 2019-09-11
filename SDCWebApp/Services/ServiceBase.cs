@@ -22,9 +22,7 @@ namespace SDCWebApp.Services
             $"{nameof(BasicEntity.Id)}",
             $"{nameof(BasicEntity.CreatedAt)}",
             $"{nameof(BasicEntity.ConcurrencyToken)}",
-            $"{nameof(BasicEntity.UpdatedAt)}",
-            $"{nameof(GeneralSightseeingInfo.ClosingDateTime)}",
-            $"{nameof(GeneralSightseeingInfo.OpeningDateTime)}"
+            $"{nameof(BasicEntity.UpdatedAt)}"
         };
         private readonly ILogger _logger;
         private readonly ApplicationDbContext _dbContext;

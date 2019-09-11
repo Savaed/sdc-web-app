@@ -1,6 +1,6 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SDCWebApp.Models
 {
@@ -9,18 +9,34 @@ namespace SDCWebApp.Models
         public string Description { get; set; }
         public int MaxChildAge { get; set; }
         public int MaxAllowedGroupSize { get; set; }
-        [DataType("time(0)")]
-        public TimeSpan OpeningHour { get; set; }
-        [DataType("time(0)")]
-        public TimeSpan ClosingHour { get; set; }
+        public float SightseeingDuration { get; set; } // In hours
         public int MaxTicketOrderInterval { get; set; } // In weeks.
 
+        // List that contains DaysOfWeek and OpeningHour, ClosingHour eg.
+        // Sunday = [ Sunday, 10:00, 18:00 ]
+        // Friday = [ Friday, 8:00, 16:00 ]
+        public virtual ICollection<OpeningHours> OpeningHours { get; set; }
 
-        [NotMapped]
-        public DateTime OpeningDateTime { get => new DateTime(OpeningHour.Ticks); }
 
-        [NotMapped]
-        public DateTime ClosingDateTime { get => new DateTime(ClosingHour.Ticks); }
+        /// <summary>
+        /// Returns company closing <see cref="DateTime"/> based on <paramref name="dateTime"/> date and stored sightseeing info.
+        /// </summary>
+        /// <param name="dateTime"><see cref="DateTime"/> for which closing hour will be calculated.</param>
+        public DateTime GetClosingDateTime(DateTime dateTime)
+        {
+            var closingHour = OpeningHours.ToList().Single(x => x.DayOfWeek == dateTime.DayOfWeek).ClosingHour;
+            return dateTime.Date.AddTicks(closingHour.Ticks);
+        }
+
+        /// <summary>
+        /// Returns company opening <see cref="DateTime"/> based on <paramref name="dateTime"/> date and stored sightseeing info.
+        /// </summary>
+        /// <param name="dateTime"><see cref="DateTime"/> for which opening hour will be calculated.</param>
+        public DateTime GetOpeningDateTime(DateTime dateTime)
+        {
+            var openingHour = OpeningHours.ToList().Single(x => x.DayOfWeek == dateTime.DayOfWeek).OpeningHour;
+            return dateTime.Date.AddTicks(openingHour.Ticks);
+        }
 
 
         #region Helper methods
@@ -41,10 +57,10 @@ namespace SDCWebApp.Models
                 return true;
 
             return Description == other.Description
-                && ClosingHour == other.ClosingHour
-                && OpeningHour == other.OpeningHour
                 && MaxAllowedGroupSize == other.MaxAllowedGroupSize
-                && MaxChildAge == other.MaxChildAge;
+                && MaxChildAge == other.MaxChildAge
+                && MaxTicketOrderInterval == other.MaxTicketOrderInterval
+                && SightseeingDuration == other.SightseeingDuration;               
         }
 
         public override bool Equals(object obj)
@@ -57,9 +73,10 @@ namespace SDCWebApp.Models
             if (Description is null)
                 return base.GetHashCode();
 
-            return (Description.GetHashCode() + ClosingHour.GetHashCode() + OpeningHour.GetHashCode() + MaxAllowedGroupSize + MaxChildAge) * 0x00010000;
+            return (Description.GetHashCode() + MaxAllowedGroupSize + MaxChildAge + MaxTicketOrderInterval + (int)SightseeingDuration) * 0x00010000;
         }
 
         #endregion
+
     }
 }

@@ -71,7 +71,7 @@ namespace UnitTests.Controllers
             var result = await usersController.LoginAsync(loginData);
 
             (result as OkObjectResult).StatusCode.Should().Be(200);
-            ((result as OkObjectResult).Value as ResponseWrapper).Error.Should().BeEquivalentTo(new ApiError());
+            ((result as OkObjectResult).Value as ResponseWrapper).Error.Should().NotBeEquivalentTo(new ApiError());
         }
 
         [Test]

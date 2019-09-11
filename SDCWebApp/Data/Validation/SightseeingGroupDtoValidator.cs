@@ -1,13 +1,15 @@
 ﻿using FluentValidation;
-using SDCWebApp.Models;
+using SDCWebApp.Models.Dtos;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace SDCWebApp.Data.Validation
 {
-    public class SightseeingGroupValidator : AbstractValidator<SightseeingGroup>, ICustomValidator<SightseeingGroup>
+    public class SightseeingGroupDtoValidator : AbstractValidator<SightseeingGroupDto>, ICustomValidator<SightseeingGroupDto>
     {
-        public SightseeingGroupValidator(ApplicationDbContext dbContext)
+        public SightseeingGroupDtoValidator(ApplicationDbContext dbContext)
         {
             var recentInfo = dbContext.GeneralSightseeingInfo.OrderByDescending(x => x.UpdatedAt == null ? x.CreatedAt : x.UpdatedAt).First();
 
@@ -22,13 +24,13 @@ namespace SDCWebApp.Data.Validation
             RuleFor(x => x.SightseeingDate)
                 .Cascade(CascadeMode.StopOnFirstFailure)
                 .NotEmpty()
-                .GreaterThan(DateTime.Now) 
+                .GreaterThan(DateTime.Now)
                 .LessThan(DateTime.Now.AddDays(recentInfo.MaxTicketOrderInterval * 7))
                 .Custom((dateTime, context) =>
                 {
                     if (dateTime.Minute != 0)
                     {
-                        context.AddFailure($"An hour of {nameof(SightseeingGroup.SightseeingDate)} must be full.");
+                        context.AddFailure($"An hour of {nameof(SightseeingGroupDto.SightseeingDate)} must be full.");
                     }
 
                     var closingDateTime = recentInfo.GetClosingDateTime(dateTime);
@@ -36,7 +38,7 @@ namespace SDCWebApp.Data.Validation
 
                     if (dateTime < openingDateTime || dateTime > closingDateTime)
                     {
-                        context.AddFailure($"{nameof(SightseeingGroup.SightseeingDate)} must be in company opening hour which is " +
+                        context.AddFailure($"{nameof(SightseeingGroupDto.SightseeingDate)} must be in company opening hour which is " +
                             $"'{openingDateTime.Hour.ToString()} - {closingDateTime.Hour.ToString()}'");
                     }
                 });

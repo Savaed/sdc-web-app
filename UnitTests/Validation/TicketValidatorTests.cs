@@ -9,6 +9,7 @@ using Moq;
 using SDCWebApp.Data;
 using Microsoft.EntityFrameworkCore;
 using UnitTests.Helpers;
+using System.Linq;
 
 namespace UnitTests.Validation
 {
@@ -21,23 +22,10 @@ namespace UnitTests.Validation
 
         [OneTimeSetUp]
         public void SetUp()
-        {
-            var info = new GeneralSightseeingInfo[]
-            {
-                new GeneralSightseeingInfo
-                {
-                    Id = "1",
-                    OpeningHour = new TimeSpan(10, 0, 0),
-                    ClosingHour = new TimeSpan(18, 0, 0),
-                    Description = "test",
-                    MaxAllowedGroupSize = 35,
-                    MaxChildAge = 5,
-                    MaxTicketOrderInterval = 4
-                }
-            };
+        {        
+            var info = CreateModel.CreateInfo();
             _dbContextMock = new Mock<ApplicationDbContext>();
-            _dbContextMock.Setup(x => x.GeneralSightseeingInfo).Returns(CreateMock.CreateDbSetMock<GeneralSightseeingInfo>(info).Object);
-
+            _dbContextMock.Setup(x => x.GeneralSightseeingInfo).Returns(CreateMock.CreateDbSetMock<GeneralSightseeingInfo>(new GeneralSightseeingInfo[] { info }).Object);
             _validator = new TicketValidator(_dbContextMock.Object);
         }
 

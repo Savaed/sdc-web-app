@@ -169,7 +169,7 @@ namespace SDCWebApp.Services
             try
             {
                 _logger.LogDebug($"Starting retrieve all sightseeing groups from the database.");
-                var groups = await _context.Groups.Include(x => x.Tickets).ToArrayAsync();
+                var groups = await _context.Groups.ToArrayAsync();
                 _logger.LogDebug("Retrieve data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(GetAllAsync)}'. Returning {groups.Count()} elements.");
                 return groups.AsEnumerable();
@@ -205,7 +205,7 @@ namespace SDCWebApp.Services
             try
             {
                 _logger.LogDebug($"Starting retrieve sighseeing group with id: '{id}' from the database.");
-                var group = await _context.Groups.Include(x => x.Tickets).SingleAsync(x => x.Id.Equals(id));
+                var group = await _context.Groups.SingleAsync(x => x.Id.Equals(id));
                 _logger.LogDebug("Retrieve data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(GetAsync)}'.");
                 return group;
@@ -272,7 +272,7 @@ namespace SDCWebApp.Services
                 }
 
                 _logger.LogDebug($"Starting retrieve data. '{nameof(pageNumber)}': {pageNumber.ToString()}, '{nameof(pageSize)}': {pageSize.ToString()}.");
-                groups = _context.Groups.Include(x => x.Tickets).Skip(pageSize * (pageNumber - 1)).Take(pageSize);
+                groups = _context.Groups.Skip(pageSize * (pageNumber - 1)).Take(pageSize);
                 _logger.LogDebug("Retrieve data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(GetWithPaginationAsync)}'.");
                 return groups;
