@@ -51,6 +51,12 @@ namespace SDCWebApp.Data
             builder.Entity<Discount>().Property(d => d.Type).HasConversion<string>();
             builder.Entity<OpeningHours>().Property(d => d.DayOfWeek).HasConversion<string>();
 
+            builder.Entity<GeneralSightseeingInfo>()
+                .HasMany(x => x.OpeningHours)
+                .WithOne(o => o.Info)
+                .OnDelete(DeleteBehavior.Cascade);
+
+
             builder.Entity<OpeningHours>().HasData(
              new OpeningHours
              {

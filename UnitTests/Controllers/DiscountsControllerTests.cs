@@ -274,7 +274,7 @@ namespace UnitTests.Controllers
         }
 
         [Test]
-        public async Task AddDiscountAsync__Add_succeeded__Should_return_200OK_response_with_added_element()
+        public async Task AddDiscountAsync__Add_succeeded__Should_return_201Created_response_with_added_element()
         {
             var validDiscount = new Discount { Id = "12312321321321", Description = "Valid description" };
             var validDiscountDto = CreateDiscountDto(validDiscount);
@@ -287,7 +287,7 @@ namespace UnitTests.Controllers
             var result = await controller.AddDiscountAsync(validDiscountDto);
 
             (result as ObjectResult).StatusCode.Should().Be(201);
-            ((result as ObjectResult).Value as ResponseWrapper).Data.Should().NotBeNull();
+            ((result as ObjectResult).Value as ResponseWrapper).Error.Should().BeEquivalentTo(new ApiError());
         }
 
         #endregion

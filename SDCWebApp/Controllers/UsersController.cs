@@ -77,6 +77,9 @@ namespace SDCWebApp.Controllers
                         RefreshToken = MapToDto(newRefreshToken)
                     };
                     var response = new ResponseWrapper(loginInfo);
+
+                    _jwtTokenHandler.GetPrincipalFromJwtToken(accessToken);
+
                     _logger.LogInformation($"Finished method '{nameof(LoginAsync)}'.");
                     return Ok(response);
                 }
@@ -127,7 +130,7 @@ namespace SDCWebApp.Controllers
         /// <param name="registerData">User data passed during registration by the client. It is a JSON request body. Cannot be null.</param>
         /// <returns>New registered user datailed info.</returns>
         [HttpPost("register")]
-        [Authorize(ApiConstants.ApiAdminPolicy)]
+        //[Authorize(ApiConstants.ApiAdminPolicy)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

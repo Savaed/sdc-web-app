@@ -17,7 +17,7 @@ namespace SDCWebApp.Services
     /// </summary>
     public abstract class ServiceBase
     {
-        private readonly string[] _readOnlyPropertiesNames = new string[]
+        protected readonly string[] _readOnlyPropertiesNames = new string[]
         {
             $"{nameof(BasicEntity.Id)}",
             $"{nameof(BasicEntity.CreatedAt)}",
@@ -73,13 +73,6 @@ namespace SDCWebApp.Services
         }
 
         /// <summary>
-        /// Checks if <see cref="BasicEntity"/> entity exists using custom equality comparer.
-        /// </summary>
-        /// <param name="entity">The <see cref="BasicEntity"/> entity to check if there is the same entity in the database.</param>
-        /// <returns></returns>
-        protected abstract Task<bool> IsEntityAlreadyExistsAsync(BasicEntity entity);
-
-        /// <summary>
         /// Filters set of data of type <typeparamref name="T"/>. Returns filterd data set. Throws <see cref="ArgumentNullException"/> if <paramref name="predicate"/> is null 
         /// or <see cref="InvalidOperationException"/> if cannot filter data.
         /// </summary>
@@ -129,5 +122,12 @@ namespace SDCWebApp.Services
                 throw;
             }
         }
+
+        /// <summary>
+        /// Checks if <see cref="BasicEntity"/> entity exists using custom equality comparer.
+        /// </summary>
+        /// <param name="entity">The <see cref="BasicEntity"/> entity to check if there is the same entity in the database.</param>
+        /// <returns></returns>
+        protected abstract Task<bool> IsEntityAlreadyExistsAsync(BasicEntity entity);
     }
 }

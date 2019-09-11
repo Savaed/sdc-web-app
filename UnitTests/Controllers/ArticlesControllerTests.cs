@@ -277,7 +277,7 @@ namespace UnitTests.Controllers
             var result = await controller.AddArticleAsync(validArticleDto);
 
             (result as ObjectResult).StatusCode.Should().Be(201);
-            ((result as ObjectResult).Value as ResponseWrapper).Data.Should().NotBeNull();
+            ((result as ObjectResult).Value as ResponseWrapper).Error.Should().BeEquivalentTo(new ApiError());
         }
 
         #endregion

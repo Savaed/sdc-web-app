@@ -114,7 +114,7 @@ namespace SDCWebApp.Services
                 if (await _context.GeneralSightseeingInfo.AnyAsync(x => x.Id.Equals(id)) == false)
                     throw new InvalidOperationException($"Cannot found element with id '{id}'. Any element does not match to the one to be updated.");
 
-                var infoToBeDeleted = await _context.GeneralSightseeingInfo.SingleAsync(x => x.Id.Equals(id));
+                var infoToBeDeleted = await _context.GeneralSightseeingInfo.Include(x => x.OpeningHours).SingleAsync(x => x.Id.Equals(id));
                 _logger.LogDebug($"Starting remove sightseeing info with id '{id}'.");
                 _context.GeneralSightseeingInfo.Remove(infoToBeDeleted);
                 await _context.TrySaveChangesAsync();
@@ -331,6 +331,24 @@ namespace SDCWebApp.Services
             return allInfo.Any(x => x.Equals(entity as GeneralSightseeingInfo));
         }
 
+        protected override BasicEntity BasicRestrictedUpdate(BasicEntity originalEntity, BasicEntity entityToBeUpdated)
+        {
+            // Update in restricted mode and delete from the database unused OpeningHours.
+            var updatedInfo = base.BasicRestrictedUpdate(originalEntity, entityToBeUpdated) as GeneralSightseeingInfo;
+            var originalInfo = originalEntity as GeneralSightseeingInfo;
+            var infoToBeUpdated = entityToBeUpdated as GeneralSightseeingInfo;
+
+            // Prevent ArgumentNullException thrown by Except() in DeleteUnusedOpeningHours()
+            // when originalInfo.OpeningHours or infoToBeUpdated.OpeningHours will be null.
+            if (originalInfo.OpeningHours is null)
+                originalInfo.OpeningHours = new OpeningHours[] { };
+            if(infoToBeUpdated.OpeningHours is null)
+                infoToBeUpdated.OpeningHours = new OpeningHours[] { };                  
+
+            DeleteUnusedOpeningHours(originalInfo, entityToBeUpdated as GeneralSightseeingInfo);
+            return updatedInfo;
+        }
+
         /// <summary>
         /// Asynchronously adds <see cref="GeneralSightseeingInfo"/> entity. If <paramref name="isRestrict"/> set to false then no restrictions will be used. If set to true then the restricted mode will be used.
         /// It will check if in database is entity with the same Description, OpeningHour, MaxAllowedGroupSize and MaxChildAge values.
@@ -430,7 +448,7 @@ namespace SDCWebApp.Services
                 if (isRestrict)
                 {
                     // Restricted update mode that ignores all changes in read-only properties like Id, CreatedAt, UpdatedAt, ConcurrencyToken.
-                    var originalInfo = await _context.GeneralSightseeingInfo.SingleAsync(x => x.Id.Equals(info.Id));
+                    var originalInfo = await _context.GeneralSightseeingInfo.Include(x => x.OpeningHours).SingleAsync(x => x.Id.Equals(info.Id));
                     updatedInfo = BasicRestrictedUpdate(originalInfo, info) as GeneralSightseeingInfo;
                 }
                 else
@@ -454,6 +472,47 @@ namespace SDCWebApp.Services
                 _logger.LogError(ex, $"{ex.GetType().Name} - {ex.Message}");
                 var internalException = new InternalDbServiceException($"Encountered problem when updating general sightseing info with id '{info.Id}'. See the inner exception for more details.", ex);
                 throw internalException;
+            }
+        }
+
+        private void DeleteUnusedOpeningHours(GeneralSightseeingInfo originalInfo, GeneralSightseeingInfo newInfo)
+        {
+            // Delete only those hours which belong to the updating info and don't belong to a new version of this info.
+            // The OpeningHoursComparer to check which hours are unused in a new info version, is used here.
+            var originalOpeningHours = _context.OpeningDates.Where(x => x.Info.Id.Equals(originalInfo.Id)).AsEnumerable();
+            var differentOpeningHours = originalOpeningHours.Except(newInfo.OpeningHours.AsEnumerable(), new OpeningHoursComparer());
+            _context.OpeningDates.RemoveRange(differentOpeningHours);
+        }
+
+
+        internal class OpeningHoursComparer : IEqualityComparer<OpeningHours>
+        {         
+            public bool Equals(OpeningHours x, OpeningHours y)
+            {
+                if (x.GetType() != y.GetType())
+                {
+                    return false;
+                }
+                if (x is null && y is null)
+                {
+                    return false;
+                }
+                if (x is null || y is null)
+                {
+                    return false;
+                }
+
+                if (ReferenceEquals(x, y))
+                {
+                    return true;
+                }
+
+                return x.OpeningHour == y.OpeningHour && x.ClosingHour == y.ClosingHour && x.DayOfWeek == y.DayOfWeek;
+            }
+
+            public int GetHashCode(OpeningHours obj)
+            {
+                return (obj.OpeningHour.GetHashCode() + obj.ClosingHour.GetHashCode() + (int)obj.DayOfWeek) * 0x10000000;
             }
         }
 

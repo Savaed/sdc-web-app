@@ -12,6 +12,6 @@ namespace SDCWebApp.Models.Dtos
         public float Price { get; set; }
 
         [JsonProperty("_links")]
-        public IEnumerable<ApiLink> Links { get; set; }
+        public IEnumerable<ApiLink> Links { get; set; } = new ApiLink[] { };
     }
 }
