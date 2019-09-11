@@ -27,6 +27,7 @@ namespace SDCWebApp.Services
             _context = context;
         }
 
+
         /// <summary>
         /// Filters set of data of type <see cref="GeneralSightseeingInfo"/>. Returns filtered data set. Throws an exception if <paramref name="predicate"/> is null, 
         /// or if cannot filter data due to any internal problem.
@@ -150,7 +151,7 @@ namespace SDCWebApp.Services
             try
             {
                 _logger.LogDebug($"Starting retrieve all sightseeing info from database.");
-                var info = await _context.GeneralSightseeingInfo.ToArrayAsync();
+                var info = await _context.GeneralSightseeingInfo.Include(x => x.OpeningHours).ToArrayAsync();
                 _logger.LogDebug("Retrieve data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(GetAllAsync)}'. Returning {info.Count()} elements.");
                 return info.AsEnumerable();
@@ -186,7 +187,7 @@ namespace SDCWebApp.Services
             try
             {
                 _logger.LogDebug($"Starting retrieve sightseeing info with id: '{id}' from database.");
-                var info = await _context.GeneralSightseeingInfo.SingleAsync(x => x.Id.Equals(id));
+                var info = await _context.GeneralSightseeingInfo.Include(x => x.OpeningHours).SingleAsync(x => x.Id.Equals(id));
                 _logger.LogDebug("Retrieve data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(GetAsync)}'.");
                 return info;
@@ -254,7 +255,7 @@ namespace SDCWebApp.Services
                 }
 
                 _logger.LogDebug($"Starting retrieve data. '{nameof(pageNumber)}': {pageNumber.ToString()}, '{nameof(pageSize)}': {pageSize.ToString()}.");
-                info = _context.GeneralSightseeingInfo.Skip(pageSize * (pageNumber - 1)).Take(pageSize);
+                info = _context.GeneralSightseeingInfo.Include(x => x.OpeningHours).Skip(pageSize * (pageNumber - 1)).Take(pageSize);
                 _logger.LogDebug("Retrieve data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(GetWithPaginationAsync)}'.");
                 return info;

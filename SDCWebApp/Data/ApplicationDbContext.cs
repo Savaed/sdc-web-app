@@ -34,7 +34,7 @@ namespace SDCWebApp.Data
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            base.OnModelCreating(builder);        
+            base.OnModelCreating(builder);
 
             builder.Entity<SightseeingGroup>(entity =>
             {
@@ -49,33 +49,70 @@ namespace SDCWebApp.Data
 
             builder.Entity<ActivityLog>().Property(a => a.Type).HasConversion<string>();
             builder.Entity<Discount>().Property(d => d.Type).HasConversion<string>();
-            builder.Entity<OpeningHours>().Property(d => d.DayOfWeek).HasConversion<string>();            
-
-            builder.Entity<OpeningHours>().HasData(
-                new OpeningHours
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    ClosingHour = new TimeSpan(18, 0, 0),
-                    OpeningHour = new TimeSpan(10, 0, 0)
-                });
+            builder.Entity<OpeningHours>().Property(d => d.DayOfWeek).HasConversion<string>();
 
             builder.Entity<OpeningHours>().HasData(
              new OpeningHours
              {
                  Id = Guid.NewGuid().ToString(),
-                 ClosingHour = new TimeSpan(10, 0, 0),
-                 OpeningHour = new TimeSpan(16, 0, 0),
-                 DayOfWeek = DayOfWeek.Saturday
+                 OpeningHour = new TimeSpan(10, 0, 0),
+                 ClosingHour = new TimeSpan(18, 0, 0),
+                 DayOfWeek = DayOfWeek.Monday
              });
 
             builder.Entity<OpeningHours>().HasData(
             new OpeningHours
             {
                 Id = Guid.NewGuid().ToString(),
-                ClosingHour = new TimeSpan(10, 0, 0),
-                OpeningHour = new TimeSpan(18, 0, 0),
-                DayOfWeek = DayOfWeek.Monday
+                OpeningHour = new TimeSpan(10, 0, 0),
+                ClosingHour = new TimeSpan(18, 0, 0),
+                DayOfWeek = DayOfWeek.Tuesday
             });
+
+            builder.Entity<OpeningHours>().HasData(
+            new OpeningHours
+            {
+                Id = Guid.NewGuid().ToString(),
+                OpeningHour = new TimeSpan(10, 0, 0),
+                ClosingHour = new TimeSpan(18, 0, 0),
+                DayOfWeek = DayOfWeek.Wednesday
+            });
+
+            builder.Entity<OpeningHours>().HasData(
+            new OpeningHours
+            {
+                Id = Guid.NewGuid().ToString(),
+                OpeningHour = new TimeSpan(10, 0, 0),
+                ClosingHour = new TimeSpan(18, 0, 0),
+                DayOfWeek = DayOfWeek.Thursday
+            });
+
+            builder.Entity<OpeningHours>().HasData(
+            new OpeningHours
+            {
+                Id = Guid.NewGuid().ToString(),
+                OpeningHour = new TimeSpan(10, 0, 0),
+                ClosingHour = new TimeSpan(18, 0, 0),
+                DayOfWeek = DayOfWeek.Friday
+            });
+
+            builder.Entity<OpeningHours>().HasData(
+            new OpeningHours
+            {
+                Id = Guid.NewGuid().ToString(),
+                OpeningHour = new TimeSpan(10, 0, 0),
+                ClosingHour = new TimeSpan(16, 0, 0),
+                DayOfWeek = DayOfWeek.Saturday
+            });
+
+            builder.Entity<OpeningHours>().HasData(
+          new OpeningHours
+          {
+              Id = Guid.NewGuid().ToString(),
+              OpeningHour = new TimeSpan(10, 0, 0),
+              ClosingHour = new TimeSpan(16, 0, 0),
+              DayOfWeek = DayOfWeek.Sunday
+          });
 
             builder.Entity<ActivityLog>().HasData(
                 new ActivityLog
@@ -188,13 +225,13 @@ namespace SDCWebApp.Data
                 new SightseeingGroup
                 {
                     Id = Guid.NewGuid().ToString(),
-                    SightseeingDate = DateTime.Now.AddDays(7),
+                    SightseeingDate = DateTime.Now.AddDays(7).Date.AddHours(12),
                     MaxGroupSize = 30
                 },
                 new SightseeingGroup
                 {
                     Id = Guid.NewGuid().ToString(),
-                    SightseeingDate = DateTime.Now.AddDays(2),
+                    SightseeingDate = DateTime.Now.AddDays(2).Date.AddHours(16),
                     MaxGroupSize = 25
                 });
 
@@ -204,7 +241,8 @@ namespace SDCWebApp.Data
                 MaxChildAge = 5,
                 MaxAllowedGroupSize = 35,
                 MaxTicketOrderInterval = 4,
-                Description = "TL;DR"
+                Description = "TL;DR",
+                SightseeingDuration = 2
             });
 
             builder.Entity<Customer>().HasData(

@@ -76,6 +76,10 @@ namespace SDCWebApp.Controllers
                 var ticketsDto = MapToTicketDtoEnumerable(addedTickets);
                 var customerDto = MapToCustomerDto(savedCustomer);
 
+
+                // TODO dla kazdego zamowienia wygenerowac guid (orderStamp) i dodac go do wszystkich biletow z danego zamowienia
+                // order id to base64(customerId;orderStamp)
+
                 // Generate order id from customer and ticket id. Format of this id is:
                 //      encoded - Base64String (eg. MzU4ZDAxZDgtYzY1NC00MWQxLTliYzctYzk0OGE5M2RmNDFkO2NhMThlZGI1LTU3NzMtNGI5OC1hY2YyLTViMDk2ZDFmZGFhOA==)
                 //      decoded - customerId;ticketId (eg. 358d01d8-c654-41d1-9bc7-c948a93df41d;ca18edb5-5773-4b98-acf2-5b096d1fdaa8)

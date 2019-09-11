@@ -105,6 +105,10 @@ namespace SDCWebApp.Services
                 {
                     result = (IEnumerable<T>)_dbContext.Tickets.IncludeDetails().Where(predicate as Expression<Func<Ticket, bool>>).AsEnumerable();
                 }
+                if (typeof(T) == typeof(GeneralSightseeingInfo))
+                {
+                    result = (IEnumerable<T>)_dbContext.GeneralSightseeingInfo.Include(x => x.OpeningHours).Where(predicate as Expression<Func<GeneralSightseeingInfo, bool>>).AsEnumerable();
+                }
                 else
                 {
                     result = _dbContext.Set<T>().Where(predicate).AsEnumerable();
