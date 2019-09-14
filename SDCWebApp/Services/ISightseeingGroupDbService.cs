@@ -1,14 +1,13 @@
-﻿using System;
+﻿using SDCWebApp.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-using SDCWebApp.Models;
-
 namespace SDCWebApp.Services
 {
     public interface ISightseeingGroupDbService : IServiceBase
-    {        
+    {
         /// <summary>
         /// Filters set of data of type <see cref="SightseeingGroup"/>. Returns filtered data set. Throws an exception if <paramref name="predicate"/> is null, 
         /// or if cannot filter data due to any internal problem.

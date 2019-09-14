@@ -1,9 +1,8 @@
 ﻿using Autofac;
-using System.Linq;
-using System.Reflection;
-
 using SDCWebApp.Controllers;
 using SDCWebApp.Services;
+using System.Linq;
+using System.Reflection;
 
 namespace SDCWebApp.Helpers
 {
@@ -50,7 +49,7 @@ namespace SDCWebApp.Helpers
 
         private void RegisterOtherTypes(ContainerBuilder builder, Assembly assembly)
         {
-            builder.RegisterAssemblyTypes(assembly)             
+            builder.RegisterAssemblyTypes(assembly)
                .AsSelf()
                .AsImplementedInterfaces()
                .InstancePerDependency();

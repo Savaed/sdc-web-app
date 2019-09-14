@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace SDCWebApp.Models
@@ -13,7 +12,7 @@ namespace SDCWebApp.Models
         public object Clone()
         {
             return MemberwiseClone();
-        }                      
+        }
 
         public override bool Equals(object obj)
         {
@@ -46,7 +45,10 @@ namespace SDCWebApp.Models
         public override int GetHashCode()
         {
             if (Name is null)
+            {
                 return base.GetHashCode() * 0x00011000;
+            }
+
             return Name.GetHashCode() * 0x00011000;
         }
     }

@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace SDCWebApp.Models
@@ -29,7 +28,9 @@ namespace SDCWebApp.Models
             }
 
             if (ReferenceEquals(this, other))
+            {
                 return true;
+            }
 
             return Description == other.Description
                 && IsPerHour == other.IsPerHour
@@ -45,7 +46,9 @@ namespace SDCWebApp.Models
         public override int GetHashCode()
         {
             if (Description is null)
+            {
                 return base.GetHashCode();
+            }
 
             return (Description.GetHashCode() + IsPerHour.GetHashCode() + IsPerPerson.GetHashCode() + DefaultPrice.GetHashCode()) * 0x00000001;
         }

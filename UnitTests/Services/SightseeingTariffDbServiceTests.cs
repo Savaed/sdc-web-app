@@ -3,16 +3,15 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using SDCWebApp.Data;
+using SDCWebApp.Models;
+using SDCWebApp.Services;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using UnitTests.Helpers;
-
-using SDCWebApp.Data;
-using SDCWebApp.Models;
-using SDCWebApp.Services;
 
 namespace UnitTests.Services
 {

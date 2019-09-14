@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace SDCWebApp.Models.Dtos
 {
-    public class OrderDto
+    public class OrderResponseDto
     {
         public string Id { get; set; }
         public CustomerDto Customer { get; set; }

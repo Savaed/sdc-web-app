@@ -1,19 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using NUnit.Framework;
+﻿using AutoMapper;
 using FluentAssertions;
-using Moq;
-using SDCWebApp.Services;
-using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Moq;
+using NUnit.Framework;
+using SDCWebApp.ApiErrors;
+using SDCWebApp.Controllers;
 using SDCWebApp.Models;
 using SDCWebApp.Models.Dtos;
-using SDCWebApp.Controllers;
-using System.Threading.Tasks;
+using SDCWebApp.Services;
+using System;
+using System.Collections.Generic;
 using System.Linq;
-using Microsoft.AspNetCore.Mvc;
-using SDCWebApp.ApiErrors;
+using System.Threading.Tasks;
 
 namespace UnitTests.Controllers
 {
@@ -94,7 +93,7 @@ namespace UnitTests.Controllers
                  }
             };
 
-            
+
         }
 
 
@@ -264,7 +263,7 @@ namespace UnitTests.Controllers
             (((result as ObjectResult).Value as ResponseWrapper).Data as IEnumerable<TicketTariffDto>).Should().NotBeEmpty();
         }
 
-      
+
 
 
         #endregion
@@ -390,7 +389,7 @@ namespace UnitTests.Controllers
             var result = await controller.AddTicketTariffToSightseeingTariffAsync(_sightseeingTariffId, ticketTariffDto);
 
             (result as ObjectResult).StatusCode.Should().Be(200);
-          // ((result as ObjectResult).Value as ResponseWrapper).Data.Should().(ticketTariffDto);
+            // ((result as ObjectResult).Value as ResponseWrapper).Data.Should().(ticketTariffDto);
         }
 
         [Test]
@@ -426,7 +425,7 @@ namespace UnitTests.Controllers
             _sightseeingTariffDbServiceMock.Setup(x => x.GetAsync(It.IsNotNull<string>())).ThrowsAsync(new InvalidOperationException());
             var controller = new TicketTariffsController(_ticketTariffDbServiceMock.Object, _sightseeingTariffDbServiceMock.Object, _logger, _mapperMock.Object);
 
-            var result = await controller.UpdateTicketTariffInSightseeingTariffAsync(_sightseeingTariffId, "4" ,_ticketTariffDtos[0]);
+            var result = await controller.UpdateTicketTariffInSightseeingTariffAsync(_sightseeingTariffId, "4", _ticketTariffDtos[0]);
 
             (result as ObjectResult).StatusCode.Should().Be(404);
             ((result as ObjectResult).Value as ResponseWrapper).Error.Should().NotBeEquivalentTo(new ApiError());

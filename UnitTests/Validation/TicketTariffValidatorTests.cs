@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using NUnit.Framework;
+﻿using FluentAssertions;
 using FluentValidation.TestHelper;
-using Moq;
+using NUnit.Framework;
 using SDCWebApp.Data.Validation;
 using SDCWebApp.Models;
-using FluentAssertions;
 
 namespace UnitTests.Validation
 {

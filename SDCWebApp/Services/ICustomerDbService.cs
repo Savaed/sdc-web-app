@@ -1,9 +1,8 @@
-﻿using System;
+﻿using SDCWebApp.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-
-using SDCWebApp.Models;
 
 namespace SDCWebApp.Services
 {
@@ -102,7 +101,7 @@ namespace SDCWebApp.Services
         /// <exception cref="InvalidOperationException">There is the same entity that one to be added in database.</exception>
         /// <exception cref="InternalDbServiceException">The table with <see cref="Customer"/> entities does not exist or it is null or 
         /// cannot save properly any changes made by add operation.</exception>
-        Task<Customer> AddAsync(Customer customer);       
+        Task<Customer> AddAsync(Customer customer);
 
         /// <summary>
         /// Asynchronously adds <see cref="Customer"/> entity to the database. Does not allow to add entity with the same EmailAddress.

@@ -1,19 +1,15 @@
 ﻿using FluentAssertions;
-using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SDCWebApp.Data;
-using SDCWebApp.Data.Validation;
 using SDCWebApp.Models;
 using SDCWebApp.Services;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using UnitTests.Helpers;
 
@@ -22,7 +18,7 @@ namespace UnitTests.Services
     [TestFixture]
     public class TicketTariffDbServiceTest
     {
-        private static TicketTariff[] _tariffForRestrictedUpdateCases = new TicketTariff[]
+        private static readonly TicketTariff[] _tariffForRestrictedUpdateCases = new TicketTariff[]
         {
             new TicketTariff { ConcurrencyToken = Encoding.ASCII.GetBytes("Updated ConcurrencyToken") },    // Attempt to change 'ConcurrencyToken' which is read-only property.
             new TicketTariff { UpdatedAt = DateTime.Now.AddYears(100) }                                     // Attempt to change 'UpdatedAt' which is read-only property.

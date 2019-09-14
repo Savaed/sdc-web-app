@@ -135,7 +135,7 @@ namespace UnitTests.Controllers
         }
 
         [Test]
-        public async Task GetDiscountAsync__Argument_id_is_null_or_empty__Should_return_400BadRequest_response([Values(null, "")] string id) 
+        public async Task GetDiscountAsync__Argument_id_is_null_or_empty__Should_return_400BadRequest_response([Values(null, "")] string id)
         {
             _discountDbServiceMock.Setup(x => x.GetAsync(id)).ThrowsAsync(new ArgumentException());
             var controller = new DiscountsController(_discountDbServiceMock.Object, _logger, _mapperMock.Object);

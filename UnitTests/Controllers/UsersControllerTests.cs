@@ -7,19 +7,18 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Threading.Tasks;
-using UnitTests.Helpers;
-
 using SDCWebApp.ApiErrors;
 using SDCWebApp.Auth;
 using SDCWebApp.Controllers;
 using SDCWebApp.Models.Dtos;
 using SDCWebApp.Models.ViewModels;
 using SDCWebApp.Services;
+using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Threading.Tasks;
+using UnitTests.Helpers;
 
 namespace UnitTests.Controllers
 {

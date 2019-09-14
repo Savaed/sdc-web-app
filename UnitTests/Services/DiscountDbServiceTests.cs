@@ -1,19 +1,15 @@
 ﻿using FluentAssertions;
-using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SDCWebApp.Data;
-using SDCWebApp.Data.Validation;
 using SDCWebApp.Models;
 using SDCWebApp.Services;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using UnitTests.Helpers;
 
@@ -22,14 +18,14 @@ namespace UnitTests.Services
     [TestFixture]
     public class DiscountDbServiceTests
     {
-        private static Discount[] _discountForRestrictedUpdateCases = new Discount[]
+        private static readonly Discount[] _discountForRestrictedUpdateCases = new Discount[]
         {
             new Discount{ ConcurrencyToken = Encoding.ASCII.GetBytes("Updated ConcurrencyToken") },    // Attempt to change 'ConcurrencyToken' which is read-only property.
             new Discount{ UpdatedAt = DateTime.Now.AddYears(100) }                                     // Attempt to change 'UpdatedAt' which is read-only property.
         };
         private Mock<ApplicationDbContext> _dbContextMock;
         private ILogger<DiscountDbService> _logger;
-        private Discount _validDiscount = new Discount { Id = "1", Description = "Sample", DiscountValueInPercentage = 12, Type = Discount.DiscountType.ForGroup, GroupSizeForDiscount = 23 };
+        private readonly Discount _validDiscount = new Discount { Id = "1", Description = "Sample", DiscountValueInPercentage = 12, Type = Discount.DiscountType.ForGroup, GroupSizeForDiscount = 23 };
         private Expression<Func<Discount, bool>> _predicate;
 
 

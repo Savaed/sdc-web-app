@@ -1,19 +1,15 @@
 ﻿using FluentAssertions;
-using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SDCWebApp.Data;
-using SDCWebApp.Data.Validation;
 using SDCWebApp.Models;
 using SDCWebApp.Services;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using UnitTests.Helpers;
 
@@ -22,7 +18,7 @@ namespace UnitTests.Services
     [TestFixture]
     public class GeneralSightseeingInfoDbServiceTests
     {
-        private static GeneralSightseeingInfo[] _infoForRestrictedUpdateCases = new GeneralSightseeingInfo[]
+        private static readonly GeneralSightseeingInfo[] _infoForRestrictedUpdateCases = new GeneralSightseeingInfo[]
         {
             new GeneralSightseeingInfo { ConcurrencyToken = Encoding.ASCII.GetBytes("Updated ConcurrencyToken") },    // Attempt to change 'ConcurrencyToken' which is read-only property.
             new GeneralSightseeingInfo { UpdatedAt = DateTime.Now.AddYears(100) }                                     // Attempt to change 'UpdatedAt' which is read-only property.
@@ -1547,7 +1543,7 @@ namespace UnitTests.Services
         #region Privates
 
         private GeneralSightseeingInfo CreateInfo(string id = "1", string description = "test", int maxChildAge = 5, int maxAllowedGroupSize = 30, int maxTicketOrderInterval = 4, int sightseeingDuration = 2)
-        {        
+        {
             return new GeneralSightseeingInfo
             {
                 Id = id,
@@ -1572,7 +1568,7 @@ namespace UnitTests.Services
                 new OpeningHours{ ClosingHour = new TimeSpan(16,0,0), OpeningHour = new TimeSpan(10,0,0) ,DayOfWeek = DayOfWeek.Saturday },
                 new OpeningHours{ ClosingHour = new TimeSpan(16,0,0), OpeningHour = new TimeSpan(10,0,0) ,DayOfWeek = DayOfWeek.Sunday }
             };
-        }       
+        }
 
         #endregion
 

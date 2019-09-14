@@ -1,14 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 using SDCWebApp.Data;
 using SDCWebApp.Helpers.Extensions;
 using SDCWebApp.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace SDCWebApp.Services
 {
@@ -118,7 +117,9 @@ namespace SDCWebApp.Services
             _logger.LogInformation($"Starting method '{nameof(DeleteAsync)}'.");
 
             if (string.IsNullOrEmpty(id))
+            {
                 throw new ArgumentException($"Argument '{nameof(id)}' cannot be null or empty.");
+            }
 
             await EnsureDatabaseCreatedAsync();
             _ = _context?.Articles ?? throw new InternalDbServiceException($"Table of type '{typeof(Article).Name}' is null.");
@@ -126,10 +127,14 @@ namespace SDCWebApp.Services
             try
             {
                 if (_context.Articles.Count() == 0)
+                {
                     throw new InvalidOperationException($"Cannot found element with id '{id}'. Resource {_context.Articles.GetType().Name} does not contain any element.");
+                }
 
                 if (await _context.Articles.AnyAsync(x => x.Id.Equals(id)) == false)
+                {
                     throw new InvalidOperationException($"Cannot found element with id '{id}'. Any element does not match to the one to be updated.");
+                }
 
                 var articleToBeDeleted = await _context.Articles.SingleAsync(x => x.Id.Equals(id));
                 _logger.LogDebug($"Starting remove article with id '{articleToBeDeleted.Id}'.");
@@ -196,7 +201,9 @@ namespace SDCWebApp.Services
             _logger.LogInformation($"Starting method '{nameof(GetAsync)}'.");
 
             if (string.IsNullOrEmpty(id))
+            {
                 throw new ArgumentException($"Argument '{nameof(id)}' cannot be null or empty.");
+            }
 
             await EnsureDatabaseCreatedAsync();
             _ = _context?.Articles ?? throw new InternalDbServiceException($"Table of type '{typeof(Article).Name}' is null.");
@@ -239,10 +246,14 @@ namespace SDCWebApp.Services
             _logger.LogInformation($"Starting method '{nameof(GetWithPaginationAsync)}'.");
 
             if (pageNumber < 1)
+            {
                 throw new ArgumentOutOfRangeException(nameof(pageNumber), $"'{pageNumber}' is not valid value for argument '{nameof(pageNumber)}'. Only number greater or equal to 1 are valid.");
+            }
 
             if (pageSize < 0)
+            {
                 throw new ArgumentOutOfRangeException(nameof(pageSize), $"'{pageSize}' is not valid value for argument '{nameof(pageSize)}'. Only number greater or equal to 0 are valid.");
+            }
 
             // TODO Create only for unit tests purposes. In debug and later should be Migrate()!!!
             await EnsureDatabaseCreatedAsync();
@@ -263,7 +274,9 @@ namespace SDCWebApp.Services
                     _logger.LogWarning($"Last page of data contain {numberOfElementsOnLastPage} elements which is less than specified in {nameof(pageSize)}: {pageSize}.");
                 }
                 else
+                {
                     maxNumberOfPageWithData = numberOfFullPages;
+                }
 
                 if (numberOfResourceElements == 0 || pageSize == 0 || pageNumber > maxNumberOfPageWithData)
                 {
@@ -328,7 +341,7 @@ namespace SDCWebApp.Services
             _logger.LogInformation($"Starting method '{nameof(RestrictedUpdateAsync)}'.");
             // Call restricted update mode.
             return await UpdateBaseAsync(article, true);
-        }    
+        }
 
 
         #region Privates
@@ -346,7 +359,9 @@ namespace SDCWebApp.Services
             _logger.LogInformation($"Starting method '{nameof(AddBaseAsync)}'.");
 
             if (article is null)
+            {
                 throw new ArgumentNullException($"Argument '{nameof(article)}' cannot be null.");
+            }
 
             await EnsureDatabaseCreatedAsync();
             _ = _context?.Articles ?? throw new InternalDbServiceException($"Table of type '{typeof(Article).Name}' is null.");
@@ -359,14 +374,18 @@ namespace SDCWebApp.Services
 
                     // Check if exist in db article with the same Title, Text and Author as adding.
                     if (await IsEntityAlreadyExistsAsync(article))
+                    {
                         throw new InvalidOperationException($"There is already the same element in the database as the one to be added. The value of '{nameof(article.Title)}', " +
                             $"'{nameof(article.Text)}' and '{nameof(article.Author)}' are not unique.");
+                    }
                 }
                 else
                 {
                     // Normal add mode without any additional restrictions.
                     if (_context.Articles.Contains(article))
+                    {
                         throw new InvalidOperationException($"There is already the same element in the database as the one to be added. Id of this element: '{article.Id}'.");
+                    }
                 }
 
                 _logger.LogDebug($"Starting add tariff with id '{article.Id}'.");
@@ -410,7 +429,9 @@ namespace SDCWebApp.Services
             _ = article ?? throw new ArgumentNullException(nameof(article), $"Argument '{nameof(article)}' cannot be null.");
 
             if (string.IsNullOrEmpty(article.Id))
+            {
                 throw new ArgumentException($"Argument '{nameof(article.Id)}' cannot be null or empty.");
+            }
 
             await EnsureDatabaseCreatedAsync();
             _ = _context?.Articles ?? throw new InternalDbServiceException($"Table of type '{typeof(Article).Name}' is null.");
@@ -418,10 +439,14 @@ namespace SDCWebApp.Services
             try
             {
                 if (_context.Articles.Count() == 0)
+                {
                     throw new InvalidOperationException($"Cannot found element with id '{article.Id}' for update. Resource {_context.Articles.GetType().Name} does not contain any element.");
+                }
 
                 if (await _context.Articles.ContainsAsync(article) == false)
+                {
                     throw new InvalidOperationException($"Cannot found element with id '{article.Id}' for update. Any element does not match to the one to be updated.");
+                }
 
                 _logger.LogDebug($"Starting update article with id '{article.Id}'.");
 

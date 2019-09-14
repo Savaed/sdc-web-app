@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SDCWebApp.Models;
 using SDCWebApp.Models.Dtos;
 using SDCWebApp.Services;
-using SDCWebApp.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace SDCWebApp.Controllers
 {
@@ -48,7 +48,9 @@ namespace SDCWebApp.Controllers
             _logger.LogInformation($"Starting method '{nameof(GetAllTicketTariffsFromSightseeingTariffAsync)}'.");
 
             if (string.IsNullOrEmpty(sightseeingTariffId))
-               return OnInvalidParameterError($"Parameter '{nameof(sightseeingTariffId)}' cannot be null or empty.");
+            {
+                return OnInvalidParameterError($"Parameter '{nameof(sightseeingTariffId)}' cannot be null or empty.");
+            }
 
             try
             {
@@ -65,7 +67,7 @@ namespace SDCWebApp.Controllers
             }
             catch (InternalDbServiceException ex)
             {
-                LogInternalDbServiceException(_sightseeingTariffDbService.GetType(), ex);
+                LogInternalDbServiceException(ex, _sightseeingTariffDbService.GetType());
                 throw;
             }
             catch (Exception ex)
@@ -94,7 +96,9 @@ namespace SDCWebApp.Controllers
             _logger.LogInformation($"Starting method '{nameof(AddTicketTariffToSightseeingTariffAsync)}'.");
 
             if (string.IsNullOrEmpty(sightseeingTariffId))
+            {
                 return OnInvalidParameterError($"Parameter '{nameof(sightseeingTariffId)}' cannot be null or empty.");
+            }
 
             TicketTariff ticketTariffToBeAdded = null;
             SightseeingTariff sightseeingTariff = null;
@@ -106,7 +110,7 @@ namespace SDCWebApp.Controllers
 
 
 
-                // TODO      JAKOS TO ZMIENIC ZEBY MIALO RECE I NOGI BO TERAZ TO TROCHE LIPA
+            // TODO      JAKOS TO ZMIENIC ZEBY MIALO RECE I NOGI BO TERAZ TO TROCHE LIPA
 
 
 
@@ -135,7 +139,7 @@ namespace SDCWebApp.Controllers
                 _logger.LogInformation($"Finished method '{nameof(AddTicketTariffToSightseeingTariffAsync)}'.");
                 return Created(addedTicketTariffUrl, response);
             }
-            catch (InvalidOperationException ex)
+            catch (InvalidOperationException)
             {
                 // TicketTariff already exists. Add it to the sightseeingTariff but not to the db.
                 var existingTariff = _ticketTariffDbService.GetAllAsync().Result.Single(x => x.Equals(ticketTariffToBeAdded));
@@ -147,7 +151,7 @@ namespace SDCWebApp.Controllers
             }
             catch (InternalDbServiceException ex)
             {
-                LogInternalDbServiceException(_ticketTariffDbService.GetType(), ex);
+                LogInternalDbServiceException(ex, _ticketTariffDbService.GetType());
                 throw;
             }
             catch (Exception ex)
@@ -361,7 +365,7 @@ namespace SDCWebApp.Controllers
             }
             catch (InternalDbServiceException ex)
             {
-                LogInternalDbServiceException(_ticketTariffDbService.GetType(), ex);
+                LogInternalDbServiceException(ex, _ticketTariffDbService.GetType());
                 throw;
             }
             catch (Exception ex)

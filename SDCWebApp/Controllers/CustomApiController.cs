@@ -1,11 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Net;
-
 using SDCWebApp.ApiErrors;
 using SDCWebApp.Models.Dtos;
 using SDCWebApp.Services;
+using System;
+using System.Net;
 
 namespace SDCWebApp.Controllers
 {
@@ -34,9 +33,13 @@ namespace SDCWebApp.Controllers
         protected virtual NotFoundObjectResult OnNotFoundError(string errorMessage, Exception exception = null)
         {
             if (exception is null)
+            {
                 _logger.LogWarning($"{errorMessage}");
+            }
             else
+            {
                 _logger.LogWarning(exception, $"{exception.GetType().Name} - {errorMessage}");
+            }
 
             var error = new NotFoundError(errorMessage);
             var errorResponse = new ResponseWrapper(error);
@@ -53,9 +56,13 @@ namespace SDCWebApp.Controllers
         protected virtual BadRequestObjectResult OnInvalidParameterError(string errorMessage, Exception exception = null)
         {
             if (exception is null)
+            {
                 _logger.LogWarning($"{errorMessage}");
+            }
             else
+            {
                 _logger.LogWarning(exception, $"{exception.GetType().Name} - {errorMessage}");
+            }
 
             var error = new InvalidParameterError(errorMessage);
             var errorResponse = new ResponseWrapper(error);
@@ -72,9 +79,13 @@ namespace SDCWebApp.Controllers
         protected virtual BadRequestObjectResult OnMismatchParameterError(string errorMessage, Exception exception = null)
         {
             if (exception is null)
+            {
                 _logger.LogWarning($"{errorMessage}");
+            }
             else
+            {
                 _logger.LogWarning(exception, $"{exception.GetType().Name} - {errorMessage}");
+            }
 
             var error = new MismatchParameterError(errorMessage);
             var errorResponse = new ResponseWrapper(error);
@@ -87,9 +98,11 @@ namespace SDCWebApp.Controllers
         /// <param name="errorMessage">Log message.</param>
         /// <param name="dbServiceType">A type of database service.</param>
         /// <param name="exception">The <see cref="InternalDbServiceException"/>.</param>
-        protected virtual void LogInternalDbServiceException(Type dbServiceType, InternalDbServiceException exception, string errorMessage = null)
+        protected virtual void LogInternalDbServiceException(InternalDbServiceException exception, Type dbServiceType = null, string errorMessage = null)
         {
-            _logger.LogError(exception, $"{exception.GetType().Name} - An error at '{dbServiceType.Name}' occurred while database operation was proccessing. {exception.Message}");
+            string fullMessage = dbServiceType is null ? $"{exception.GetType().Name} - An error occurred while database operation was proccessing. {exception.Message}" :
+                $"{exception.GetType().Name} - An error occurred at '{dbServiceType.Name}' while database operation was proccessing. {exception.Message}";
+            _logger.LogError(exception, fullMessage);
         }
 
         /// <summary>

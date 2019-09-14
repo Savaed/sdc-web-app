@@ -18,13 +18,13 @@ namespace UnitTests.Auth
 
 
         [OneTimeSetUp]
-        public void SetUp() 
+        public void SetUp()
         {
             _roles = new string[] { "mod" };
             _logger = Mock.Of<ILogger<JwtTokenHandler>>();
             _jwtOptions = Mock.Of<IOptions<JwtSettings>>(x => x.Value.Audience == "google.com"
-                                                      && x.Value.SecretKey == "secret_key_which_must_have_more_than_128_bits_length" 
-                                                      && x.Value.Issuer == "google.com" 
+                                                      && x.Value.SecretKey == "secret_key_which_must_have_more_than_128_bits_length"
+                                                      && x.Value.Issuer == "google.com"
                                                       && x.Value.ExpiryIn == 3600);
             _user = new IdentityUser
             {
@@ -47,7 +47,7 @@ namespace UnitTests.Auth
 
             result.Should().NotBeNull();
         }
-       
+
         #endregion
     }
 }

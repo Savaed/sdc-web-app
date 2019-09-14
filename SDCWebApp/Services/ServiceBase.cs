@@ -1,14 +1,13 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using SDCWebApp.Data;
+using SDCWebApp.Helpers.Extensions;
+using SDCWebApp.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-
-using SDCWebApp.Data;
-using SDCWebApp.Models;
-using Microsoft.EntityFrameworkCore;
-using SDCWebApp.Helpers.Extensions;
 
 namespace SDCWebApp.Services
 {
@@ -52,9 +51,13 @@ namespace SDCWebApp.Services
             foreach (var property in properties)
             {
                 if (_readOnlyPropertiesNames.Any(x => x.Equals(property.Name)))
+                {
                     _logger.LogWarning($"Encouneterd property '{property.Name}' when updating '{typeof(BasicEntity).Name}'. This property is read-only and any attempts to change its value will be ignored.");
+                }
                 else
+                {
                     property.SetValue(originalEntity, property.GetValue(entityToBeUpdated));
+                }
             }
 
             originalEntity.UpdatedAt = DateTime.UtcNow;
@@ -69,7 +72,9 @@ namespace SDCWebApp.Services
         protected virtual async Task EnsureDatabaseCreatedAsync()
         {
             if (await _dbContext.Database.EnsureCreatedAsync() == false)
+            {
                 _logger.LogWarning($"Database with provider '{_dbContext.Database.ProviderName}' does not exist. It will be created but not using migrations so it cannot be updating using migrations later.");
+            }
         }
 
         /// <summary>
@@ -98,9 +103,13 @@ namespace SDCWebApp.Services
                 {
                     result = (IEnumerable<T>)_dbContext.Tickets.IncludeDetails().Where(predicate as Expression<Func<Ticket, bool>>).AsEnumerable();
                 }
-                if (typeof(T) == typeof(GeneralSightseeingInfo))
+                else if (typeof(T) == typeof(GeneralSightseeingInfo))
                 {
                     result = (IEnumerable<T>)_dbContext.GeneralSightseeingInfo.Include(x => x.OpeningHours).Where(predicate as Expression<Func<GeneralSightseeingInfo, bool>>).AsEnumerable();
+                }
+                else if (typeof(T) == typeof(SightseeingGroup))
+                {
+                    result = (IEnumerable<T>)_dbContext.Groups.Include(x => x.Tickets).Where(predicate as Expression<Func<SightseeingGroup, bool>>).AsEnumerable();
                 }
                 else
                 {

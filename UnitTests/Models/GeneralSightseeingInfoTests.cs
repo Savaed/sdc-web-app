@@ -1,10 +1,9 @@
 ﻿using FluentAssertions;
 using NUnit.Framework;
+using SDCWebApp.Models;
 using System;
 using System.Linq;
 using UnitTests.Helpers;
-
-using SDCWebApp.Models;
 
 namespace UnitTests.Models
 {

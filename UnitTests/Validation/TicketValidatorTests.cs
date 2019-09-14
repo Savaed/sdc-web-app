@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using NUnit.Framework;
-using FluentValidation.TestHelper;
-using SDCWebApp.Models;
-using SDCWebApp.Data.Validation;
+﻿using FluentValidation.TestHelper;
 using Moq;
+using NUnit.Framework;
 using SDCWebApp.Data;
-using Microsoft.EntityFrameworkCore;
+using SDCWebApp.Data.Validation;
+using SDCWebApp.Models;
+using System;
 using UnitTests.Helpers;
-using System.Linq;
 
 namespace UnitTests.Validation
 {
@@ -22,49 +18,11 @@ namespace UnitTests.Validation
 
         [OneTimeSetUp]
         public void SetUp()
-        {        
+        {
             var info = CreateModel.CreateInfo();
             _dbContextMock = new Mock<ApplicationDbContext>();
             _dbContextMock.Setup(x => x.GeneralSightseeingInfo).Returns(CreateMock.CreateDbSetMock<GeneralSightseeingInfo>(new GeneralSightseeingInfo[] { info }).Object);
             _validator = new TicketValidator(_dbContextMock.Object);
-        }
-
-
-        [Test]
-        public void Validate__Discount_is_invalid__Should_be_invalid()
-        {
-            var invalidDiscount = new Discount { DiscountValueInPercentage = 2000 };
-            var invalidTicket = new Ticket { Discount = invalidDiscount };
-
-            _validator.ShouldHaveChildValidator(x => x.Discount, typeof(DiscountValidator));
-            _validator.ShouldHaveValidationErrorFor(x => x.Discount, invalidTicket);
-        }
-
-        [Test]
-        public void Validate__Customer_is_invalid__Should_be_invalid()
-        {
-            var invalidCustomer = new Customer { DateOfBirth = DateTime.Now.AddYears(23) };
-            var invalidTicket = new Ticket { Customer = invalidCustomer };
-
-            _validator.ShouldHaveValidationErrorFor(x => x.Customer, invalidTicket);
-        }
-
-        [Test]
-        public void Validate__SightseeingGroup_is_invalid__Should_be_invalid()
-        {
-            var invalidGroup = new SightseeingGroup { MaxGroupSize = -12 };
-            var invalidTicket = new Ticket { Group = invalidGroup };
-
-            _validator.ShouldHaveValidationErrorFor(x => x.Group, invalidTicket);
-        }
-
-        [Test]
-        public void Validate__TicketTariff_is_invalid__Should_be_invalid()
-        {
-            var invalidTariff = new TicketTariff { DefaultPrice = 0.0f };
-            var invalidTicket = new Ticket { Tariff = invalidTariff };
-
-            _validator.ShouldHaveValidationErrorFor(x => x.Tariff, invalidTicket);
         }
 
 
@@ -81,7 +39,7 @@ namespace UnitTests.Validation
             [Values("C56A4180-65AA-42EC-A945-5FD21DEC",
             "!",
             "00000000-0000-0000-0000-000000000000", // Null GUID is invalid in this case.
-            "00000000000000000000000000000000", // Null GUID is invalid in this case.
+            "00000000000000000000000000000000",     // Null GUID is invalid in this case.
             "                                ",
             "x56a4180-h5aa-42ec-a945-5fd21dec0538",
             "a56a4180-a5aa-42ec-a945--fd21dec0538",
@@ -118,7 +76,7 @@ namespace UnitTests.Validation
             _validator.ShouldHaveValidationErrorFor(x => x.PurchaseDate, invalidTicket);
         }
 
-        // SDC opened on 2.06.2019, so you couldn't buy a ticket before the company wa opened.
+        // SDC opened on 2.06.2019, so you couldn't buy a ticket before the company was opened.
         [Test]
         public void Validate__PurchaseDate_is_in_the_past_but_before_2_06_2012__Should_be_invalid()
         {
@@ -142,47 +100,14 @@ namespace UnitTests.Validation
             _validator.ShouldNotHaveValidationErrorFor(x => x.PurchaseDate, validTicket);
         }
 
-        // Due to the time it takes the client to send the request to the server and process it by the server, the situation where the purchase date is now (in milliseconds) is impossible.
+        // Due to the time it takes the client to send the request to the server and process it by the server, 
+        // the situation where the purchase date is now (in milliseconds) is impossible.
         [Test]
         public void Validate__PurchaseDate_is_right_now__Should_be_invalid()
         {
             var invalidTicket = new Ticket { PurchaseDate = DateTime.Now };
 
             _validator.ShouldHaveValidationErrorFor(x => x.PurchaseDate, invalidTicket);
-        }
-
-        // Maximum date of valid tickets is 1 year from now.
-        [Test]
-        public void Validate__ValidFor_is_in_the_future_less_than_1_year_letter__Should_be_valid()
-        {
-            var validTicket = new Ticket { ValidFor = DateTime.Now.AddDays(1) };
-
-            _validator.ShouldNotHaveValidationErrorFor(x => x.ValidFor, validTicket);
-        }
-
-        // Maximum date of valid tickets is 1 year from now.
-        [Test]
-        public void Validate__ValidFor_is_in_the_future_more_than_1_year_letter__Should_be_invalid()
-        {
-            var invalidTicket = new Ticket { ValidFor = DateTime.Now.AddYears(100) };
-
-            _validator.ShouldHaveValidationErrorFor(x => x.ValidFor, invalidTicket);
-        }
-
-        [Test]
-        public void Validate__ValidFor_is_in_the_past__Should_be_invalid()
-        {
-            var invalidTicket = new Ticket { ValidFor = new DateTime(2012, 6, 1) };
-
-            _validator.ShouldHaveValidationErrorFor(x => x.ValidFor, invalidTicket);
-        }
-
-        [Test]
-        public void Validate__ValidFor_is_right_now__Should_be_valid()
-        {
-            var validTicket = new Ticket { ValidFor = DateTime.Now };
-
-            _validator.ShouldNotHaveValidationErrorFor(x => x.ValidFor, validTicket);
         }
     }
 }

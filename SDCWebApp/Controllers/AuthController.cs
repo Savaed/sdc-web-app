@@ -4,17 +4,16 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using SDCWebApp.Auth;
+using SDCWebApp.Helpers.Constants;
+using SDCWebApp.Models;
+using SDCWebApp.Models.Dtos;
+using SDCWebApp.Services;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
-
-using SDCWebApp.Auth;
-using SDCWebApp.Models;
-using SDCWebApp.Models.Dtos;
-using SDCWebApp.Services;
-using SDCWebApp.Helpers.Constants;
 
 namespace SDCWebApp.Controllers
 {
@@ -52,7 +51,7 @@ namespace SDCWebApp.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> RefreshTokenExchangeAsync([FromBody] RefreshTokenViewModel refreshTokenData)
         {
-            _logger.LogInformation($"Starting method '{nameof(RefreshTokenExchangeAsync)}'.");           
+            _logger.LogInformation($"Starting method '{nameof(RefreshTokenExchangeAsync)}'.");
 
             try
             {

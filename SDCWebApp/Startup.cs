@@ -14,16 +14,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Reflection;
-using System.Threading.Tasks;
-
 using SDCWebApp.Auth;
 using SDCWebApp.Data;
 using SDCWebApp.Helpers;
 using SDCWebApp.Helpers.Constants;
+using System;
 using System.Data.SqlClient;
+using System.IdentityModel.Tokens.Jwt;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace SDCWebApp
 {

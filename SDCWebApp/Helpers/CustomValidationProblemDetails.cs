@@ -1,11 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using SDCWebApp.ApiErrors;
-using System;
-using System.Collections.Generic;
 using System.Net;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace SDCWebApp.Helpers
 {
@@ -37,7 +33,7 @@ namespace SDCWebApp.Helpers
                 }
             }
 
-            return new ApiError(400, HttpStatusCode.BadRequest.ToString()+"Error", errorMessage);
+            return new ApiError(400, HttpStatusCode.BadRequest.ToString() + "Error", errorMessage);
         }
 
 

@@ -1,10 +1,9 @@
 ﻿using AutoMapper;
-using System;
-
 using SDCWebApp.Helpers.Extensions;
+using SDCWebApp.Maps.CustomResolvers;
 using SDCWebApp.Models;
 using SDCWebApp.Models.Dtos;
-using SDCWebApp.Maps.CustomResolvers;
+using System;
 
 namespace SDCWebApp.Maps
 {

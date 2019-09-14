@@ -1,14 +1,13 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using SDCWebApp.Data;
+using SDCWebApp.Helpers.Extensions;
+using SDCWebApp.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-
-using SDCWebApp.Data;
-using SDCWebApp.Helpers.Extensions;
-using SDCWebApp.Models;
 
 namespace SDCWebApp.Services
 {
@@ -43,7 +42,9 @@ namespace SDCWebApp.Services
             _logger.LogDebug($"Starting method '{nameof(AddAsync)}'.");
 
             if (ticket is null)
+            {
                 throw new ArgumentNullException($"Argument '{nameof(ticket)}' cannot be null.");
+            }
 
             await EnsureDatabaseCreatedAsync();
             _ = _dbContext?.Tickets ?? throw new InternalDbServiceException($"Table of type '{typeof(Ticket).Name}' is null.");
@@ -131,7 +132,9 @@ namespace SDCWebApp.Services
             _logger.LogInformation($"Starting method '{nameof(GetAsync)}'.");
 
             if (string.IsNullOrEmpty(id))
+            {
                 throw new ArgumentException($"Argument '{nameof(id)}' cannot be null or empty.");
+            }
 
             await EnsureDatabaseCreatedAsync();
             _ = _dbContext?.Tickets ?? throw new InternalDbServiceException($"Table of type '{typeof(Ticket).Name}' is null.");
@@ -215,10 +218,14 @@ namespace SDCWebApp.Services
             _logger.LogInformation($"Starting method '{nameof(GetWithPaginationAsync)}'.");
 
             if (pageNumber < 1)
+            {
                 throw new ArgumentOutOfRangeException(nameof(pageNumber), $"'{pageNumber}' is not valid value for argument '{nameof(pageNumber)}'. Only number greater or equals to 1 is valid.");
+            }
 
             if (pageSize < 0)
+            {
                 throw new ArgumentOutOfRangeException(nameof(pageSize), $"'{pageSize}' is not valid value for argument '{nameof(pageSize)}'. Only number greater or equals to 0 is valid.");
+            }
 
             await EnsureDatabaseCreatedAsync();
             _ = _dbContext?.Tickets ?? throw new InternalDbServiceException($"Table of type '{typeof(Ticket).Name}' is null.");
@@ -238,7 +245,9 @@ namespace SDCWebApp.Services
                     _logger.LogWarning($"Last page of data contain {numberOfElementsOnLastPage} elements which is less than specified in {nameof(pageSize)}: {pageSize}.");
                 }
                 else
+                {
                     maxNumberOfPageWithData = numberOfFullPages;
+                }
 
                 if (numberOfResourceElements == 0 || pageSize == 0 || pageNumber > maxNumberOfPageWithData)
                 {
@@ -256,6 +265,59 @@ namespace SDCWebApp.Services
             {
                 _logger.LogError(ex, $"{ex.GetType().Name} - {ex.Message}");
                 var internalException = new InternalDbServiceException($"Encountered problem when retrieving tickets from database. See the inner exception for more details.", ex);
+                throw internalException;
+            }
+        }
+
+        /// <summary>
+        /// Asynchronously deletes <see cref="Ticket"/> entity from the database. Throws an exception if cannot found entity 
+        /// to be deleted or any problem with saving changes occurred.
+        /// </summary>
+        /// <param name="id">The id of entity to be deleted. Cannot be null or empty.</param>
+        /// <exception cref="ArgumentException">Argument <paramref name="id"/> is null or empty string.</exception>
+        /// <exception cref="InvalidOperationException">Cannot foound entity with given <paramref name="id"/> for delete.</exception>
+        /// <exception cref="InternalDbServiceException">The table with <see cref="Ticket"/> entities does not exist or it is null or 
+        /// cannot save properly any changes made by add operation.</exception>
+        public async Task DeleteAsync(string id)
+        {
+            _logger.LogInformation($"Starting method '{nameof(DeleteAsync)}'.");
+
+            if (string.IsNullOrEmpty(id))
+            {
+                throw new ArgumentException($"Argument '{nameof(id)}' cannot be null or empty.");
+            }
+
+            await EnsureDatabaseCreatedAsync();
+            _ = _dbContext?.Tickets ?? throw new InternalDbServiceException($"Table of type '{typeof(Ticket).Name}' is null.");
+
+            try
+            {
+                if (_dbContext.Tickets.Count() == 0)
+                {
+                    throw new InvalidOperationException($"Cannot found element with id '{id}'. Resource {_dbContext.Tickets.GetType().Name} does not contain any element.");
+                }
+
+                if (await _dbContext.Tickets.AnyAsync(x => x.Id.Equals(id)) == false)
+                {
+                    throw new InvalidOperationException($"Cannot found element with id '{id}'. Any element does not match to the one to be updated.");
+                }
+
+                var ToBeDeleted = await _dbContext.Tickets.SingleAsync(x => x.Id.Equals(id));
+                _logger.LogDebug($"Starting remove ticket  with id '{ToBeDeleted.Id}'.");
+                _dbContext.Tickets.Remove(ToBeDeleted);
+                await _dbContext.TrySaveChangesAsync();
+                _logger.LogDebug("Remove data succeeded.");
+                _logger.LogInformation($"Finished method '{nameof(DeleteAsync)}'.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogError(ex, $"{ex.GetType().Name} - Cannot found element. See the exception for more details. Operation failed.");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{ex.GetType().Name} - {ex.Message}");
+                var internalException = new InternalDbServiceException($"Encountered problem when removing ticket with id '{id}' from the database. See the inner exception for more details.", ex);
                 throw internalException;
             }
         }

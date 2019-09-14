@@ -44,7 +44,10 @@ namespace SDCWebApp.Models
         public override int GetHashCode()
         {
             if (Author is null || Text is null || Title is null)
+            {
                 return base.GetHashCode();
+            }
+
             return Title.GetHashCode() * 0x00011000 + Text.GetHashCode() * 0x10000000 + Author.GetHashCode() * 0x00000001;
         }
     }

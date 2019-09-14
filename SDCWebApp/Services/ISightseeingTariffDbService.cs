@@ -1,9 +1,8 @@
-﻿using System;
+﻿using SDCWebApp.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-
-using SDCWebApp.Models;
 
 namespace SDCWebApp.Services
 {

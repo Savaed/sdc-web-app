@@ -1,9 +1,8 @@
 ﻿using AutoMapper;
-using System;
-
 using SDCWebApp.Helpers.Extensions;
 using SDCWebApp.Models;
 using SDCWebApp.Models.Dtos;
+using System;
 
 namespace SDCWebApp.Maps
 {

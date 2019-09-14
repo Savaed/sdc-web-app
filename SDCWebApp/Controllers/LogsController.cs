@@ -1,17 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Net;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-
 using SDCWebApp.Helpers.Constants;
 using SDCWebApp.Models;
 using SDCWebApp.Models.Dtos;
 using SDCWebApp.Services;
+using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace SDCWebApp.Controllers
 {
@@ -31,7 +30,7 @@ namespace SDCWebApp.Controllers
             _logDbService = logDbService;
             _mapper = mapper;
         }
-        
+
 
         /// <summary>
         /// Asynchronously gets specified <see cref="ActivityLog"/> by <paramref name="id"/>.
@@ -51,7 +50,9 @@ namespace SDCWebApp.Controllers
             _logger.LogInformation($"Starting method '{nameof(GetLogAsync)}'.");
 
             if (string.IsNullOrEmpty(id))
+            {
                 return OnInvalidParameterError($"Parameter '{nameof(id)}' cannot be null or empty.");
+            }
 
             try
             {
@@ -67,7 +68,7 @@ namespace SDCWebApp.Controllers
             }
             catch (InternalDbServiceException ex)
             {
-                LogInternalDbServiceException(_logDbService.GetType(), ex);
+                LogInternalDbServiceException(ex, _logDbService.GetType());
                 throw;
             }
             catch (Exception ex)
@@ -100,7 +101,7 @@ namespace SDCWebApp.Controllers
             }
             catch (InternalDbServiceException ex)
             {
-                LogInternalDbServiceException(_logDbService.GetType(), ex);
+                LogInternalDbServiceException(ex, _logDbService.GetType());
                 throw;
             }
             catch (Exception ex)

@@ -1,17 +1,16 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SDCWebApp.Helpers.Constants;
+using SDCWebApp.Models;
+using SDCWebApp.Models.Dtos;
+using SDCWebApp.Services;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-
-using SDCWebApp.Models;
-using SDCWebApp.Models.Dtos;
-using SDCWebApp.Services;
-using Microsoft.AspNetCore.Authorization;
-using SDCWebApp.Helpers.Constants;
 
 namespace SDCWebApp.Controllers
 {
@@ -73,7 +72,7 @@ namespace SDCWebApp.Controllers
             }
             catch (InternalDbServiceException ex)
             {
-                LogInternalDbServiceException(_articleDbService.GetType(), ex);
+                LogInternalDbServiceException(ex, _articleDbService.GetType());
                 throw;
             }
             catch (Exception ex)
@@ -100,7 +99,9 @@ namespace SDCWebApp.Controllers
             _logger.LogInformation($"Starting method '{nameof(DeleteArticleAsync)}'.");
 
             if (string.IsNullOrEmpty(id))
+            {
                 return OnInvalidParameterError($"Parameter '{nameof(id)}' cannot be null or empty.");
+            }
 
             try
             {
@@ -115,7 +116,7 @@ namespace SDCWebApp.Controllers
             }
             catch (InternalDbServiceException ex)
             {
-                LogInternalDbServiceException(_articleDbService.GetType(), ex);
+                LogInternalDbServiceException(ex, _articleDbService.GetType());
                 throw;
             }
             catch (Exception ex)
@@ -148,7 +149,7 @@ namespace SDCWebApp.Controllers
             }
             catch (InternalDbServiceException ex)
             {
-                LogInternalDbServiceException(_articleDbService.GetType(), ex);
+                LogInternalDbServiceException(ex, _articleDbService.GetType());
                 throw;
             }
             catch (Exception ex)
@@ -177,7 +178,9 @@ namespace SDCWebApp.Controllers
             _logger.LogInformation($"Starting method '{nameof(GetArticleAsync)}'.");
 
             if (string.IsNullOrEmpty(id))
+            {
                 return OnInvalidParameterError($"Parameter '{nameof(id)}' cannot be null or empty.");
+            }
 
             try
             {
@@ -193,7 +196,7 @@ namespace SDCWebApp.Controllers
             }
             catch (InternalDbServiceException ex)
             {
-                LogInternalDbServiceException(_articleDbService.GetType(), ex);
+                LogInternalDbServiceException(ex, _articleDbService.GetType());
                 throw;
             }
             catch (Exception ex)
@@ -222,10 +225,14 @@ namespace SDCWebApp.Controllers
             _logger.LogInformation($"Starting method '{nameof(UpdateArticleAsync)}'.");
 
             if (string.IsNullOrEmpty(id))
+            {
                 return OnInvalidParameterError($"An argument '{nameof(id)}' cannot be null or empty.");
+            }
 
             if (!id.Equals(article.Id))
+            {
                 return OnMismatchParameterError($"An '{nameof(id)}' in URL end field '{nameof(article.Id).ToLower()}' in request body mismatches. Value in URL: '{id}'. Value in body: '{article.Id}'.");
+            }
 
             try
             {
@@ -244,7 +251,7 @@ namespace SDCWebApp.Controllers
             }
             catch (InternalDbServiceException ex)
             {
-                LogInternalDbServiceException(_articleDbService.GetType(), ex);
+                LogInternalDbServiceException(ex, _articleDbService.GetType());
                 throw;
             }
             catch (Exception ex)

@@ -2,12 +2,10 @@
 using NUnit.Framework;
 using SDCWebApp.Models;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace UnitTests.Models
 {
-    class TicketTariffTests
+    internal class TicketTariffTests
     {
         [Test]
         public void Equals__One_ticket_tariff_is_reffered_to_second__Should_be_the_same()

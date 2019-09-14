@@ -1,8 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
+using SDCWebApp.Models;
 using System;
 using System.Threading.Tasks;
-
-using SDCWebApp.Models;
 
 namespace SDCWebApp.Services
 {

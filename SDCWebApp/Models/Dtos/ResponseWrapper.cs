@@ -1,9 +1,4 @@
-﻿using Newtonsoft.Json;
-using SDCWebApp.ApiErrors;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using SDCWebApp.ApiErrors;
 
 namespace SDCWebApp.Models.Dtos
 {
@@ -38,6 +33,6 @@ namespace SDCWebApp.Models.Dtos
         {
             Data = new object();
             Error = error;
-        }        
+        }
     }
 }

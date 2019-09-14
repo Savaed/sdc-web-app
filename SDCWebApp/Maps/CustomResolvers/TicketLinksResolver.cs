@@ -1,9 +1,8 @@
 ﻿using AutoMapper;
-using System.Collections.Generic;
-using System.Linq;
-
 using SDCWebApp.Models;
 using SDCWebApp.Models.Dtos;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SDCWebApp.Maps.CustomResolvers
 {

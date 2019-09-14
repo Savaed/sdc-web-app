@@ -3,20 +3,19 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using SDCWebApp.Data;
+using SDCWebApp.Models;
+using SDCWebApp.Services;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 using UnitTests.Helpers;
 
-using SDCWebApp.Data;
-using SDCWebApp.Models;
-using SDCWebApp.Services;
-
 namespace UnitTests.Services
 {
     [TestFixture]
     public class ActivityLogDbServiceTests
-    {       
+    {
         private readonly ActivityLog _validActivityLog = new ActivityLog
         {
             Id = "1",

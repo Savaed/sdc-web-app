@@ -1,15 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using SDCWebApp.Auth;
+using SDCWebApp.Data;
+using SDCWebApp.Helpers.Extensions;
+using SDCWebApp.Models;
 using System;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
-
-using SDCWebApp.Data;
-using SDCWebApp.Helpers.Extensions;
-using SDCWebApp.Models;
-using Microsoft.Extensions.Options;
-using SDCWebApp.Auth;
 
 namespace SDCWebApp.Services
 {
@@ -43,7 +42,9 @@ namespace SDCWebApp.Services
             _logger.LogInformation($"Starting method '{nameof(AddRefreshTokenAsync)}'.");
 
             if (refreshToken is null)
+            {
                 throw new ArgumentNullException($"Argument '{nameof(refreshToken)}' cannot be null.");
+            }
 
             await EnsureDatabaseCreatedAsync();
             _ = _dbContext?.RefreshTokens ?? throw new InternalDbServiceException($"Table of type '{typeof(RefreshToken).Name}' is null.");
@@ -51,7 +52,9 @@ namespace SDCWebApp.Services
             try
             {
                 if (await IsEntityAlreadyExistsAsync(refreshToken))
+                {
                     throw new InvalidOperationException($"There is already the same token in the database as the one to be added.");
+                }
 
                 _logger.LogDebug($"Starting add refresh token with id '{refreshToken.Id}'.");
                 _dbContext.RefreshTokens.Add(refreshToken);
@@ -93,7 +96,9 @@ namespace SDCWebApp.Services
             _logger.LogInformation($"Starting method '{nameof(DeleteRefreshTokenAsync)}'.");
 
             if (refreshToken is null)
+            {
                 throw new ArgumentNullException($"Argument '{nameof(refreshToken)}' cannot be null.");
+            }
 
             await EnsureDatabaseCreatedAsync();
             _ = _dbContext?.RefreshTokens ?? throw new InternalDbServiceException($"Table of type '{typeof(RefreshToken).Name}' is null.");
@@ -101,11 +106,15 @@ namespace SDCWebApp.Services
             try
             {
                 if (_dbContext.RefreshTokens.Count() == 0)
+                {
                     throw new InvalidOperationException($"Cannot found refresh token with token value '{refreshToken.Token}'. Resource {_dbContext.RefreshTokens.GetType().Name} does not contain " +
                         $"any element.");
+                }
 
                 if (!await IsEntityAlreadyExistsAsync(refreshToken))
+                {
                     throw new InvalidOperationException($"Cannot found refresh token with token value '{refreshToken.Token}'. Any element does not match to the one to be updated.");
+                }
 
                 var tokenToBeDeleted = await _dbContext.RefreshTokens.SingleAsync(x => x.Token.Equals(refreshToken.Token));
                 _logger.LogDebug($"Starting remove refresh token with id '{tokenToBeDeleted.Id}'.");
@@ -144,7 +153,7 @@ namespace SDCWebApp.Services
                 token = Convert.ToBase64String(randomNumber);
             }
 
-            var expiryIn = new DateTimeOffset(DateTime.UtcNow.AddSeconds((double)_jwtOptions.Value.RefreshTokenExpiryIn)).ToUnixTimeSeconds();
+            var expiryIn = new DateTimeOffset(DateTime.UtcNow.AddSeconds(_jwtOptions.Value.RefreshTokenExpiryIn)).ToUnixTimeSeconds();
             return new RefreshToken { Id = Guid.NewGuid().ToString(), Token = token, ExpiryIn = (int)expiryIn };
         }
 
@@ -163,7 +172,9 @@ namespace SDCWebApp.Services
             _logger.LogInformation($"Starting method '{nameof(GetSavedRefreshTokenAsync)}'.");
 
             if (string.IsNullOrEmpty(refreshToken))
+            {
                 throw new ArgumentException($"Argument '{nameof(refreshToken)}' cannot be null or empty.");
+            }
 
             await EnsureDatabaseCreatedAsync();
             _ = _dbContext?.RefreshTokens ?? throw new InternalDbServiceException($"Table of type '{typeof(RefreshToken).Name}' is null.");

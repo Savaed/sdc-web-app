@@ -3,14 +3,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SDCWebApp.Models;
+using SDCWebApp.Models.Dtos;
+using SDCWebApp.Services;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-
-using SDCWebApp.Models;
-using SDCWebApp.Models.Dtos;
-using SDCWebApp.Services;
 
 namespace SDCWebApp.Controllers
 {
@@ -71,7 +70,7 @@ namespace SDCWebApp.Controllers
             }
             catch (InternalDbServiceException ex)
             {
-                LogInternalDbServiceException(_infoDbService.GetType(), ex);
+                LogInternalDbServiceException(ex, _infoDbService.GetType());
                 throw;
             }
             catch (Exception ex)
@@ -98,7 +97,9 @@ namespace SDCWebApp.Controllers
             _logger.LogInformation($"Starting method '{nameof(DeleteInfoAsync)}'.");
 
             if (string.IsNullOrEmpty(id))
+            {
                 return OnInvalidParameterError($"Parameter '{nameof(id)}' cannot be null or empty.");
+            }
 
             try
             {
@@ -113,7 +114,7 @@ namespace SDCWebApp.Controllers
             }
             catch (InternalDbServiceException ex)
             {
-                LogInternalDbServiceException(_infoDbService.GetType(), ex);
+                LogInternalDbServiceException(ex, _infoDbService.GetType());
                 throw;
             }
             catch (Exception ex)
@@ -146,7 +147,7 @@ namespace SDCWebApp.Controllers
             }
             catch (InternalDbServiceException ex)
             {
-                LogInternalDbServiceException(_infoDbService.GetType(), ex);
+                LogInternalDbServiceException(ex, _infoDbService.GetType());
                 throw;
             }
             catch (Exception ex)
@@ -175,7 +176,9 @@ namespace SDCWebApp.Controllers
             _logger.LogInformation($"Starting method '{nameof(GetInfoAsync)}'.");
 
             if (string.IsNullOrEmpty(id))
+            {
                 return OnInvalidParameterError($"Parameter '{nameof(id)}' cannot be null or empty.");
+            }
 
             try
             {
@@ -191,7 +194,7 @@ namespace SDCWebApp.Controllers
             }
             catch (InternalDbServiceException ex)
             {
-                LogInternalDbServiceException(_infoDbService.GetType(), ex);
+                LogInternalDbServiceException(ex, _infoDbService.GetType());
                 throw;
             }
             catch (Exception ex)
@@ -220,10 +223,14 @@ namespace SDCWebApp.Controllers
             _logger.LogInformation($"Starting method '{nameof(UpdateInfoAsync)}'.");
 
             if (string.IsNullOrEmpty(id))
+            {
                 return OnInvalidParameterError($"An argument '{nameof(id)}' cannot be null or empty.");
+            }
 
             if (!id.Equals(info.Id))
+            {
                 return OnMismatchParameterError($"An '{nameof(id)}' in URL end field '{nameof(info.Id).ToLower()}' in request body mismatches. Value in URL: '{id}'. Value in body: '{info.Id}'.");
+            }
 
             try
             {
@@ -242,7 +249,7 @@ namespace SDCWebApp.Controllers
             }
             catch (InternalDbServiceException ex)
             {
-                LogInternalDbServiceException(_infoDbService.GetType(), ex);
+                LogInternalDbServiceException(ex, _infoDbService.GetType());
                 throw;
             }
             catch (Exception ex)

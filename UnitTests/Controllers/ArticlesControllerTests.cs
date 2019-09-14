@@ -4,16 +4,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 using SDCWebApp.ApiErrors;
 using SDCWebApp.Controllers;
 using SDCWebApp.Models;
 using SDCWebApp.Models.Dtos;
 using SDCWebApp.Services;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace UnitTests.Controllers
 {
@@ -457,7 +456,7 @@ namespace UnitTests.Controllers
             {
                 Id = article.Id,
                 Title = article.Title,
-                Text = article.Text               
+                Text = article.Text
             };
         }
 

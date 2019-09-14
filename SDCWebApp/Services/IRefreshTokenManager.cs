@@ -1,7 +1,6 @@
-﻿using System;
+﻿using SDCWebApp.Models;
+using System;
 using System.Threading.Tasks;
-
-using SDCWebApp.Models;
 
 namespace SDCWebApp.Services
 {

@@ -26,7 +26,7 @@ namespace SDCWebApp.Auth
                 // Ensure that tokent hasn't expired.
                 RequireExpirationTime = true,
                 ValidateLifetime = true,
-                
+
                 // Ensure the token audience matches server audience.
                 ValidAudience = Audience,
                 ValidateAudience = true,

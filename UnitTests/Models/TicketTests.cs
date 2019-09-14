@@ -2,13 +2,14 @@
 using NUnit.Framework;
 using SDCWebApp.Models;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace UnitTests.Models
 {
     public class TicketTests
     {
+
+        #region Price
+
         [Test]
         public void Price__Tariff_and_Discount_are_null__Should_return_zero()
         {
@@ -58,5 +59,35 @@ namespace UnitTests.Models
             price.Equals(discountPrice);
             price.Should().NotBe(ticket.Tariff.DefaultPrice);
         }
+
+        #endregion
+
+
+        #region ValidFor
+
+        [Test]
+        public void ValidFor__Group_is_null__Should_return_DateTime_MinValue()
+        {
+            var ticket = new Ticket { Group = null };
+
+            DateTime validFor = ticket.ValidFor;
+
+            validFor.Should().Be(DateTime.MinValue);
+        }
+
+        [Test]
+        public void ValidFor__Group_is_set__Should_return_this_date_time()
+        {
+            var group = new SightseeingGroup { SightseeingDate = DateTime.Now.AddDays(2).Date.AddHours(14) };
+            var ticket = new Ticket { Group = group };
+            DateTime expectedDateTime = group.SightseeingDate;
+
+            var validFor = ticket.ValidFor;
+
+            validFor.Should().Be(expectedDateTime);
+        }
+
+        #endregion
+
     }
 }

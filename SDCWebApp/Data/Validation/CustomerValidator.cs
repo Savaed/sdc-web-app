@@ -9,6 +9,18 @@ namespace SDCWebApp.Data.Validation
     {
         public CustomerValidator()
         {
+            RuleFor(x => x.HasFamilyCard)
+                .Cascade(CascadeMode.StopOnFirstFailure)
+                .NotNull().WithMessage("{PropertyName} is required.");
+
+            RuleFor(x => x.IsChild)
+               .Cascade(CascadeMode.StopOnFirstFailure)
+               .NotNull().WithMessage("{PropertyName} is required.");
+
+            RuleFor(x => x.IsDisabled)
+               .Cascade(CascadeMode.StopOnFirstFailure)
+               .NotNull().WithMessage("{PropertyName} is required.");
+
             RuleFor(x => x.DateOfBirth)
                 .Cascade(CascadeMode.StopOnFirstFailure)
                 .NotEmpty().WithMessage("{PropertyName} required.")

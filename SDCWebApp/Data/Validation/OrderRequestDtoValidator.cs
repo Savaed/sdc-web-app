@@ -1,23 +1,21 @@
 ﻿using FluentValidation;
 using SDCWebApp.Models.Dtos;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace SDCWebApp.Data.Validation
 {
-    public class OrderDtoValidator : AbstractValidator<OrderDto>, ICustomValidator<OrderDto>
+    public class OrderRequestDtoValidator : AbstractValidator<OrderRequestDto>, ICustomValidator<OrderRequestDto>
     {
-        public OrderDtoValidator()
+        public OrderRequestDtoValidator(ApplicationDbContext dbContext)
         {
             RuleFor(x => x.Customer)
                 .Cascade(CascadeMode.StopOnFirstFailure)
+                .NotNull()
                 .SetValidator(new CustomerDtoValidator());
 
             RuleForEach(x => x.Tickets)
                 .Cascade(CascadeMode.StopOnFirstFailure)
-                .SetValidator(new TicketDtoValidator());
+                .NotEmpty()
+                .SetValidator(new ShallowTicketValidator(dbContext));
         }
     }
 }

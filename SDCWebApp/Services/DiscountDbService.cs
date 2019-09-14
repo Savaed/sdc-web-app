@@ -1,14 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 using SDCWebApp.Data;
 using SDCWebApp.Helpers.Extensions;
 using SDCWebApp.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace SDCWebApp.Services
 {
@@ -126,7 +125,9 @@ namespace SDCWebApp.Services
             _logger.LogInformation($"Starting method '{nameof(DeleteAsync)}'.");
 
             if (string.IsNullOrEmpty(id))
+            {
                 throw new ArgumentException($"Argument '{nameof(id)}' cannot be null or empty.");
+            }
 
             await EnsureDatabaseCreatedAsync();
             _ = _context?.Discounts ?? throw new InternalDbServiceException($"Table of type '{typeof(Discount).Name}' is null.");
@@ -134,10 +135,14 @@ namespace SDCWebApp.Services
             try
             {
                 if (_context.Discounts.Count() == 0)
+                {
                     throw new InvalidOperationException($"Cannot found element with id '{id}'. Resource {_context.Discounts.GetType().Name} does not contain any element.");
+                }
 
                 if (await _context.Discounts.AnyAsync(x => x.Id.Equals(id)) == false)
+                {
                     throw new InvalidOperationException($"Cannot found element with id '{id}'. Any element does not match to the one to be updated.");
+                }
 
                 var disountToBeDeleted = await _context.Discounts.SingleAsync(x => x.Id.Equals(id));
                 _logger.LogDebug($"Starting remove discount with id '{disountToBeDeleted.Id}'.");
@@ -204,7 +209,9 @@ namespace SDCWebApp.Services
             _logger.LogInformation($"Starting method '{nameof(GetAsync)}'.");
 
             if (string.IsNullOrEmpty(id))
+            {
                 throw new ArgumentException($"Argument '{nameof(id)}' cannot be null or empty.");
+            }
 
             await EnsureDatabaseCreatedAsync();
             _ = _context?.Discounts ?? throw new InternalDbServiceException($"Table of type '{typeof(Discount).Name}' is null.");
@@ -247,10 +254,14 @@ namespace SDCWebApp.Services
             _logger.LogInformation($"Starting method '{nameof(GetWithPaginationAsync)}'.");
 
             if (pageNumber < 1)
+            {
                 throw new ArgumentOutOfRangeException(nameof(pageNumber), $"'{pageNumber}' is not valid value for argument '{nameof(pageNumber)}'. Only number greater or equals to 1 is valid.");
+            }
 
             if (pageSize < 0)
+            {
                 throw new ArgumentOutOfRangeException(nameof(pageSize), $"'{pageSize}' is not valid value for argument '{nameof(pageSize)}'. Only number greater or equals to 0 is valid.");
+            }
 
             await EnsureDatabaseCreatedAsync();
             _ = _context?.Discounts ?? throw new InternalDbServiceException($"Table of type '{typeof(Discount).Name}' is null.");
@@ -270,7 +281,9 @@ namespace SDCWebApp.Services
                     _logger.LogWarning($"Last page of data contain {numberOfElementsOnLastPage} elements which is less than specified in '{nameof(pageSize)}': {pageSize}.");
                 }
                 else
+                {
                     maxNumberOfPageWithData = numberOfFullPages;
+                }
 
                 if (numberOfResourceElements == 0 || pageSize == 0 || pageNumber > maxNumberOfPageWithData)
                 {
@@ -344,7 +357,9 @@ namespace SDCWebApp.Services
             _logger.LogDebug($"Starting method '{nameof(AddBaseAsync)}'.");
 
             if (discount is null)
+            {
                 throw new ArgumentNullException($"Argument '{nameof(discount)}' cannot be null.");
+            }
 
             await EnsureDatabaseCreatedAsync();
             _ = _context?.Discounts ?? throw new InternalDbServiceException($"Table of type '{typeof(Discount).Name}' is null.");
@@ -357,15 +372,19 @@ namespace SDCWebApp.Services
 
                     // Check if exist in db disount with the same properties as adding.
                     if (await IsEntityAlreadyExistsAsync(discount))
+                    {
                         throw new InvalidOperationException($"There is already the same element in the database as the one to be added. " +
                             $"The value of '{nameof(discount.Description)}', '{nameof(discount.DiscountValueInPercentage)}', '{nameof(discount.GroupSizeForDiscount)}' and " +
                             $"'{nameof(discount.Type)}' are not unique.");
+                    }
                 }
                 else
                 {
                     // Normal add mode without any additional restrictions.
                     if (_context.Discounts.Contains(discount))
+                    {
                         throw new InvalidOperationException($"There is already the same element in the database as the one to be added. Id of this element: '{discount.Id}'.");
+                    }
                 }
 
                 _logger.LogDebug($"Starting add discount with id '{discount.Id}'.");
@@ -409,7 +428,9 @@ namespace SDCWebApp.Services
             _ = discount ?? throw new ArgumentNullException(nameof(discount), $"Argument '{nameof(discount)}' cannot be null.");
 
             if (string.IsNullOrEmpty(discount.Id))
+            {
                 throw new ArgumentException($"Argument '{nameof(discount.Id)}' cannot be null or empty.");
+            }
 
             await EnsureDatabaseCreatedAsync();
             _ = _context?.Discounts ?? throw new InternalDbServiceException($"Table of type '{typeof(Discount).Name}' is null.");
@@ -417,10 +438,14 @@ namespace SDCWebApp.Services
             try
             {
                 if (_context.Discounts.Count() == 0)
+                {
                     throw new InvalidOperationException($"Cannot found element with id '{discount.Id}' for update. Resource {_context.Discounts.GetType().Name} does not contain any element.");
+                }
 
                 if (await _context.Discounts.ContainsAsync(discount) == false)
+                {
                     throw new InvalidOperationException($"Cannot found element with id '{discount.Id}' for update. Any element does not match to the one to be updated.");
+                }
 
                 _logger.LogDebug($"Starting update customer with id '{discount.Id}'.");
 

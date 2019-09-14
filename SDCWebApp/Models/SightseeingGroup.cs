@@ -8,10 +8,6 @@ namespace SDCWebApp.Models
 {
     public class SightseeingGroup : BasicEntity, ICloneable, IEquatable<SightseeingGroup>
     {
-        private bool _isAvailablePlace = true;
-        private int _currentGroupSize = 0;
-
-
         // Time must be full hour
         [Required, Column(TypeName = "datetime2(0)")]
         public DateTime SightseeingDate { get; set; }
@@ -19,13 +15,13 @@ namespace SDCWebApp.Models
         public int MaxGroupSize { get; set; } = 30;
         public int CurrentGroupSize
         {
-            get => Tickets is null ? _currentGroupSize : Tickets.Count;
-            private set => _currentGroupSize = value;
+            get => Tickets is null ? 0 : Tickets.Count;
+            private set { }
         }
         public bool IsAvailablePlace
         {
             get => CurrentGroupSize < MaxGroupSize;
-            private set => _isAvailablePlace = value;
+            private set { }
         }
         public virtual ICollection<Ticket> Tickets { get; set; }
 
@@ -43,16 +39,18 @@ namespace SDCWebApp.Models
             }
 
             if (ReferenceEquals(this, other))
+            {
                 return true;
+            }
 
             return SightseeingDate == other.SightseeingDate;
         }
 
         public override bool Equals(object obj)
         {
-            return Equals(obj as SightseeingGroup);           
+            return Equals(obj as SightseeingGroup);
         }
-    
+
         public override int GetHashCode()
         {
             return SightseeingDate.GetHashCode() * 0x00010000;

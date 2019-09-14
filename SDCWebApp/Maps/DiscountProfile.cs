@@ -1,11 +1,8 @@
 ﻿using AutoMapper;
+using SDCWebApp.Helpers.Extensions;
 using SDCWebApp.Models;
 using SDCWebApp.Models.Dtos;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using SDCWebApp.Helpers.Extensions;
 
 namespace SDCWebApp.Maps
 {

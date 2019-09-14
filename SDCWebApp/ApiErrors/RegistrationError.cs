@@ -1,6 +1,4 @@
-﻿using System.Net;
-
-namespace SDCWebApp.ApiErrors
+﻿namespace SDCWebApp.ApiErrors
 {
     public class RegistrationError : ApiError
     {

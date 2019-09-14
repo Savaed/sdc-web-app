@@ -1,9 +1,8 @@
-﻿using System;
+﻿using SDCWebApp.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-
-using SDCWebApp.Models;
 
 namespace SDCWebApp.Services
 {
@@ -103,7 +102,7 @@ namespace SDCWebApp.Services
         /// <exception cref="InternalDbServiceException">The table with <see cref="GeneralSightseeingInfo"/> entities does not exist or it is null or 
         /// cannot save properly any changes made by add operation.</exception>
         Task<GeneralSightseeingInfo> AddAsync(GeneralSightseeingInfo info);
-      
+
         /// <summary>
         /// Asynchronously adds <see cref="GeneralSightseeingInfo"/> entity to the database. Do not allow to add entity with the same properties value as existing one.
         /// Throws an exception if already there is the same entity in database or any problem with saving changes occurred.

@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using SDCWebApp.Data.Validation.Extensions;
-using SDCWebApp.Helpers.Extensions;
 using SDCWebApp.Models.ViewModels;
 using System.Linq;
 using System.Text.RegularExpressions;

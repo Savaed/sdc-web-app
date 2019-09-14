@@ -2,13 +2,12 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using SDCWebApp.Helpers.Constants;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
-
-using SDCWebApp.Helpers.Constants;
 
 namespace SDCWebApp.Auth
 {
@@ -25,7 +24,9 @@ namespace SDCWebApp.Auth
         public JwtTokenHandler(IOptions<JwtSettings> options, ILogger<JwtTokenHandler> logger)
         {
             if (_jwtSecurityTokenHandler is null)
+            {
                 _jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
+            }
 
             _logger = logger;
             _jwtOptions = options;
@@ -59,7 +60,7 @@ namespace SDCWebApp.Auth
                 throw;
             }
         }
-        
+
         /// <summary>
         /// Validates JWT token and gets <see cref="ClaimsPrincipal"/> described by it.
         /// Throws an exception if token validtion failed.
@@ -134,7 +135,10 @@ namespace SDCWebApp.Auth
 
         private void ThrowIfInvalidOptions(IOptions<JwtSettings> options)
         {
-            if (options == null) throw new ArgumentNullException(nameof(options));
+            if (options == null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
 
             if (options.Value.ExpiryIn <= 0)
             {
@@ -166,7 +170,9 @@ namespace SDCWebApp.Auth
 
                 // Check the type of the token and algorithm used to encode token. It must be SecurityAlgorithms.HmacSha256.
                 if (!(securityToken is JwtSecurityToken jwtSecurityToken) || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+                {
                     throw new SecurityTokenException("Invalid token.");
+                }
 
                 _logger.LogInformation($"Finished method '{nameof(ValidateToken)}'.");
                 return principal;

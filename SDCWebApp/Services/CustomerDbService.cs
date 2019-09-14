@@ -1,14 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 using SDCWebApp.Data;
 using SDCWebApp.Helpers.Extensions;
 using SDCWebApp.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace SDCWebApp.Services
 {
@@ -119,7 +118,9 @@ namespace SDCWebApp.Services
             _logger.LogInformation($"Starting method '{nameof(DeleteAsync)}'.");
 
             if (string.IsNullOrEmpty(id))
+            {
                 throw new ArgumentException($"Argument '{nameof(id)}' cannot be null or empty.");
+            }
 
             await EnsureDatabaseCreatedAsync();
             _ = _context?.Customers ?? throw new InternalDbServiceException($"Table of type '{typeof(Customer).Name}' is null.");
@@ -127,10 +128,14 @@ namespace SDCWebApp.Services
             try
             {
                 if (_context.Customers.Count() == 0)
+                {
                     throw new InvalidOperationException($"Cannot found element with id '{id}'. Resource {_context.Customers.GetType().Name} does not contain any element.");
+                }
 
                 if (await _context.Customers.AnyAsync(x => x.Id.Equals(id)) == false)
+                {
                     throw new InvalidOperationException($"Cannot found element with id '{id}'. Any element does not match to the one to be updated.");
+                }
 
                 var customerToBeDeleted = await _context.Customers.SingleAsync(x => x.Id.Equals(id));
                 _logger.LogDebug($"Starting remove customer with id '{customerToBeDeleted.Id}'.");
@@ -197,7 +202,9 @@ namespace SDCWebApp.Services
             _logger.LogInformation($"Starting method '{nameof(GetAsync)}'.");
 
             if (string.IsNullOrEmpty(id))
+            {
                 throw new ArgumentException($"Argument '{nameof(id)}' cannot be null or empty.");
+            }
 
             await EnsureDatabaseCreatedAsync();
             _ = _context?.Customers ?? throw new InternalDbServiceException($"Table of type '{typeof(Customer).Name}' is null.");
@@ -240,10 +247,14 @@ namespace SDCWebApp.Services
             _logger.LogInformation($"Starting method '{nameof(GetWithPaginationAsync)}'.");
 
             if (pageNumber < 1)
+            {
                 throw new ArgumentOutOfRangeException(nameof(pageNumber), $"'{pageNumber}' is not valid value for argument '{nameof(pageNumber)}'. Only number greater or equals to 1 is valid.");
+            }
 
             if (pageSize < 0)
+            {
                 throw new ArgumentOutOfRangeException(nameof(pageSize), $"'{pageSize}' is not valid value for argument '{nameof(pageSize)}'. Only number greater or equals to 0 is valid.");
+            }
 
             await EnsureDatabaseCreatedAsync();
             _ = _context?.Customers ?? throw new InternalDbServiceException($"Table of type '{typeof(Customer).Name}' is null.");
@@ -263,7 +274,9 @@ namespace SDCWebApp.Services
                     _logger.LogWarning($"Last page of data contains {numberOfElementsOnLastPage} elements which is less than specified in '{nameof(pageSize)}': {pageSize}.");
                 }
                 else
+                {
                     maxNumberOfPageWithData = numberOfFullPages;
+                }
 
                 if (numberOfResourceElements == 0 || pageSize == 0 || pageNumber > maxNumberOfPageWithData)
                 {
@@ -363,7 +376,9 @@ namespace SDCWebApp.Services
             _logger.LogDebug($"Starting method '{nameof(AddBaseAsync)}'.");
 
             if (customer is null)
+            {
                 throw new ArgumentNullException($"Argument '{nameof(customer)}' cannot be null.");
+            }
 
             await EnsureDatabaseCreatedAsync();
             _ = _context?.Customers ?? throw new InternalDbServiceException($"Table of type '{typeof(Customer).Name}' is null.");
@@ -377,13 +392,17 @@ namespace SDCWebApp.Services
 
                     // Check if exist in db customer with the same EmailAddress as adding.
                     if (await IsEntityAlreadyExistsAsync(customer))
+                    {
                         throw new InvalidOperationException($"There is already the same element in the database as the one to be added. The value of '{nameof(customer.EmailAddress)}' is not unique.");
+                    }
                 }
                 else
                 {
                     // Normal add mode without any additional restrictions.
                     if (_context.Customers.Contains(customer))
+                    {
                         throw new InvalidOperationException($"There is already the same element in the database as the one to be added. Id of this element: '{customer.Id}'.");
+                    }
                 }
 
                 _logger.LogDebug($"Starting add customer with id '{customer.Id}'.");
@@ -427,7 +446,9 @@ namespace SDCWebApp.Services
             _ = customer ?? throw new ArgumentNullException(nameof(customer), $"Argument '{nameof(customer)}' cannot be null.");
 
             if (string.IsNullOrEmpty(customer.Id))
+            {
                 throw new ArgumentException($"Argument '{nameof(customer.Id)}' cannot be null or empty.");
+            }
 
             await EnsureDatabaseCreatedAsync();
             _ = _context?.Customers ?? throw new InternalDbServiceException($"Table of type '{typeof(Customer).Name}' is null.");
@@ -435,10 +456,14 @@ namespace SDCWebApp.Services
             try
             {
                 if (_context.Customers.Count() == 0)
+                {
                     throw new InvalidOperationException($"Cannot found element with id '{customer.Id}' for update. Resource {_context.Customers.GetType().Name} does not contain any element.");
+                }
 
                 if (await _context.Customers.ContainsAsync(customer) == false)
+                {
                     throw new InvalidOperationException($"Cannot found element with id '{customer.Id}' for update. Any element does not match to the one to be updated.");
+                }
 
                 _logger.LogDebug($"Starting update customer with id '{customer.Id}'.");
 

@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SDCWebApp.Models
@@ -32,7 +31,9 @@ namespace SDCWebApp.Models
             }
 
             if (ReferenceEquals(this, other))
+            {
                 return true;
+            }
 
             return EmailAddress == other.EmailAddress;
         }
@@ -45,7 +46,9 @@ namespace SDCWebApp.Models
         public override int GetHashCode()
         {
             if (EmailAddress is null)
+            {
                 return base.GetHashCode();
+            }
 
             return EmailAddress.GetHashCode() * 0x10000000;
         }

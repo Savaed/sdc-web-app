@@ -1,7 +1,7 @@
 ﻿using SDCWebApp.Models;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System;
 
 namespace SDCWebApp.Services
 {
@@ -17,7 +17,7 @@ namespace SDCWebApp.Services
         /// <exception cref="InvalidOperationException">Cannot found entity with given <paramref name="id"/>.</exception>
         /// <exception cref="InternalDbServiceException">The resource does not exist or has a null value or any
         /// other problems with retrieving data from database occurred.</exception>
-        Task<ActivityLog> GetAsync(string id);      
+        Task<ActivityLog> GetAsync(string id);
 
         /// <summary>
         /// Asynchronously retrieves <see cref="ActivityLog"/> entities with specified page size and page number.
@@ -29,7 +29,7 @@ namespace SDCWebApp.Services
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageSize"/> is a negative number or <paramref name="pageNumber"/> is less than 1.</exception>
         /// <exception cref="InternalDbServiceException">The resource does not exist or has a null value or any
         /// other problems with retrieving data from database occurred.</exception>
-        Task<IEnumerable<ActivityLog>> GetWithPaginationAsync(int pageNumber = 1, int pageSize = 30);     
+        Task<IEnumerable<ActivityLog>> GetWithPaginationAsync(int pageNumber = 1, int pageSize = 30);
 
         /// <summary>
         /// Asynchronously adds <see cref="ActivityLog"/> entity to the database. Throws an exception if 
@@ -41,6 +41,6 @@ namespace SDCWebApp.Services
         /// <exception cref="InvalidOperationException">There is the same entity that one to be added in database.</exception>
         /// <exception cref="InternalDbServiceException">The table with <see cref="Article"/> entities does not exist or it is null or 
         /// cannot save properly any changes made by add operation.</exception>
-        Task<ActivityLog> AddAsync(ActivityLog log);     
+        Task<ActivityLog> AddAsync(ActivityLog log);
     }
 }

@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-
 using SDCWebApp.Data;
 using SDCWebApp.Helpers.Extensions;
 using SDCWebApp.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SDCWebApp.Services
 {
@@ -39,7 +38,9 @@ namespace SDCWebApp.Services
             _logger.LogInformation($"Starting method '{nameof(AddAsync)}'.");
 
             if (log is null)
+            {
                 throw new ArgumentNullException($"Argument '{nameof(log)}' cannot be null.");
+            }
 
             await EnsureDatabaseCreatedAsync();
             _ = _dbContext?.ActivityLogs ?? throw new InternalDbServiceException($"Table of type '{typeof(ActivityLog).Name}' is null.");
@@ -47,7 +48,9 @@ namespace SDCWebApp.Services
             try
             {
                 if (_dbContext.ActivityLogs.Contains(log))
+                {
                     throw new InvalidOperationException($"There is already the same element in the database as the one to be added. Id of this element: '{log.Id}'.");
+                }
 
                 _logger.LogDebug($"Starting add activity log with id '{log.Id}'.");
                 var addedlog = _dbContext.ActivityLogs.Add(log).Entity;
@@ -90,7 +93,9 @@ namespace SDCWebApp.Services
             _logger.LogInformation($"Starting method '{nameof(GetAsync)}'.");
 
             if (string.IsNullOrEmpty(id))
+            {
                 throw new ArgumentException($"Argument '{nameof(id)}' cannot be null or empty.");
+            }
 
             await EnsureDatabaseCreatedAsync();
             _ = _dbContext?.ActivityLogs ?? throw new InternalDbServiceException($"Table of type '{typeof(ActivityLog).Name}' is null.");
@@ -133,10 +138,14 @@ namespace SDCWebApp.Services
             _logger.LogInformation($"Starting method '{nameof(GetWithPaginationAsync)}'.");
 
             if (pageNumber < 1)
+            {
                 throw new ArgumentOutOfRangeException(nameof(pageNumber), $"'{pageNumber}' is not valid value for argument '{nameof(pageNumber)}'. Only number greater or equal to 1 are valid.");
+            }
 
             if (pageSize < 0)
+            {
                 throw new ArgumentOutOfRangeException(nameof(pageSize), $"'{pageSize}' is not valid value for argument '{nameof(pageSize)}'. Only number greater or equal to 0 are valid.");
+            }
 
             await EnsureDatabaseCreatedAsync();
             _ = _dbContext?.ActivityLogs ?? throw new InternalDbServiceException($"Table of type '{typeof(ActivityLog).Name}' is null.");
@@ -156,7 +165,9 @@ namespace SDCWebApp.Services
                     _logger.LogWarning($"Last page of data contain {numberOfElementsOnLastPage} elements which is less than specified in {nameof(pageSize)}: {pageSize}.");
                 }
                 else
+                {
                     maxNumberOfPageWithData = numberOfFullPages;
+                }
 
                 if (numberOfResourceElements == 0 || pageSize == 0 || pageNumber > maxNumberOfPageWithData)
                 {
@@ -181,7 +192,7 @@ namespace SDCWebApp.Services
 
         #region Privates
 
-        protected async override Task<bool> IsEntityAlreadyExistsAsync(BasicEntity entity)
+        protected override async Task<bool> IsEntityAlreadyExistsAsync(BasicEntity entity)
         {
             return await _dbContext.ActivityLogs.ContainsAsync(entity as ActivityLog);
         }

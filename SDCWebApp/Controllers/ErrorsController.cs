@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Net;
-
 using SDCWebApp.ApiErrors;
+using System.Net;
 
 namespace SDCWebApp.Controllers
 {

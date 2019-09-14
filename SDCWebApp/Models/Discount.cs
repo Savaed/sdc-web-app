@@ -1,8 +1,5 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace SDCWebApp.Models
 {
@@ -39,9 +36,11 @@ namespace SDCWebApp.Models
             }
 
             if (ReferenceEquals(this, discount))
+            {
                 return true;
+            }
 
-            return Type == discount.Type && Description == discount.Description && DiscountValueInPercentage == discount.DiscountValueInPercentage && 
+            return Type == discount.Type && Description == discount.Description && DiscountValueInPercentage == discount.DiscountValueInPercentage &&
                    (GroupSizeForDiscount is null ? false : GroupSizeForDiscount == discount.GroupSizeForDiscount);
         }
 
@@ -54,8 +53,11 @@ namespace SDCWebApp.Models
         public override int GetHashCode()
         {
             if (Description is null | GroupSizeForDiscount is null)
+            {
                 return base.GetHashCode();
+            }
+
             return Type.GetHashCode() + Description.GetHashCode() + DiscountValueInPercentage.GetHashCode() + GroupSizeForDiscount.Value.GetHashCode();
         }
-    }   
+    }
 }

@@ -4,17 +4,16 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using UnitTests.Helpers;
-
 using SDCWebApp.ApiErrors;
 using SDCWebApp.Controllers;
 using SDCWebApp.Models;
 using SDCWebApp.Models.Dtos;
 using SDCWebApp.Services;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using UnitTests.Helpers;
 
 namespace UnitTests.Controllers
 {
@@ -246,7 +245,7 @@ namespace UnitTests.Controllers
         // Info to be updated not found -> 404NotFound
         // Id is null or empty -> 400BadRequest
         // Id and info.Id mismatches -> 400BadRequest
-        
+
         [Test]
         public async Task UpdateInfoAsync__Element_not_found__Should_return_404NotFound_response_with_error()
         {

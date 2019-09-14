@@ -64,5 +64,16 @@ namespace SDCWebApp.Services
         /// <exception cref="InternalDbServiceException">The resource does not exist or has a null value or any
         /// other problems with retrieving data from database occurred.</exception>
         Task<IEnumerable<Ticket>> GetWithPaginationAsync(int pageNumber = 1, int pageSize = 30);
+
+        /// <summary>
+        /// Asynchronously deletes <see cref="Ticket"/> entity from the database. Throws an exception if cannot found entity 
+        /// to be deleted or any problem with saving changes occurred.
+        /// </summary>
+        /// <param name="id">The id of entity to be deleted. Cannot be null or empty.</param>
+        /// <exception cref="ArgumentException">Argument <paramref name="id"/> is null or empty string.</exception>
+        /// <exception cref="InvalidOperationException">Cannot foound entity with given <paramref name="id"/> for delete.</exception>
+        /// <exception cref="InternalDbServiceException">The table with <see cref="Ticket"/> entities does not exist or it is null or 
+        /// cannot save properly any changes made by add operation.</exception>
+        Task DeleteAsync(string id);
     }
 }

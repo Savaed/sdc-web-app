@@ -6,7 +6,7 @@ namespace SDCWebApp.Controllers
 {
     public interface IOrdersController
     {
-        Task<IActionResult> CreateOrderAsync(OrderDto order);
+        Task<IActionResult> CreateOrderAsync(OrderRequestDto order);
         Task<IActionResult> GetOrderAsync(string id);
     }
 }

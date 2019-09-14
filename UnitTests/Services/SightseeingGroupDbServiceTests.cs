@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -8,11 +7,9 @@ using SDCWebApp.Data;
 using SDCWebApp.Models;
 using SDCWebApp.Services;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using UnitTests.Helpers;
 
@@ -21,7 +18,7 @@ namespace UnitTests.Services
     [TestFixture]
     public class SightseeingGroupDbServiceTest
     {
-        private static SightseeingGroup[] _groupForRestrictedUpdateCases = new SightseeingGroup[]
+        private static readonly SightseeingGroup[] _groupForRestrictedUpdateCases = new SightseeingGroup[]
         {
             new SightseeingGroup { ConcurrencyToken = Encoding.ASCII.GetBytes("Updated ConcurrencyToken") },    // Attempt to change 'ConcurrencyToken' which is read-only property.
             new SightseeingGroup { UpdatedAt = DateTime.Now.AddYears(100) }                                     // Attempt to change 'UpdatedAt' which is read-only property.
@@ -29,7 +26,7 @@ namespace UnitTests.Services
         private Mock<ApplicationDbContext> _dbContextMock;
         private ILogger<SightseeingGroupDbService> _logger;
         private Expression<Func<SightseeingGroup, bool>> _predicate;
-        SightseeingGroup _validGroup = new SightseeingGroup
+        private readonly SightseeingGroup _validGroup = new SightseeingGroup
         {
             Id = " 1",
             MaxGroupSize = 23,

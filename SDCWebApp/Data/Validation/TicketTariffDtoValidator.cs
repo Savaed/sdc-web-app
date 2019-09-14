@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using FluentValidation.Validators;
 using SDCWebApp.Models.Dtos;
 
 namespace SDCWebApp.Data.Validation

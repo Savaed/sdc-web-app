@@ -4,11 +4,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-
 using SDCWebApp.ApiErrors;
 using SDCWebApp.Auth;
 using SDCWebApp.Helpers.Constants;
@@ -16,6 +11,10 @@ using SDCWebApp.Models;
 using SDCWebApp.Models.Dtos;
 using SDCWebApp.Models.ViewModels;
 using SDCWebApp.Services;
+using System;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace SDCWebApp.Controllers
 {

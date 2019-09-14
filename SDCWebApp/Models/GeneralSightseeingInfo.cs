@@ -54,13 +54,15 @@ namespace SDCWebApp.Models
             }
 
             if (ReferenceEquals(this, other))
+            {
                 return true;
+            }
 
             return Description == other.Description
                 && MaxAllowedGroupSize == other.MaxAllowedGroupSize
                 && MaxChildAge == other.MaxChildAge
                 && MaxTicketOrderInterval == other.MaxTicketOrderInterval
-                && SightseeingDuration == other.SightseeingDuration;               
+                && SightseeingDuration == other.SightseeingDuration;
         }
 
         public override bool Equals(object obj)
@@ -71,7 +73,9 @@ namespace SDCWebApp.Models
         public override int GetHashCode()
         {
             if (Description is null)
+            {
                 return base.GetHashCode();
+            }
 
             return (Description.GetHashCode() + MaxAllowedGroupSize + MaxChildAge + MaxTicketOrderInterval + (int)SightseeingDuration) * 0x00010000;
         }

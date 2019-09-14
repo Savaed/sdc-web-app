@@ -6,18 +6,17 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Moq;
 using NUnit.Framework;
-using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
-
 using SDCWebApp.ApiErrors;
 using SDCWebApp.Auth;
 using SDCWebApp.Controllers;
 using SDCWebApp.Models;
 using SDCWebApp.Models.Dtos;
 using SDCWebApp.Services;
+using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace UnitTests.Controllers
 {
@@ -145,7 +144,7 @@ namespace UnitTests.Controllers
             var savedRefreshToken = new RefreshToken { Id = "1", Token = _refreshToken, ExpiryIn = (int)new DateTimeOffset(DateTime.UtcNow.AddDays(2)).ToUnixTimeSeconds() };
             var newRefreshToken = new RefreshToken { Id = "2", Token = "newRefreshToken", ExpiryIn = (int)new DateTimeOffset(DateTime.UtcNow.AddDays(2)).ToUnixTimeSeconds() };
             SetUpMocksForSucceed(newJwtToken, newAccessToken, savedRefreshToken, newRefreshToken);
-            _mapperMock.Setup(x => x.Map<RefreshTokenDto>(It.IsNotNull<RefreshToken>())).Returns(new RefreshTokenDto { ExpiryIn = newRefreshToken.ExpiryIn, Token = newRefreshToken.Token });            
+            _mapperMock.Setup(x => x.Map<RefreshTokenDto>(It.IsNotNull<RefreshToken>())).Returns(new RefreshTokenDto { ExpiryIn = newRefreshToken.ExpiryIn, Token = newRefreshToken.Token });
             var controller = new AuthController(_jwtTokenHandlerMock.Object, _refreshTokenManagerMock.Object, _logger, _mapperMock.Object);
             var refreshRequestBody = new RefreshTokenViewModel { AccessToken = _validAccessToken, RefreshToken = _refreshToken };
 
@@ -176,7 +175,7 @@ namespace UnitTests.Controllers
 
         private ClaimsPrincipal GetNotExpiredTokenPrincipal()
         {
-            
+
             string[] userRoles = new string[] { "admin" };
             var notExpiredTokenPrincipal = new ClaimsPrincipal();
             notExpiredTokenPrincipal.AddIdentity(new ClaimsIdentity(new Claim[]

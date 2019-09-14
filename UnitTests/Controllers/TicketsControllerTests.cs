@@ -1,21 +1,19 @@
-﻿using NUnit.Framework;
+﻿using AutoMapper;
+using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Moq;
+using NUnit.Framework;
+using SDCWebApp.ApiErrors;
+using SDCWebApp.Controllers;
+using SDCWebApp.Models;
+using SDCWebApp.Models.Dtos;
+using SDCWebApp.Services;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using Moq;
-using FluentAssertions;
-using AutoMapper;
-using Microsoft.Extensions.Logging;
-using SDCWebApp.Controllers;
-using System.Threading.Tasks;
-using SDCWebApp.Services;
-using Microsoft.AspNetCore.Mvc;
-using SDCWebApp.Models.Dtos;
-using SDCWebApp.Models;
-using SDCWebApp.ApiErrors;
 using System.Linq;
-using Autofac.Features.Indexed;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace UnitTests.Controllers
 {
@@ -207,8 +205,8 @@ namespace UnitTests.Controllers
 
             await result.Should().ThrowExactlyAsync<InternalDbServiceException>();
         }
-                          
-        [Test]            
+
+        [Test]
         public async Task GetCustomerTicket__An_unexpected_internal_error_occurred__Should_throw_Exception()
         {
             _ticketDbServiceMock.Setup(x => x.GetByAsync(It.IsAny<Expression<Func<Ticket, bool>>>())).ThrowsAsync(new Exception());
@@ -245,7 +243,7 @@ namespace UnitTests.Controllers
             ((result as ObjectResult).Value as ResponseWrapper).Error.Should().NotBeEquivalentTo(new ApiError());
         }
 
-        [Test, Combinatorial]            
+        [Test, Combinatorial]
         public async Task GetCustomerTicket__Arguments_are_null_or_empty__Should_return_400BadRequest_response([Values(null, "")] string customerId, [Values(null, "")] string ticketId)
         {
             var controller = new TicketsController(_ticketDbServiceMock.Object, _logger, _mapperMock.Object);
@@ -255,8 +253,8 @@ namespace UnitTests.Controllers
             (result as ObjectResult).StatusCode.Should().Be(400);
             ((result as ObjectResult).Value as ResponseWrapper).Error.Should().NotBeEquivalentTo(new ApiError());
         }
-                          
-        [Test]            
+
+        [Test]
         public async Task GetCustomerTicket__Data_retrieve_succeeded__Should_return_200Ok_response_with_data()
         {
             _ticketDbServiceMock.Setup(x => x.GetByAsync(It.IsAny<Expression<Func<Ticket, bool>>>())).ReturnsAsync(new Ticket[] { _validTicket }.AsEnumerable());
@@ -306,20 +304,20 @@ namespace UnitTests.Controllers
         {
             // The customer must have at least one ticket because it is created if it has ordered at least one ticket
             _ticketDbServiceMock.Setup(x => x.GetByAsync(It.IsAny<Expression<Func<Ticket, bool>>>())).ReturnsAsync(Enumerable.Empty<Ticket>());
-            _mapperMock.Setup(x => x.Map<IEnumerable<TicketDto>>(It.IsNotNull<IEnumerable<Ticket>>())).Returns(Enumerable.Empty<TicketDto>());         
+            _mapperMock.Setup(x => x.Map<IEnumerable<TicketDto>>(It.IsNotNull<IEnumerable<Ticket>>())).Returns(Enumerable.Empty<TicketDto>());
             var controller = new TicketsController(_ticketDbServiceMock.Object, _logger, _mapperMock.Object);
 
             var result = await controller.GetCustomerTicketsAsync("1");
 
             (result as ObjectResult).StatusCode.Should().Be(404);
             ((result as ObjectResult).Value as ResponseWrapper).Error.Should().NotBeEquivalentTo(new ApiError());
-        }       
+        }
 
         [Test]
         public async Task GetCustomerTickets__At_least_one_ticket_found__Should_return_200OK_response_with_not_empty_IEnumerable()
         {
             _ticketDbServiceMock.Setup(x => x.GetByAsync(It.IsAny<Expression<Func<Ticket, bool>>>())).ReturnsAsync(new Ticket[] { _validTicket }.AsEnumerable());
-            _mapperMock.Setup(x => x.Map<IEnumerable<TicketDto>>(It.IsNotNull<IEnumerable<Ticket>>())).Returns(new TicketDto[] { _validTicketDto }.AsEnumerable());     
+            _mapperMock.Setup(x => x.Map<IEnumerable<TicketDto>>(It.IsNotNull<IEnumerable<Ticket>>())).Returns(new TicketDto[] { _validTicketDto }.AsEnumerable());
             var controller = new TicketsController(_ticketDbServiceMock.Object, _logger, _mapperMock.Object);
 
             var result = await controller.GetCustomerTicketsAsync("1");

@@ -1,33 +1,45 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SDCWebApp.Models
 {
     public class Ticket : BasicEntity, ICloneable
     {
-        private float _price = 0.0f;
-
-
         public string TicketUniqueId { get; set; }
         [Column(TypeName = "datetime2(0)")]
         public DateTime PurchaseDate { get; set; } = DateTime.Now;
-        [Column(TypeName = "date")]
-        public DateTime ValidFor { get; set; }
 
-        // Ticket price calculated basic on default price in TicketTariff and Discount.
+        [Column(TypeName = "datetime2(0)")]
+        public DateTime ValidFor
+        {
+            get
+            {
+                return Group is null ? DateTime.MinValue : Group.SightseeingDate;
+            }
+
+            private set { }
+        }
+
+        public string OrderStamp { get; set; }
+
+        // Ticket price calculated based on default price in TicketTariff and Discount value in percentage.
         public float Price
         {
             get
             {
                 if (Tariff != null && Discount != null)
-                    _price = Tariff.DefaultPrice * (1.0f - (Discount.DiscountValueInPercentage / 100.0f));
+                {
+                    return Tariff.DefaultPrice * (1.0f - (Discount.DiscountValueInPercentage / 100.0f));
+                }
                 else if (Tariff != null)
-                    _price = Tariff.DefaultPrice;
-                return _price;
+                {
+                    return Tariff.DefaultPrice;
+                }
+
+                return 0.0f;
             }
-            private set => _price = value;
+            private set { }
         }
 
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]

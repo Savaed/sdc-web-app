@@ -4,14 +4,13 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using SDCWebApp.Auth;
+using SDCWebApp.Models;
+using SDCWebApp.Services;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 using UnitTests.Helpers;
-
-using SDCWebApp.Auth;
-using SDCWebApp.Models;
-using SDCWebApp.Services;
 
 namespace UnitTests.Services
 {

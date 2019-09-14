@@ -1,17 +1,16 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SDCWebApp.Helpers.Constants;
+using SDCWebApp.Models;
+using SDCWebApp.Models.Dtos;
+using SDCWebApp.Services;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-
-using SDCWebApp.Models;
-using SDCWebApp.Models.Dtos;
-using SDCWebApp.Services;
-using Microsoft.AspNetCore.Authorization;
-using SDCWebApp.Helpers.Constants;
 
 namespace SDCWebApp.Controllers
 {
@@ -30,13 +29,13 @@ namespace SDCWebApp.Controllers
         private readonly IUserActivityLogger _activityLogger;
 
 
-        public DiscountsController(IDiscountDbService discountDbService, ILogger<DiscountsController> logger, IMapper mapper, IUserActivityLogger activityLogger) : base(logger)
-        {
-            _mapper = mapper;
-            _logger = logger;
-            _discountDbService = discountDbService;
-            _activityLogger = activityLogger;
-        }
+        //public DiscountsController(IDiscountDbService discountDbService, ILogger<DiscountsController> logger, IMapper mapper, IUserActivityLogger activityLogger) : base(logger)
+        //{
+        //    _mapper = mapper;
+        //    _logger = logger;
+        //    _discountDbService = discountDbService;
+        //    _activityLogger = activityLogger;
+        //}
 
         public DiscountsController(IDiscountDbService discountDbService, ILogger<DiscountsController> logger, IMapper mapper) : base(logger)
         {
@@ -83,7 +82,7 @@ namespace SDCWebApp.Controllers
             }
             catch (InternalDbServiceException ex)
             {
-                LogInternalDbServiceException(_discountDbService.GetType(), ex);
+                LogInternalDbServiceException(ex, _discountDbService.GetType());
                 throw;
             }
             catch (Exception ex)
@@ -110,7 +109,9 @@ namespace SDCWebApp.Controllers
             _logger.LogInformation($"Starting method '{nameof(DeleteDiscountAsync)}'.");
 
             if (string.IsNullOrEmpty(id))
+            {
                 return OnInvalidParameterError($"Parameter '{nameof(id)}' cannot be null or empty.");
+            }
 
             try
             {
@@ -125,7 +126,7 @@ namespace SDCWebApp.Controllers
             }
             catch (InternalDbServiceException ex)
             {
-                LogInternalDbServiceException(_discountDbService.GetType(), ex);
+                LogInternalDbServiceException(ex, _discountDbService.GetType());
                 throw;
             }
             catch (Exception ex)
@@ -158,7 +159,7 @@ namespace SDCWebApp.Controllers
             }
             catch (InternalDbServiceException ex)
             {
-                LogInternalDbServiceException(_discountDbService.GetType(), ex);
+                LogInternalDbServiceException(ex, _discountDbService.GetType());
                 throw;
             }
             catch (Exception ex)
@@ -187,7 +188,9 @@ namespace SDCWebApp.Controllers
             _logger.LogInformation($"Starting method '{nameof(GetDiscountAsync)}'.");
 
             if (string.IsNullOrEmpty(id))
+            {
                 return OnInvalidParameterError($"Parameter '{nameof(id)}' cannot be null or empty.");
+            }
 
             try
             {
@@ -203,7 +206,7 @@ namespace SDCWebApp.Controllers
             }
             catch (InternalDbServiceException ex)
             {
-                LogInternalDbServiceException(_discountDbService.GetType(), ex);
+                LogInternalDbServiceException(ex, _discountDbService.GetType());
                 throw;
             }
             catch (Exception ex)
@@ -232,10 +235,14 @@ namespace SDCWebApp.Controllers
             _logger.LogInformation($"Starting method '{nameof(UpdateDiscountAsync)}'.");
 
             if (string.IsNullOrEmpty(id))
+            {
                 return OnInvalidParameterError($"An argument '{nameof(id)}' cannot be null or empty.");
+            }
 
             if (!id.Equals(discount.Id))
+            {
                 return OnMismatchParameterError($"An '{nameof(id)}' in URL end field '{nameof(discount.Id).ToLower()}' in request body mismatches. Value in URL: '{id}'. Value in body: '{discount.Id}'.");
+            }
 
             try
             {
@@ -254,7 +261,7 @@ namespace SDCWebApp.Controllers
             }
             catch (InternalDbServiceException ex)
             {
-                LogInternalDbServiceException(_discountDbService.GetType(), ex);
+                LogInternalDbServiceException(ex, _discountDbService.GetType());
                 throw;
             }
             catch (Exception ex)

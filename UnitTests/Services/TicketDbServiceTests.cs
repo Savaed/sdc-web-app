@@ -3,15 +3,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using SDCWebApp.Data;
+using SDCWebApp.Models;
+using SDCWebApp.Services;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using UnitTests.Helpers;
-
-using SDCWebApp.Data;
-using SDCWebApp.Models;
-using SDCWebApp.Services;
 
 namespace UnitTests.Services
 {
@@ -21,7 +20,7 @@ namespace UnitTests.Services
         private Mock<ApplicationDbContext> _dbContextMock;
         private ILogger<TicketDbService> _logger;
         private Expression<Func<Ticket, bool>> _predicate;
-        private Ticket _validTicket = new Ticket
+        private readonly Ticket _validTicket = new Ticket
         {
             Id = "1",
             Customer = new Customer { Id = "1", EmailAddress = "samplecustomer@mail.com" },

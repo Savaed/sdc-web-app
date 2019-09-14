@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using SDCWebApp.Models;
 using System;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace SDCWebApp.Data.Validation
     {
         public SightseeingGroupValidator(ApplicationDbContext dbContext)
         {
-            var recentInfo = dbContext.GeneralSightseeingInfo.OrderByDescending(x => x.UpdatedAt == null ? x.CreatedAt : x.UpdatedAt).First();
+            var recentInfo = dbContext.GeneralSightseeingInfo.Include(x => x.OpeningHours).OrderByDescending(x => x.UpdatedAt == DateTime.MinValue ? x.CreatedAt : x.UpdatedAt).First();
 
             RuleFor(x => x.MaxGroupSize)
                 .Cascade(CascadeMode.StopOnFirstFailure)
@@ -22,7 +23,7 @@ namespace SDCWebApp.Data.Validation
             RuleFor(x => x.SightseeingDate)
                 .Cascade(CascadeMode.StopOnFirstFailure)
                 .NotEmpty()
-                .GreaterThan(DateTime.Now) 
+                .GreaterThan(DateTime.Now)
                 .LessThan(DateTime.Now.AddDays(recentInfo.MaxTicketOrderInterval * 7))
                 .Custom((dateTime, context) =>
                 {

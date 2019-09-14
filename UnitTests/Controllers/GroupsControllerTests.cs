@@ -5,18 +5,17 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using SDCWebApp.ApiErrors;
+using SDCWebApp.Controllers;
+using SDCWebApp.Models;
+using SDCWebApp.Models.Dtos;
+using SDCWebApp.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using UnitTests.Helpers;
-
-using SDCWebApp.ApiErrors;
-using SDCWebApp.Controllers;
-using SDCWebApp.Models;
-using SDCWebApp.Models.Dtos;
-using SDCWebApp.Services;
 
 namespace UnitTests.Controllers
 {
@@ -218,8 +217,8 @@ namespace UnitTests.Controllers
 
             await result.Should().ThrowExactlyAsync<InternalDbServiceException>();
         }
-                          
-        [Test]            
+
+        [Test]
         public async Task GetAvailableGroupDatesAsync__An_unexpected_internal_error_occurred__Should_throw_Exception()
         {
             _groupDbServiceMock.Setup(x => x.GetByAsync(It.IsAny<Expression<Func<SightseeingGroup, bool>>>())).ThrowsAsync(new Exception());
@@ -230,8 +229,8 @@ namespace UnitTests.Controllers
 
             await result.Should().ThrowExactlyAsync<Exception>();
         }
-                          
-        [Test]            
+
+        [Test]
         public async Task GetAvailableGroupDatesAsync__Resource_is_empty__Should_return_200OK_response_with__not_empty_IEnumerable()
         {
             _infoDbServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new GeneralSightseeingInfo[] { _info }.AsEnumerable());
@@ -243,8 +242,8 @@ namespace UnitTests.Controllers
             (result as ObjectResult).StatusCode.Should().Be(200);
             (((result as ObjectResult).Value as ResponseWrapper).Data as IEnumerable<GroupInfo>).Should().NotBeEmpty();
         }
-                          
-        [Test]            
+
+        [Test]
         public async Task GetAvailableGroupDatesAsync__At_least_one_element_found__Should_return_200OK_response_with_not_empty_IEnumerable()
         {
             _infoDbServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new GeneralSightseeingInfo[] { _info }.AsEnumerable());
@@ -256,8 +255,8 @@ namespace UnitTests.Controllers
             (result as ObjectResult).StatusCode.Should().Be(200);
             (((result as ObjectResult).Value as ResponseWrapper).Data as IEnumerable<GroupInfo>).Should().NotBeEmpty();
         }
-                          
-        [Test]            
+
+        [Test]
         public async Task GetAvailableGroupDatesAsync__There_is_group_without_available_places__Returned_IEnumerable_should_not_contain_date_of_this_group()
         {
             _infoDbServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new GeneralSightseeingInfo[] { _info }.AsEnumerable());
@@ -275,8 +274,8 @@ namespace UnitTests.Controllers
             (result as ObjectResult).StatusCode.Should().Be(200);
             (((result as ObjectResult).Value as ResponseWrapper).Data as IEnumerable<GroupInfo>).Any(x => x.SightseeingDate == notAvailableGroup.SightseeingDate).Should().BeFalse();
         }
-                          
-        [Test]            
+
+        [Test]
         public async Task GetAvailableGroupDatesAsync__Sightseeing_info_not_found__Should_return_200OK_response_with_empty_IEnumerable()
         {
             _infoDbServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(Enumerable.Empty<GeneralSightseeingInfo>());
@@ -288,8 +287,8 @@ namespace UnitTests.Controllers
             (result as ObjectResult).StatusCode.Should().Be(200);
             (((result as ObjectResult).Value as ResponseWrapper).Data as IEnumerable<GroupInfo>).Should().BeEmpty();
         }
-                          
-        [Test]            
+
+        [Test]
         public async Task GetAvailableGroupDatesAsync__At_least_one_element_found__Should_return_200OK_response_with_distinct_groups()
         {
             _infoDbServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new GeneralSightseeingInfo[] { _info }.AsEnumerable());

@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SDCWebApp.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace SDCWebApp.Data
 {
@@ -13,7 +11,7 @@ namespace SDCWebApp.Data
     /// </summary>
     public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     {
-        // All DbSet<TEntity> properties are marked as virtual for enabling unit testing and using Mock.Setup / Verifiable functionality
+        // All DbSet<TEntity> properties are marked as virtual for enabling unit testing and using Mock.Setup / Verifiable functionality.
         public virtual DbSet<Ticket> Tickets { get; set; }
         public virtual DbSet<Discount> Discounts { get; set; }
         public virtual DbSet<SightseeingTariff> SightseeingTariffs { get; set; }
@@ -36,26 +34,21 @@ namespace SDCWebApp.Data
         {
             base.OnModelCreating(builder);
 
-            builder.Entity<SightseeingGroup>(entity =>
-            {
-                entity.Property(s => s.CurrentGroupSize).HasField("_currentGroupSize").UsePropertyAccessMode(PropertyAccessMode.FieldDuringConstruction);
-                entity.Property(c => c.IsAvailablePlace).HasField("_isAvailablePlace").UsePropertyAccessMode(PropertyAccessMode.FieldDuringConstruction);
-            });
-
-            builder.Entity<Ticket>(entity =>
-            {
-                entity.Property(t => t.Price).HasField("_price").UsePropertyAccessMode(PropertyAccessMode.FieldDuringConstruction);
-            });
-
             builder.Entity<ActivityLog>().Property(a => a.Type).HasConversion<string>();
             builder.Entity<Discount>().Property(d => d.Type).HasConversion<string>();
             builder.Entity<OpeningHours>().Property(d => d.DayOfWeek).HasConversion<string>();
 
+            // Allow deleting OpeningHours if deleting SightseeingInfo.
             builder.Entity<GeneralSightseeingInfo>()
                 .HasMany(x => x.OpeningHours)
                 .WithOne(o => o.Info)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            // Allow deleting Tickets if deleting SightseeingGroup.
+            builder.Entity<SightseeingGroup>()
+                .HasMany(x => x.Tickets)
+                .WithOne(x => x.Group)
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<OpeningHours>().HasData(
              new OpeningHours
@@ -158,13 +151,13 @@ namespace SDCWebApp.Data
                 {
                     Id = Guid.NewGuid().ToString(),
                     TicketUniqueId = Guid.NewGuid().ToString(),
-                    ValidFor = DateTime.Now.AddDays(7)
+                    OrderStamp = Guid.NewGuid().ToString()
                 },
                 new Ticket
                 {
                     Id = Guid.NewGuid().ToString(),
                     TicketUniqueId = Guid.NewGuid().ToString(),
-                    ValidFor = DateTime.Now.AddDays(21)
+                    OrderStamp = Guid.NewGuid().ToString()
                 });
 
             builder.Entity<Discount>().HasData(
