@@ -8,7 +8,7 @@ namespace SDCWebApp.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_OpeningDates_GeneralSightseeingInfo_InfoId",
+                name: "FK_OpeningDates_VisitInfo_InfoId",
                 table: "OpeningDates");
 
             migrationBuilder.DeleteData(
@@ -62,7 +62,7 @@ namespace SDCWebApp.Migrations
                 keyValue: "80d3a5ca-a8db-4eb0-aeff-b9417869bb82");
 
             migrationBuilder.DeleteData(
-                table: "GeneralSightseeingInfo",
+                table: "VisitInfo",
                 keyColumn: "Id",
                 keyValue: "5d12cac1-1e48-4be2-a778-04176e233411");
 
@@ -197,7 +197,7 @@ namespace SDCWebApp.Migrations
                 values: new object[] { "592c7016-a06e-41b8-8915-4116123613cf", new DateTime(2019, 9, 12, 9, 54, 56, 175, DateTimeKind.Utc).AddTicks(524), "Discount only for kids under specific age.", 100, null, "ForChild", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
 
             migrationBuilder.InsertData(
-                table: "GeneralSightseeingInfo",
+                table: "VisitInfo",
                 columns: new[] { "Id", "CreatedAt", "Description", "MaxAllowedGroupSize", "MaxChildAge", "MaxTicketOrderInterval", "SightseeingDuration", "UpdatedAt" },
                 values: new object[] { "c55b5340-b93e-4587-90e8-73d9b0a9551c", new DateTime(2019, 9, 12, 9, 54, 56, 176, DateTimeKind.Utc).AddTicks(7419), "TL;DR", 35, 5, 4, 2f, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
 
@@ -277,10 +277,10 @@ namespace SDCWebApp.Migrations
                 values: new object[] { "1bcc5bcc-1cf8-4a2c-83ec-a7e5516d3116", new DateTime(2019, 9, 12, 9, 54, 56, 174, DateTimeKind.Utc).AddTicks(7995), null, null, null, "6aa222e0-0242-42e1-93b2-32aa99a71dc8", 0f, new DateTime(2019, 9, 12, 11, 54, 56, 174, DateTimeKind.Local).AddTicks(7986), null, "94febddc-7aa8-4ef1-ad9e-150ad5b12e9e", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2019, 10, 3, 11, 54, 56, 174, DateTimeKind.Local).AddTicks(8011) });
 
             migrationBuilder.AddForeignKey(
-                name: "FK_OpeningDates_GeneralSightseeingInfo_InfoId",
+                name: "FK_OpeningDates_VisitInfo_InfoId",
                 table: "OpeningDates",
                 column: "InfoId",
-                principalTable: "GeneralSightseeingInfo",
+                principalTable: "VisitInfo",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Cascade);
         }
@@ -288,7 +288,7 @@ namespace SDCWebApp.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_OpeningDates_GeneralSightseeingInfo_InfoId",
+                name: "FK_OpeningDates_VisitInfo_InfoId",
                 table: "OpeningDates");
 
             migrationBuilder.DeleteData(
@@ -342,7 +342,7 @@ namespace SDCWebApp.Migrations
                 keyValue: "91e38b65-a0db-4908-89f2-406461a00d25");
 
             migrationBuilder.DeleteData(
-                table: "GeneralSightseeingInfo",
+                table: "VisitInfo",
                 keyColumn: "Id",
                 keyValue: "c55b5340-b93e-4587-90e8-73d9b0a9551c");
 
@@ -476,7 +476,7 @@ namespace SDCWebApp.Migrations
                 values: new object[] { "5d9087d3-f88b-478d-8296-0cee76a6c129", new DateTime(2019, 9, 11, 12, 2, 36, 773, DateTimeKind.Utc).AddTicks(5764), "Discount only for kids under specific age.", 100, null, "ForChild", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
 
             migrationBuilder.InsertData(
-                table: "GeneralSightseeingInfo",
+                table: "VisitInfo",
                 columns: new[] { "Id", "CreatedAt", "Description", "MaxAllowedGroupSize", "MaxChildAge", "MaxTicketOrderInterval", "SightseeingDuration", "UpdatedAt" },
                 values: new object[] { "5d12cac1-1e48-4be2-a778-04176e233411", new DateTime(2019, 9, 11, 12, 2, 36, 775, DateTimeKind.Utc).AddTicks(9231), "TL;DR", 35, 5, 4, 2f, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
 
@@ -556,10 +556,10 @@ namespace SDCWebApp.Migrations
                 values: new object[] { "c8045805-6091-46fd-968c-e959d0d461ec", new DateTime(2019, 9, 11, 12, 2, 36, 773, DateTimeKind.Utc).AddTicks(3205), null, null, null, 0f, new DateTime(2019, 9, 11, 14, 2, 36, 773, DateTimeKind.Local).AddTicks(3197), null, "88a0248d-f1da-4724-8df0-fc4ae1277e19", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2019, 10, 2, 14, 2, 36, 773, DateTimeKind.Local).AddTicks(3220) });
 
             migrationBuilder.AddForeignKey(
-                name: "FK_OpeningDates_GeneralSightseeingInfo_InfoId",
+                name: "FK_OpeningDates_VisitInfo_InfoId",
                 table: "OpeningDates",
                 column: "InfoId",
-                principalTable: "GeneralSightseeingInfo",
+                principalTable: "VisitInfo",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Restrict);
         }

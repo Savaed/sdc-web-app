@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace SDCWebApp.Models
 {
-    public class GeneralSightseeingInfo : BasicEntity, ICloneable, IEquatable<GeneralSightseeingInfo>
+    public class VisitInfo : BasicEntity, ICloneable, IEquatable<VisitInfo>
     {
         public string Description { get; set; }
         public int MaxChildAge { get; set; }
@@ -46,7 +46,7 @@ namespace SDCWebApp.Models
             return MemberwiseClone();
         }
 
-        public bool Equals(GeneralSightseeingInfo other)
+        public bool Equals(VisitInfo other)
         {
             if (other is null || GetType() != other.GetType())
             {
@@ -67,7 +67,7 @@ namespace SDCWebApp.Models
 
         public override bool Equals(object obj)
         {
-            return Equals(obj as GeneralSightseeingInfo);
+            return Equals(obj as VisitInfo);
         }
 
         public override int GetHashCode()

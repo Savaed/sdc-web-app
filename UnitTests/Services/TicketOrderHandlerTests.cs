@@ -4,14 +4,14 @@ using FluentValidation;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using SDCWebApp.Models;
+using SDCWebApp.Models.Dtos;
+using SDCWebApp.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using SDCWebApp.Models;
-using SDCWebApp.Models.Dtos;
-using SDCWebApp.Services;
 
 namespace UnitTests.Services
 {
@@ -24,7 +24,7 @@ namespace UnitTests.Services
         private Mock<ICustomerDbService> _customerDbServiceMock;
         private Mock<IDiscountDbService> _discountDbServiceMock;
         private Mock<ITicketTariffDbService> _ticketTariffDbServiceMock;
-        private Mock<IGeneralSightseeingInfoDbService> _infoDbServiceMock;
+        private Mock<IVisitInfoDbService> _infoDbServiceMock;
         private Mock<IValidator<SightseeingGroup>> _validatorMock;
         private ILogger<TicketOrderHandler> _logger;
         private Customer _customer;
@@ -40,7 +40,7 @@ namespace UnitTests.Services
             _validatorMock = new Mock<IValidator<SightseeingGroup>>();
             _logger = Mock.Of<ILogger<TicketOrderHandler>>();
 
-            var info = new GeneralSightseeingInfo
+            var info = new VisitInfo
             {
                 Id = "1",
                 Description = "recent sightseeing info",
@@ -50,8 +50,8 @@ namespace UnitTests.Services
                 SightseeingDuration = 2,
                 OpeningHours = new OpeningHours[] { }
             };
-            _infoDbServiceMock = new Mock<IGeneralSightseeingInfoDbService>();
-            _infoDbServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new GeneralSightseeingInfo[] { info }.AsEnumerable());
+            _infoDbServiceMock = new Mock<IVisitInfoDbService>();
+            _infoDbServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new VisitInfo[] { info }.AsEnumerable());
 
             _ticketTariff = new TicketTariff { Id = "1", DefaultPrice = 20, Description = "ticket tariff" };
             _ticketTariffDbServiceMock = new Mock<ITicketTariffDbService>();
@@ -88,7 +88,7 @@ namespace UnitTests.Services
             _dbServiceFactoryMock.Setup(x => x["ICustomerDbService"]).Returns(_customerDbServiceMock.Object);
             _dbServiceFactoryMock.Setup(x => x["IDiscountDbService"]).Returns(_discountDbServiceMock.Object);
             _dbServiceFactoryMock.Setup(x => x["ITicketTariffDbService"]).Returns(_ticketTariffDbServiceMock.Object);
-            _dbServiceFactoryMock.Setup(x => x["IGeneralSightseeingInfoDbService"]).Returns(_infoDbServiceMock.Object);
+            _dbServiceFactoryMock.Setup(x => x["IVisitInfoDbService"]).Returns(_infoDbServiceMock.Object);
             _dbServiceFactoryMock.Setup(x => x["ISightseeingGroupDbService"]).Returns(_groupDbServiceMock.Object);
             _dbServiceFactoryMock.Setup(x => x["ITicketDbService"]).Returns(_ticketDbServiceMock.Object);
         }
@@ -361,10 +361,10 @@ namespace UnitTests.Services
 
         private void SetUpForFailedUpdate(DateTime sightseeingDate)
         {
-            var info = new GeneralSightseeingInfo { MaxAllowedGroupSize = 1 };
+            var info = new VisitInfo { MaxAllowedGroupSize = 1 };
             var existentGroup = new SightseeingGroup { MaxGroupSize = 1, SightseeingDate = sightseeingDate, Tickets = new Ticket[] { _ticket } };
 
-            _infoDbServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new GeneralSightseeingInfo[] { info });
+            _infoDbServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new VisitInfo[] { info });
 
             _groupDbServiceMock.Setup(x => x.GetByAsync(It.IsAny<Expression<Func<SightseeingGroup, bool>>>())).ReturnsAsync(new SightseeingGroup[] { existentGroup });
 
@@ -374,9 +374,9 @@ namespace UnitTests.Services
 
         private void SetUpForFailedCreateNewGroup()
         {
-            var info = new GeneralSightseeingInfo { MaxAllowedGroupSize = 1 };
+            var info = new VisitInfo { MaxAllowedGroupSize = 1 };
 
-            _infoDbServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new GeneralSightseeingInfo[] { info });
+            _infoDbServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new VisitInfo[] { info });
 
             _groupDbServiceMock.Setup(x => x.GetByAsync(It.IsAny<Expression<Func<SightseeingGroup, bool>>>())).ReturnsAsync(Enumerable.Empty<SightseeingGroup>());
 
@@ -386,11 +386,11 @@ namespace UnitTests.Services
 
         private void SetUpForSucceededOrderHandle(DateTime sightseeingDate, IEnumerable<Ticket> tickets)
         {
-            var info = new GeneralSightseeingInfo { MaxAllowedGroupSize = 3 };
+            var info = new VisitInfo { MaxAllowedGroupSize = 3 };
             var existentGroup = new SightseeingGroup { MaxGroupSize = info.MaxAllowedGroupSize, SightseeingDate = sightseeingDate, Tickets = new Ticket[] { _ticket } };
             var newGroup = new SightseeingGroup { MaxGroupSize = info.MaxAllowedGroupSize, SightseeingDate = sightseeingDate, Tickets = (ICollection<Ticket>)tickets };
 
-            _infoDbServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new GeneralSightseeingInfo[] { info });
+            _infoDbServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new VisitInfo[] { info });
 
             _groupDbServiceMock.Setup(x => x.GetByAsync(It.IsAny<Expression<Func<SightseeingGroup, bool>>>())).ReturnsAsync(new SightseeingGroup[] { existentGroup });
             _groupDbServiceMock.Setup(x => x.RestrictedAddAsync(It.IsAny<SightseeingGroup>())).ReturnsAsync(newGroup);

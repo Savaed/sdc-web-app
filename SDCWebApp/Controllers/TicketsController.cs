@@ -98,7 +98,7 @@ namespace SDCWebApp.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                return OnNotFoundError($"Cannot found element '{typeof(SightseeingTariff).Name}' with specified id: '{id}'.", ex);
+                return OnNotFoundError($"Cannot found element '{typeof(VisitTariff).Name}' with specified id: '{id}'.", ex);
             }
             catch (InternalDbServiceException ex)
             {
@@ -128,7 +128,7 @@ namespace SDCWebApp.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetCustomerTicketAsync(string customerId, string ticketId)
         {
-            _logger.LogInformation($"Starting method '{nameof(GetCustomerTicketAsync)}'.");
+            _logger.LogInformation($"Starting method '{nameof(GetCustomerTicketsAsync)}'.");
 
             if (string.IsNullOrEmpty(customerId) || string.IsNullOrEmpty(ticketId))
             {
@@ -151,7 +151,7 @@ namespace SDCWebApp.Controllers
                 _logger.LogDebug("Data retrieved succeeded");
                 var customersSearchedTicketDto = MapToDto(customersSearchedTicket);
                 var response = new ResponseWrapper(customersSearchedTicketDto);
-                _logger.LogInformation($"Finished method '{nameof(GetCustomerTicketAsync)}'.");
+                _logger.LogInformation($"Finished method '{nameof(GetCustomerTicketsAsync)}'.");
                 return Ok(response);
             }
             catch (InvalidOperationException ex) when (allCustomerTickets.Count() > 0)
@@ -186,7 +186,7 @@ namespace SDCWebApp.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetCustomerTicketsAsync(string customerId)
         {
-            _logger.LogInformation($"Starting method '{nameof(GetCustomerTicketAsync)}'.");
+            _logger.LogInformation($"Starting method '{nameof(GetCustomerTicketsAsync)}'.");
 
             if (string.IsNullOrEmpty(customerId))
             {
@@ -206,7 +206,7 @@ namespace SDCWebApp.Controllers
                 _logger.LogDebug("Data retrieved succeeded");
                 var allCustomerTicketsDto = MapToDtoEnumerable(allCustomerTickets);
                 var response = new ResponseWrapper(allCustomerTicketsDto);
-                _logger.LogInformation($"Finished method '{nameof(GetCustomerTicketAsync)}'.");
+                _logger.LogInformation($"Finished method '{nameof(GetCustomerTicketsAsync)}'.");
                 return Ok(response);
             }
             catch (InternalDbServiceException ex)

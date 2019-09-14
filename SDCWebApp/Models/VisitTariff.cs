@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace SDCWebApp.Models
 {
-    public class SightseeingTariff : BasicEntity, ICloneable, IEquatable<SightseeingTariff>
+    public class VisitTariff : BasicEntity, ICloneable, IEquatable<VisitTariff>
     {
         public string Name { get; set; }
         public virtual ICollection<TicketTariff> TicketTariffs { get; set; }
@@ -16,13 +16,13 @@ namespace SDCWebApp.Models
 
         public override bool Equals(object obj)
         {
-            return Equals(obj as SightseeingTariff);
+            return Equals(obj as VisitTariff);
         }
 
-        public bool Equals(SightseeingTariff tariff)
+        public bool Equals(VisitTariff tariff)
         {
             // If parameter is null, return false.
-            if (ReferenceEquals(tariff, null))
+            if (tariff is null)
             {
                 return false;
             }

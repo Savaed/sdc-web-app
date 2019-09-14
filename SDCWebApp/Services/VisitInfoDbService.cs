@@ -12,15 +12,15 @@ using System.Threading.Tasks;
 namespace SDCWebApp.Services
 {
     /// <summary>
-    /// Provides methods for GET, ADD, UPDATE and DELETE operations for <see cref="GeneralSightseeingInfo"/> entities in the database.
+    /// Provides methods for GET, ADD, UPDATE and DELETE operations for <see cref="VisitInfo"/> entities in the database.
     /// </summary>
-    public class GeneralSightseeingInfoDbService : ServiceBase, IGeneralSightseeingInfoDbService
+    public class VisitInfoDbService : ServiceBase, IVisitInfoDbService
     {
-        private readonly ILogger<GeneralSightseeingInfoDbService> _logger;
+        private readonly ILogger<VisitInfoDbService> _logger;
         private readonly ApplicationDbContext _context;
 
 
-        public GeneralSightseeingInfoDbService(ApplicationDbContext context, ILogger<GeneralSightseeingInfoDbService> logger) : base(context, logger)
+        public VisitInfoDbService(ApplicationDbContext context, ILogger<VisitInfoDbService> logger) : base(context, logger)
         {
             _logger = logger;
             _context = context;
@@ -28,26 +28,26 @@ namespace SDCWebApp.Services
 
 
         /// <summary>
-        /// Filters set of data of type <see cref="GeneralSightseeingInfo"/>. Returns filtered data set. Throws an exception if <paramref name="predicate"/> is null, 
+        /// Filters set of data of type <see cref="VisitInfo"/>. Returns filtered data set. Throws an exception if <paramref name="predicate"/> is null, 
         /// or if cannot filter data due to any internal problem.
         /// </summary>
         /// <typeparam name="T">The type of entity to set be filtered.</typeparam>
         /// <param name="predicate">A function to test each element for a condition.</param>
-        /// <returns>Filterd <see cref="GeneralSightseeingInfo"/> set.</returns>
+        /// <returns>Filterd <see cref="VisitInfo"/> set.</returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="predicate"/> is null.</exception>
         /// <exception cref="InvalidOperationException">Cannot filter data.</exception>
         /// <exception cref="InternalDbServiceException">The resource does not exist or has a null value or any
         /// other problems with retrieving data from database occurred.</exception>        
-        public async Task<IEnumerable<GeneralSightseeingInfo>> GetByAsync(Expression<Func<GeneralSightseeingInfo, bool>> predicate)
+        public async Task<IEnumerable<VisitInfo>> GetByAsync(Expression<Func<VisitInfo, bool>> predicate)
         {
             _logger.LogInformation($"Starting method '{nameof(GetByAsync)}'.");
 
             await EnsureDatabaseCreatedAsync();
-            _ = _context?.GeneralSightseeingInfo ?? throw new InternalDbServiceException($"Table of type '{typeof(GeneralSightseeingInfo).Name}' is null.");
+            _ = _context?.Info ?? throw new InternalDbServiceException($"Table of type '{typeof(VisitInfo).Name}' is null.");
 
             try
             {
-                var result = GetByPredicate<GeneralSightseeingInfo>(predicate) as IEnumerable<GeneralSightseeingInfo>;
+                var result = GetByPredicate<VisitInfo>(predicate) as IEnumerable<VisitInfo>;
                 _logger.LogInformation($"Finished method '{nameof(GetByAsync)}'.");
                 return result;
             }
@@ -70,16 +70,16 @@ namespace SDCWebApp.Services
         }
 
         /// <summary>
-        /// Asynchronously adds <see cref="GeneralSightseeingInfo"/> entity to the database. Throws an exception if 
+        /// Asynchronously adds <see cref="VisitInfo"/> entity to the database. Throws an exception if 
         /// already there is the same entity in database or any problem with saving changes occurred.
         /// </summary>
         /// <param name="info">The info to be added. Cannot be null.</param>
         /// <returns>The added entity.</returns>
         /// <exception cref="ArgumentNullException">The value of <paramref name="info"/> to be added is null.</exception>
         /// <exception cref="InvalidOperationException">There is the same entity that one to be added in database.</exception>
-        /// <exception cref="InternalDbServiceException">The table with <see cref="GeneralSightseeingInfo"/> entities does not exist or it is null or 
+        /// <exception cref="InternalDbServiceException">The table with <see cref="VisitInfo"/> entities does not exist or it is null or 
         /// cannot save properly any changes made by add operation.</exception>
-        public async Task<GeneralSightseeingInfo> AddAsync(GeneralSightseeingInfo info)
+        public async Task<VisitInfo> AddAsync(VisitInfo info)
         {
             _logger.LogInformation($"Starting method '{nameof(AddAsync)}'.");
             // Call restricted add mode.
@@ -87,13 +87,13 @@ namespace SDCWebApp.Services
         }
 
         /// <summary>
-        /// Asynchronously deletes <see cref="GeneralSightseeingInfo"/> entity from the database. Throws an exception if cannot found entity 
+        /// Asynchronously deletes <see cref="VisitInfo"/> entity from the database. Throws an exception if cannot found entity 
         /// to be deleted or any problem with saving changes occurred.
         /// </summary>
         /// <param name="id">The id of entity to be deleted. Cannot be null or empty.</param>
         /// <exception cref="ArgumentException">Argument <paramref name="id"/> is null or empty string.</exception>
         /// <exception cref="InvalidOperationException">Cannot foound entity with given <paramref name="id"/> for delete.</exception>
-        /// <exception cref="InternalDbServiceException">The table with <see cref="GeneralSightseeingInfo"/> entities does not exist or it is null or 
+        /// <exception cref="InternalDbServiceException">The table with <see cref="VisitInfo"/> entities does not exist or it is null or 
         /// cannot save properly any changes made by add operation.</exception>
         public async Task DeleteAsync(string id)
         {
@@ -105,23 +105,23 @@ namespace SDCWebApp.Services
             }
 
             await EnsureDatabaseCreatedAsync();
-            _ = _context?.GeneralSightseeingInfo ?? throw new InternalDbServiceException($"Table of type '{typeof(GeneralSightseeingInfo).Name}' is null.");
+            _ = _context?.Info ?? throw new InternalDbServiceException($"Table of type '{typeof(VisitInfo).Name}' is null.");
 
             try
             {
-                if (_context.GeneralSightseeingInfo.Count() == 0)
+                if (_context.Info.Count() == 0)
                 {
-                    throw new InvalidOperationException($"Cannot found element with id '{id}'. Resource {_context.GeneralSightseeingInfo.GetType().Name} does not contain any element.");
+                    throw new InvalidOperationException($"Cannot found element with id '{id}'. Resource {_context.Info.GetType().Name} does not contain any element.");
                 }
 
-                if (await _context.GeneralSightseeingInfo.AnyAsync(x => x.Id.Equals(id)) == false)
+                if (await _context.Info.AnyAsync(x => x.Id.Equals(id)) == false)
                 {
                     throw new InvalidOperationException($"Cannot found element with id '{id}'. Any element does not match to the one to be updated.");
                 }
 
-                var infoToBeDeleted = await _context.GeneralSightseeingInfo.Include(x => x.OpeningHours).SingleAsync(x => x.Id.Equals(id));
+                var infoToBeDeleted = await _context.Info.Include(x => x.OpeningHours).SingleAsync(x => x.Id.Equals(id));
                 _logger.LogDebug($"Starting remove sightseeing info with id '{id}'.");
-                _context.GeneralSightseeingInfo.Remove(infoToBeDeleted);
+                _context.Info.Remove(infoToBeDeleted);
                 await _context.TrySaveChangesAsync();
                 _logger.LogDebug("Remove data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(DeleteAsync)}'.");
@@ -140,23 +140,23 @@ namespace SDCWebApp.Services
         }
 
         /// <summary>
-        /// Asynchronously retrievs all <see cref="GeneralSightseeingInfo"/> entities from the database. 
+        /// Asynchronously retrievs all <see cref="VisitInfo"/> entities from the database. 
         /// Throws an exception if any problem with retrieving occurred.
         /// </summary>
-        /// <returns>Set of all <see cref="GeneralSightseeingInfo"/> entities from database.</returns>
+        /// <returns>Set of all <see cref="VisitInfo"/> entities from database.</returns>
         /// <exception cref="InternalDbServiceException">The resource does not exist or has a null value or any
         /// other problems with retrieving data from database occurred.</exception>
-        public async Task<IEnumerable<GeneralSightseeingInfo>> GetAllAsync()
+        public async Task<IEnumerable<VisitInfo>> GetAllAsync()
         {
             _logger.LogInformation($"Starting method '{nameof(GetAllAsync)}'.");
 
             await EnsureDatabaseCreatedAsync();
-            _ = _context?.GeneralSightseeingInfo ?? throw new InternalDbServiceException($"Table of type '{typeof(GeneralSightseeingInfo).Name}' is null.");
+            _ = _context?.Info ?? throw new InternalDbServiceException($"Table of type '{typeof(VisitInfo).Name}' is null.");
 
             try
             {
                 _logger.LogDebug($"Starting retrieve all sightseeing info from database.");
-                var info = await _context.GeneralSightseeingInfo.Include(x => x.OpeningHours).ToArrayAsync();
+                var info = await _context.Info.Include(x => x.OpeningHours).ToArrayAsync();
                 _logger.LogDebug("Retrieve data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(GetAllAsync)}'. Returning {info.Count()} elements.");
                 return info.AsEnumerable();
@@ -170,7 +170,7 @@ namespace SDCWebApp.Services
         }
 
         /// <summary>
-        /// Asynchronously retrieves <see cref="GeneralSightseeingInfo"/> entity with given <paramref name="id"/> from the database. 
+        /// Asynchronously retrieves <see cref="VisitInfo"/> entity with given <paramref name="id"/> from the database. 
         /// Throws an exception if cannot found entity or any problem with retrieving occurred.
         /// </summary>
         /// <param name="id">The id of entity to be retrived. Cannot be nul or empty.</param>
@@ -179,7 +179,7 @@ namespace SDCWebApp.Services
         /// <exception cref="InvalidOperationException">Cannot found entity with given <paramref name="id"/>.</exception>
         /// <exception cref="InternalDbServiceException">The resource does not exist or has a null value or any
         /// other problems with retrieving data from database occurred.</exception>
-        public async Task<GeneralSightseeingInfo> GetAsync(string id)
+        public async Task<VisitInfo> GetAsync(string id)
         {
             _logger.LogInformation($"Starting method '{nameof(GetAsync)}'.");
 
@@ -189,19 +189,19 @@ namespace SDCWebApp.Services
             }
 
             await EnsureDatabaseCreatedAsync();
-            _ = _context?.GeneralSightseeingInfo ?? throw new InternalDbServiceException($"Table of type '{typeof(GeneralSightseeingInfo).Name}' is null.");
+            _ = _context?.Info ?? throw new InternalDbServiceException($"Table of type '{typeof(VisitInfo).Name}' is null.");
 
             try
             {
                 _logger.LogDebug($"Starting retrieve sightseeing info with id: '{id}' from database.");
-                var info = await _context.GeneralSightseeingInfo.Include(x => x.OpeningHours).SingleAsync(x => x.Id.Equals(id));
+                var info = await _context.Info.Include(x => x.OpeningHours).SingleAsync(x => x.Id.Equals(id));
                 _logger.LogDebug("Retrieve data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(GetAsync)}'.");
                 return info;
             }
             catch (InvalidOperationException ex)
             {
-                string message = _context.GeneralSightseeingInfo.Count() == 0 ? $"Element not found because resource {_context.GeneralSightseeingInfo.GetType().Name} does contain any elements. See the inner exception."
+                string message = _context.Info.Count() == 0 ? $"Element not found because resource {_context.Info.GetType().Name} does contain any elements. See the inner exception."
                     : "Element not found. See the inner exception.";
                 _logger.LogError(ex, $"{ex.GetType().Name} {message} Operation failed.");
                 throw;
@@ -215,16 +215,16 @@ namespace SDCWebApp.Services
         }
 
         /// <summary>
-        /// Asynchronously retrieves <see cref="GeneralSightseeingInfo"/> entities with specified page size and page number.
+        /// Asynchronously retrieves <see cref="VisitInfo"/> entities with specified page size and page number.
         /// Throws an exception if arguments is out of range or any problem with retrieving occurred.
         /// </summary>
         /// <param name="pageNumber">Page number that will be retrieved. Must be greater than 0.</param>
         /// <param name="pageSize">Page size. Must be a positive number.</param>
-        /// <returns>Set of <see cref="GeneralSightseeingInfo"/> entities.</returns>
+        /// <returns>Set of <see cref="VisitInfo"/> entities.</returns>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageSize"/> is a negative number or <paramref name="pageNumber"/> is less than 1.</exception>
         /// <exception cref="InternalDbServiceException">The resource does not exist or has a null value or any
         /// other problems with retrieving data from database occurred.</exception>
-        public async Task<IEnumerable<GeneralSightseeingInfo>> GetWithPaginationAsync(int pageNumber = 1, int pageSize = 30)
+        public async Task<IEnumerable<VisitInfo>> GetWithPaginationAsync(int pageNumber = 1, int pageSize = 30)
         {
             _logger.LogInformation($"Starting method '{nameof(GetWithPaginationAsync)}'.");
 
@@ -240,14 +240,14 @@ namespace SDCWebApp.Services
 
             // TODO Create only for unit tests purposes. In debug and later should be Migrate()!!!
             await EnsureDatabaseCreatedAsync();
-            _ = _context?.GeneralSightseeingInfo ?? throw new InternalDbServiceException($"Table of type '{typeof(GeneralSightseeingInfo).Name}' is null.");
+            _ = _context?.Info ?? throw new InternalDbServiceException($"Table of type '{typeof(VisitInfo).Name}' is null.");
 
             try
             {
-                IEnumerable<GeneralSightseeingInfo> info = new GeneralSightseeingInfo[] { }.AsEnumerable();
+                IEnumerable<VisitInfo> info = new VisitInfo[] { }.AsEnumerable();
                 int maxNumberOfPageWithData;
 
-                int numberOfResourceElements = await _context.GeneralSightseeingInfo.CountAsync();
+                int numberOfResourceElements = await _context.Info.CountAsync();
                 int numberOfElementsOnLastPage = numberOfResourceElements % pageSize;
                 int numberOfFullPages = (numberOfResourceElements - numberOfElementsOnLastPage) / pageSize;
 
@@ -268,7 +268,7 @@ namespace SDCWebApp.Services
                 }
 
                 _logger.LogDebug($"Starting retrieve data. '{nameof(pageNumber)}': {pageNumber.ToString()}, '{nameof(pageSize)}': {pageSize.ToString()}.");
-                info = _context.GeneralSightseeingInfo.Include(x => x.OpeningHours).Skip(pageSize * (pageNumber - 1)).Take(pageSize);
+                info = _context.Info.Include(x => x.OpeningHours).Skip(pageSize * (pageNumber - 1)).Take(pageSize);
                 _logger.LogDebug("Retrieve data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(GetWithPaginationAsync)}'.");
                 return info;
@@ -282,7 +282,7 @@ namespace SDCWebApp.Services
         }
 
         /// <summary>
-        /// Asynchronously updates <see cref="GeneralSightseeingInfo"/> entity. 
+        /// Asynchronously updates <see cref="VisitInfo"/> entity. 
         /// Throws an exception if cannot found entity or any problem with updating occurred.
         /// </summary>
         /// <param name="info">The sightseeing info to be updated. Cannot be null or has Id property set to null or empty string.</param>
@@ -292,7 +292,7 @@ namespace SDCWebApp.Services
         /// <exception cref="InvalidOperationException">Cannot found entity to be updated.</exception>
         /// <exception cref="InternalDbServiceException">The resource does not exist or has a null value or any
         /// other problems with retrieving data from database occurred.</exception>
-        public async Task<GeneralSightseeingInfo> UpdateAsync(GeneralSightseeingInfo info)
+        public async Task<VisitInfo> UpdateAsync(VisitInfo info)
         {
             _logger.LogInformation($"Starting method '{nameof(UpdateAsync)}'.");
             // Call normal update mode.
@@ -300,16 +300,16 @@ namespace SDCWebApp.Services
         }
 
         /// <summary>
-        /// Asynchronously adds <see cref="GeneralSightseeingInfo"/> entity to the database. Do not allow to add entity with the same properties value as existing one.
+        /// Asynchronously adds <see cref="VisitInfo"/> entity to the database. Do not allow to add entity with the same properties value as existing one.
         /// Throws an exception if already there is the same entity in database or any problem with saving changes occurred.
         /// </summary>
         /// <param name="info">The info to be added. Cannot be null.</param>
         /// <returns>The added entity.</returns>
         /// <exception cref="ArgumentNullException">The value of <paramref name="info"/> to be added is null.</exception>
         /// <exception cref="InvalidOperationException">There is the same entity that one to be added in database.</exception>
-        /// <exception cref="InternalDbServiceException">The table with <see cref="GeneralSightseeingInfo"/> entities does not exist or it is null or 
+        /// <exception cref="InternalDbServiceException">The table with <see cref="VisitInfo"/> entities does not exist or it is null or 
         /// cannot save properly any changes made by add operation.</exception>
-        public async Task<GeneralSightseeingInfo> RestrictedAddAsync(GeneralSightseeingInfo info)
+        public async Task<VisitInfo> RestrictedAddAsync(VisitInfo info)
         {
             _logger.LogInformation($"Starting method '{nameof(RestrictedAddAsync)}'.");
             // Call restricted add mode.
@@ -327,7 +327,7 @@ namespace SDCWebApp.Services
         /// <exception cref="InvalidOperationException">Cannot found entity to be updated.</exception>
         /// <exception cref="InternalDbServiceException">The resource does not exist or has a null value or any
         /// other problems with retrieving data from database occurred.</exception>
-        public async Task<GeneralSightseeingInfo> RestrictedUpdateAsync(GeneralSightseeingInfo info)
+        public async Task<VisitInfo> RestrictedUpdateAsync(VisitInfo info)
         {
             _logger.LogInformation($"Starting method '{nameof(RestrictedUpdateAsync)}'.");
             // Call restricted update mode.
@@ -340,16 +340,16 @@ namespace SDCWebApp.Services
 
         protected override async Task<bool> IsEntityAlreadyExistsAsync(BasicEntity entity)
         {
-            var allInfo = await _context.GeneralSightseeingInfo.ToArrayAsync();
-            return allInfo.Any(x => x.Equals(entity as GeneralSightseeingInfo));
+            var allInfo = await _context.Info.ToArrayAsync();
+            return allInfo.Any(x => x.Equals(entity as VisitInfo));
         }
 
         protected override BasicEntity BasicRestrictedUpdate(BasicEntity originalEntity, BasicEntity entityToBeUpdated)
         {
             // Update in restricted mode and delete from the database unused OpeningHours.
-            var updatedInfo = base.BasicRestrictedUpdate(originalEntity, entityToBeUpdated) as GeneralSightseeingInfo;
-            var originalInfo = originalEntity as GeneralSightseeingInfo;
-            var infoToBeUpdated = entityToBeUpdated as GeneralSightseeingInfo;
+            var updatedInfo = base.BasicRestrictedUpdate(originalEntity, entityToBeUpdated) as VisitInfo;
+            var originalInfo = originalEntity as VisitInfo;
+            var infoToBeUpdated = entityToBeUpdated as VisitInfo;
 
             // Prevent ArgumentNullException thrown by Except() in DeleteUnusedOpeningHours()
             // when originalInfo.OpeningHours or infoToBeUpdated.OpeningHours will be null.
@@ -363,19 +363,19 @@ namespace SDCWebApp.Services
                 infoToBeUpdated.OpeningHours = new OpeningHours[] { };
             }
 
-            DeleteUnusedOpeningHours(originalInfo, entityToBeUpdated as GeneralSightseeingInfo);
+            DeleteUnusedOpeningHours(originalInfo, entityToBeUpdated as VisitInfo);
             return updatedInfo;
         }
 
         /// <summary>
-        /// Asynchronously adds <see cref="GeneralSightseeingInfo"/> entity. If <paramref name="isRestrict"/> set to false then no restrictions will be used. If set to true then the restricted mode will be used.
+        /// Asynchronously adds <see cref="VisitInfo"/> entity. If <paramref name="isRestrict"/> set to false then no restrictions will be used. If set to true then the restricted mode will be used.
         /// It will check if in database is entity with the same Description, OpeningHour, MaxAllowedGroupSize and MaxChildAge values.
         /// </summary>
-        /// <param name="info"><see cref="GeneralSightseeingInfo"/> to be added.</param>
+        /// <param name="info"><see cref="VisitInfo"/> to be added.</param>
         /// <param name="isRestrict">If set to false then no restrictions will be used and update allow entirely entity updating. If set to true then the restricted mode will be used.
         /// It will check if in database is entity with the same Description, OpeningHour, MaxAllowedGroupSize and MaxChildAge values. </param>
-        /// <returns>Added <see cref="GeneralSightseeingInfo"/> entity.</returns>
-        private async Task<GeneralSightseeingInfo> AddBaseAsync(GeneralSightseeingInfo info, bool isRestrict = false)
+        /// <returns>Added <see cref="VisitInfo"/> entity.</returns>
+        private async Task<VisitInfo> AddBaseAsync(VisitInfo info, bool isRestrict = false)
         {
             _logger.LogDebug($"Starting method '{nameof(AddBaseAsync)}'.");
 
@@ -385,7 +385,7 @@ namespace SDCWebApp.Services
             }
 
             await EnsureDatabaseCreatedAsync();
-            _ = _context?.GeneralSightseeingInfo ?? throw new InternalDbServiceException($"Table of type '{typeof(GeneralSightseeingInfo).Name}' is null.");
+            _ = _context?.Info ?? throw new InternalDbServiceException($"Table of type '{typeof(VisitInfo).Name}' is null.");
 
             try
             {
@@ -404,14 +404,14 @@ namespace SDCWebApp.Services
                 else
                 {
                     // Normal add mode without any additional restrictions.
-                    if (_context.GeneralSightseeingInfo.Contains(info))
+                    if (_context.Info.Contains(info))
                     {
                         throw new InvalidOperationException($"There is already the same element in the database as the one to be added. Id of this element: '{info.Id}'.");
                     }
                 }
 
                 _logger.LogDebug($"Starting add general sightseeing info with id '{info.Id}'.");
-                var addedInfo = _context.GeneralSightseeingInfo.Add(info).Entity;
+                var addedInfo = _context.Info.Add(info).Entity;
                 await _context.TrySaveChangesAsync();
                 _logger.LogDebug("Add data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(AddAsync)}'.");
@@ -437,14 +437,14 @@ namespace SDCWebApp.Services
         }
 
         /// <summary>
-        /// Asynchronously updates <see cref="GeneralSightseeingInfo"/> entity. If <paramref name="isRestrict"/> set to false then no restrictions will be used and update allow entirely entity updating. 
+        /// Asynchronously updates <see cref="VisitInfo"/> entity. If <paramref name="isRestrict"/> set to false then no restrictions will be used and update allow entirely entity updating. 
         /// Otherwise the restricted mode will be using. It will ignore updating some read-only properties.
         /// </summary>
-        /// <param name="info"><see cref="GeneralSightseeingInfo"/> to be updated.</param>
+        /// <param name="info"><see cref="VisitInfo"/> to be updated.</param>
         /// <param name="isRestrict">If set to false then no restrictions will be used and update allow entirely entity updating. If set to true then the restricted mode will be used.
         /// It will ignore some read-only properties changes.</param>
         /// <returns>Updated <see cref="Customer"/> entity.</returns>
-        private async Task<GeneralSightseeingInfo> UpdateBaseAsync(GeneralSightseeingInfo info, bool isRestrict = false)
+        private async Task<VisitInfo> UpdateBaseAsync(VisitInfo info, bool isRestrict = false)
         {
             _logger.LogDebug($"Starting method '{nameof(UpdateBaseAsync)}'.");
 
@@ -456,35 +456,35 @@ namespace SDCWebApp.Services
             }
 
             await EnsureDatabaseCreatedAsync();
-            _ = _context?.GeneralSightseeingInfo ?? throw new InternalDbServiceException($"Table of type '{typeof(GeneralSightseeingInfo).Name}' is null.");
+            _ = _context?.Info ?? throw new InternalDbServiceException($"Table of type '{typeof(VisitInfo).Name}' is null.");
 
             try
             {
-                if (_context.GeneralSightseeingInfo.Count() == 0)
+                if (_context.Info.Count() == 0)
                 {
-                    throw new InvalidOperationException($"Cannot found element with id '{info.Id}' for update. Resource {_context.GeneralSightseeingInfo.GetType().Name} does not contain any element.");
+                    throw new InvalidOperationException($"Cannot found element with id '{info.Id}' for update. Resource {_context.Info.GetType().Name} does not contain any element.");
                 }
 
-                if (await _context.GeneralSightseeingInfo.ContainsAsync(info) == false)
+                if (await _context.Info.ContainsAsync(info) == false)
                 {
                     throw new InvalidOperationException($"Cannot found element with id '{info.Id}' for update. Any element does not match to the one to be updated.");
                 }
 
                 _logger.LogDebug($"Starting update customer with id '{info.Id}'.");
 
-                GeneralSightseeingInfo updatedInfo = null;
+                VisitInfo updatedInfo = null;
                 info.UpdatedAt = DateTime.UtcNow;
 
                 if (isRestrict)
                 {
                     // Restricted update mode that ignores all changes in read-only properties like Id, CreatedAt, UpdatedAt, ConcurrencyToken.
-                    var originalInfo = await _context.GeneralSightseeingInfo.Include(x => x.OpeningHours).SingleAsync(x => x.Id.Equals(info.Id));
-                    updatedInfo = BasicRestrictedUpdate(originalInfo, info) as GeneralSightseeingInfo;
+                    var originalInfo = await _context.Info.Include(x => x.OpeningHours).SingleAsync(x => x.Id.Equals(info.Id));
+                    updatedInfo = BasicRestrictedUpdate(originalInfo, info) as VisitInfo;
                 }
                 else
                 {
                     // Normal update mode without any additional restrictions.
-                    updatedInfo = _context.GeneralSightseeingInfo.Update(info).Entity;
+                    updatedInfo = _context.Info.Update(info).Entity;
                 }
 
                 await _context.TrySaveChangesAsync();
@@ -505,7 +505,7 @@ namespace SDCWebApp.Services
             }
         }
 
-        private void DeleteUnusedOpeningHours(GeneralSightseeingInfo originalInfo, GeneralSightseeingInfo newInfo)
+        private void DeleteUnusedOpeningHours(VisitInfo originalInfo, VisitInfo newInfo)
         {
             // Delete only those hours which belong to the updating info and don't belong to a new version of this info.
             // The OpeningHoursComparer to check which hours are unused in a new info version, is used here.

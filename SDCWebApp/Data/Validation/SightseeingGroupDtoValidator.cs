@@ -9,7 +9,7 @@ namespace SDCWebApp.Data.Validation
     {
         public SightseeingGroupDtoValidator(ApplicationDbContext dbContext)
         {
-            var recentInfo = dbContext.GeneralSightseeingInfo.OrderByDescending(x => x.UpdatedAt == null ? x.CreatedAt : x.UpdatedAt).First();
+            var recentInfo = dbContext.Info.OrderByDescending(x => x.UpdatedAt == null ? x.CreatedAt : x.UpdatedAt).First();
 
             RuleFor(x => x.MaxGroupSize)
                 .Cascade(CascadeMode.StopOnFirstFailure)

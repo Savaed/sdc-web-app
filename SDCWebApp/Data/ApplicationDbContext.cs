@@ -14,13 +14,13 @@ namespace SDCWebApp.Data
         // All DbSet<TEntity> properties are marked as virtual for enabling unit testing and using Mock.Setup / Verifiable functionality.
         public virtual DbSet<Ticket> Tickets { get; set; }
         public virtual DbSet<Discount> Discounts { get; set; }
-        public virtual DbSet<SightseeingTariff> SightseeingTariffs { get; set; }
+        public virtual DbSet<VisitTariff> VisitTariffs { get; set; }
         public virtual DbSet<TicketTariff> TicketTariffs { get; set; }
         public virtual DbSet<Article> Articles { get; set; }
         public virtual DbSet<ActivityLog> ActivityLogs { get; set; }
         public virtual DbSet<SightseeingGroup> Groups { get; set; }
         public virtual DbSet<Customer> Customers { get; set; }
-        public virtual DbSet<GeneralSightseeingInfo> GeneralSightseeingInfo { get; set; }
+        public virtual DbSet<VisitInfo> Info { get; set; }
         public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
         public virtual DbSet<OpeningHours> OpeningDates { get; set; }
 
@@ -39,7 +39,7 @@ namespace SDCWebApp.Data
             builder.Entity<OpeningHours>().Property(d => d.DayOfWeek).HasConversion<string>();
 
             // Allow deleting OpeningHours if deleting SightseeingInfo.
-            builder.Entity<GeneralSightseeingInfo>()
+            builder.Entity<VisitInfo>()
                 .HasMany(x => x.OpeningHours)
                 .WithOne(o => o.Info)
                 .OnDelete(DeleteBehavior.Cascade);
@@ -211,13 +211,13 @@ namespace SDCWebApp.Data
                     DefaultPrice = 10
                 });
 
-            builder.Entity<SightseeingTariff>(entity =>
+            builder.Entity<VisitTariff>(entity =>
             {
                 entity.HasMany(s => s.TicketTariffs)
                       .WithOne(t => t.SightseeingTariff)
                       .OnDelete(DeleteBehavior.SetNull);
 
-                entity.HasData(new SightseeingTariff { Id = Guid.NewGuid().ToString(), Name = "BasicTickets" });
+                entity.HasData(new VisitTariff { Id = Guid.NewGuid().ToString(), Name = "BasicTickets" });
             });
 
             builder.Entity<SightseeingGroup>().HasData(
@@ -234,7 +234,7 @@ namespace SDCWebApp.Data
                     MaxGroupSize = 25
                 });
 
-            builder.Entity<GeneralSightseeingInfo>().HasData(new GeneralSightseeingInfo
+            builder.Entity<VisitInfo>().HasData(new VisitInfo
             {
                 Id = Guid.NewGuid().ToString(),
                 MaxChildAge = 5,

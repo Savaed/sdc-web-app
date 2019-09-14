@@ -14,19 +14,19 @@ using System.Threading.Tasks;
 namespace SDCWebApp.Controllers
 {
     /// <summary>
-    /// Provides methods to Http verbs proccessing on <see cref="GeneralSightseeingInfo"/> entities.
+    /// Provides methods to Http verbs proccessing on <see cref="VisitInfo"/> entities.
     /// </summary>
     [Route("api/info")]
     [ApiController]
-    public class SightseeingInfoController : CustomApiController, ISightseeingInfoController
+    public class VisitInfoController : CustomApiController, IVisitInfoController
     {
         private const string ControllerPrefix = "info";
-        private readonly IGeneralSightseeingInfoDbService _infoDbService;
-        private readonly ILogger<SightseeingInfoController> _logger;
+        private readonly IVisitInfoDbService _infoDbService;
+        private readonly ILogger<VisitInfoController> _logger;
         private readonly IMapper _mapper;
 
 
-        public SightseeingInfoController(IGeneralSightseeingInfoDbService infoDbService, ILogger<SightseeingInfoController> logger, IMapper mapper) : base(logger)
+        public VisitInfoController(IVisitInfoDbService infoDbService, ILogger<VisitInfoController> logger, IMapper mapper) : base(logger)
         {
             _logger = logger;
             _mapper = mapper;
@@ -35,17 +35,17 @@ namespace SDCWebApp.Controllers
 
 
         /// <summary>
-        /// Asynchronously adds <see cref="GeneralSightseeingInfo"/>.
-        /// Returns <see cref="HttpStatusCode.Created"/> response if <see cref="SightseeingInfo"/> create succeeded or
+        /// Asynchronously adds <see cref="VisitInfo"/>.
+        /// Returns <see cref="HttpStatusCode.Created"/> response if <see cref="VisitInfo"/> create succeeded or
         /// <see cref="HttpStatusCode.BadRequest"/> response if the request is malformed.
         /// Throws an <see cref="InternalDbServiceException"/> or <see cref="Exception"/> if any internal problem with processing data.
         /// </summary>
-        /// <param name="info">The <see cref="SightseeingInfoDto"/> info to be added. This parameter is a body of JSON request. Cannot be null.</param>
-        /// <returns>An added <see cref="GeneralSightseeingInfo"/>.</returns>
+        /// <param name="info">The <see cref="VisitInfoDto"/> info to be added. This parameter is a body of JSON request. Cannot be null.</param>
+        /// <returns>An added <see cref="VisitInfo"/>.</returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> AddInfoAsync([FromBody] SightseeingInfoDto info)
+        public async Task<IActionResult> AddInfoAsync([FromBody] VisitInfoDto info)
         {
             _logger.LogInformation($"Starting method '{nameof(AddInfoAsync)}'.");
 
@@ -66,7 +66,7 @@ namespace SDCWebApp.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                return OnInvalidParameterError($"Element '{typeof(GeneralSightseeingInfo).Name}' already exists.", ex);
+                return OnInvalidParameterError($"Element '{typeof(VisitInfo).Name}' already exists.", ex);
             }
             catch (InternalDbServiceException ex)
             {
@@ -81,13 +81,13 @@ namespace SDCWebApp.Controllers
         }
 
         /// <summary>
-        /// Asynchronously deletes specified <see cref="GeneralSightseeingInfo"/> by <paramref name="id"/>.
-        /// Returns <see cref="HttpStatusCode.OK"/> response if <see cref="GeneralSightseeingInfo"/> delete succeeded,
+        /// Asynchronously deletes specified <see cref="VisitInfo"/> by <paramref name="id"/>.
+        /// Returns <see cref="HttpStatusCode.OK"/> response if <see cref="VisitInfo"/> delete succeeded,
         /// <see cref="HttpStatusCode.BadRequest"/> response if the request is malformed or
-        /// <see cref="HttpStatusCode.NotFound"/> if specified <see cref="GeneralSightseeingInfo"/> not found.
+        /// <see cref="HttpStatusCode.NotFound"/> if specified <see cref="VisitInfo"/> not found.
         /// Throws an <see cref="InternalDbServiceException"/> or <see cref="Exception"/> if any internal problem with processing data.
         /// </summary>
-        /// <param name="id">The id of <see cref="GeneralSightseeingInfo"/> to be deleted. Cannot be null or empty.</param>
+        /// <param name="id">The id of <see cref="VisitInfo"/> to be deleted. Cannot be null or empty.</param>
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -110,7 +110,7 @@ namespace SDCWebApp.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                return OnNotFoundError($"Cannot found element '{typeof(GeneralSightseeingInfo).Name}' with specified id: '{id}'.", ex);
+                return OnNotFoundError($"Cannot found element '{typeof(VisitInfo).Name}' with specified id: '{id}'.", ex);
             }
             catch (InternalDbServiceException ex)
             {
@@ -125,11 +125,11 @@ namespace SDCWebApp.Controllers
         }
 
         /// <summary>
-        /// Asynchronously gets <see cref="IEnumerable{GeneralSightseeingInfo}"/>.
+        /// Asynchronously gets <see cref="IEnumerable{VisitInfo}"/>.
         /// Returns <see cref="HttpStatusCode.OK"/> response regardless if returned set is empty or not.
         /// Throws an <see cref="InternalDbServiceException"/> or <see cref="Exception"/> if any internal problem with processing data.
         /// </summary>
-        /// <returns><see cref="IEnumerable{GeneralSightseeingInfo}"/>.</returns>
+        /// <returns><see cref="IEnumerable{VisitInfo}"/>.</returns>
         [HttpGet]
         [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -158,14 +158,14 @@ namespace SDCWebApp.Controllers
         }
 
         /// <summary>
-        /// Asynchronously gets specified <see cref="GeneralSightseeingInfo"/> by <paramref name="id"/>.
-        /// Returns <see cref="HttpStatusCode.OK"/> response if the specified <see cref="GeneralSightseeingInfo"/> found, 
+        /// Asynchronously gets specified <see cref="VisitInfo"/> by <paramref name="id"/>.
+        /// Returns <see cref="HttpStatusCode.OK"/> response if the specified <see cref="VisitInfo"/> found, 
         /// <see cref="HttpStatusCode.BadRequest"/> response if the request is malformed or
-        /// <see cref="HttpStatusCode.NotFound"/> response if specified <see cref="GeneralSightseeingInfo"/> does not exist.
+        /// <see cref="HttpStatusCode.NotFound"/> response if specified <see cref="VisitInfo"/> does not exist.
         /// Throws an <see cref="InternalDbServiceException"/> or <see cref="Exception"/> if any internal problem with processing data.
         /// </summary>
-        /// <param name="id">The id of searched <see cref="GeneralSightseeingInfo"/>. Cannot be null or empty.</param>
-        /// <returns>An specified <see cref="GeneralSightseeingInfo"/>.</returns>
+        /// <param name="id">The id of searched <see cref="VisitInfo"/>. Cannot be null or empty.</param>
+        /// <returns>An specified <see cref="VisitInfo"/>.</returns>
         [HttpGet("{id}")]
         [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -190,7 +190,7 @@ namespace SDCWebApp.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                return OnNotFoundError($"Cannot found element '{typeof(GeneralSightseeingInfo).Name}' with specified id: '{id}'.", ex);
+                return OnNotFoundError($"Cannot found element '{typeof(VisitInfo).Name}' with specified id: '{id}'.", ex);
             }
             catch (InternalDbServiceException ex)
             {
@@ -205,20 +205,20 @@ namespace SDCWebApp.Controllers
         }
 
         /// <summary>
-        /// Asynchronously updates <see cref="GeneralSightseeingInfo"/>.
-        /// Returns <see cref="HttpStatusCode.OK"/> response if <see cref="GeneralSightseeingInfo"/> update succeeded,
+        /// Asynchronously updates <see cref="VisitInfo"/>.
+        /// Returns <see cref="HttpStatusCode.OK"/> response if <see cref="VisitInfo"/> update succeeded,
         /// <see cref="HttpStatusCode.BadRequest"/> response if the request is malformed or
-        /// <see cref="HttpStatusCode.NotFound"/> response if specified <see cref="GeneralSightseeingInfo"/> does not exist.
+        /// <see cref="HttpStatusCode.NotFound"/> response if specified <see cref="VisitInfo"/> does not exist.
         /// Throws an <see cref="InternalDbServiceException"/> or <see cref="Exception"/> if any internal problem with processing data.
         /// </summary>
-        /// <param name="id">The id of <see cref="GeneralSightseeingInfo"/> to be updated. Cannot be null or empty. Must match to <paramref name="info"/>.Id property.</param>
-        /// <param name="info">The <see cref="SightseeingInfoDto"/> info to be added. This parameter is a body of JSON request. Cannot be null.</param>
-        /// <returns>An updated <see cref="GeneralSightseeingInfo"/>.</returns>
+        /// <param name="id">The id of <see cref="VisitInfo"/> to be updated. Cannot be null or empty. Must match to <paramref name="info"/>.Id property.</param>
+        /// <param name="info">The <see cref="VisitInfoDto"/> info to be added. This parameter is a body of JSON request. Cannot be null.</param>
+        /// <returns>An updated <see cref="VisitInfo"/>.</returns>
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> UpdateInfoAsync(string id, [FromBody] SightseeingInfoDto info)
+        public async Task<IActionResult> UpdateInfoAsync(string id, [FromBody] VisitInfoDto info)
         {
             _logger.LogInformation($"Starting method '{nameof(UpdateInfoAsync)}'.");
 
@@ -245,7 +245,7 @@ namespace SDCWebApp.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                return OnNotFoundError($"Cannot found element '{typeof(GeneralSightseeingInfo).Name}' with specified id: '{id}'.", ex);
+                return OnNotFoundError($"Cannot found element '{typeof(VisitInfo).Name}' with specified id: '{id}'.", ex);
             }
             catch (InternalDbServiceException ex)
             {
@@ -262,9 +262,9 @@ namespace SDCWebApp.Controllers
 
         #region Privates
 
-        private GeneralSightseeingInfo MapToDomainModel(SightseeingInfoDto tariffDto) => _mapper.Map<GeneralSightseeingInfo>(tariffDto);
-        private SightseeingInfoDto MapToDto(GeneralSightseeingInfo tariff) => _mapper.Map<SightseeingInfoDto>(tariff);
-        private IEnumerable<SightseeingInfoDto> MapToDtoEnumerable(IEnumerable<GeneralSightseeingInfo> tariff) => _mapper.Map<IEnumerable<SightseeingInfoDto>>(tariff);
+        private VisitInfo MapToDomainModel(VisitInfoDto tariffDto) => _mapper.Map<VisitInfo>(tariffDto);
+        private VisitInfoDto MapToDto(VisitInfo tariff) => _mapper.Map<VisitInfoDto>(tariff);
+        private IEnumerable<VisitInfoDto> MapToDtoEnumerable(IEnumerable<VisitInfo> tariff) => _mapper.Map<IEnumerable<VisitInfoDto>>(tariff);
 
         #endregion
     }

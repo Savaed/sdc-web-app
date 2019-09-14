@@ -13,7 +13,7 @@ namespace UnitTests.Validation
     {
         private const int MaxAllowedGroupSize = 30;
         private SightseeingGroupValidator _validator;
-        private GeneralSightseeingInfo _info;
+        private VisitInfo _info;
         private int _maxDaysForOrder;
 
 
@@ -22,7 +22,7 @@ namespace UnitTests.Validation
         {
             _info = CreateModel.CreateInfo(maxAllowedGroupSize: MaxAllowedGroupSize);
             var _dbContextMock = new Mock<ApplicationDbContext>();
-            _dbContextMock.Setup(x => x.GeneralSightseeingInfo).Returns(CreateMock.CreateDbSetMock<GeneralSightseeingInfo>(new GeneralSightseeingInfo[] { _info }).Object);
+            _dbContextMock.Setup(x => x.Info).Returns(CreateMock.CreateDbSetMock<VisitInfo>(new VisitInfo[] { _info }).Object);
             _validator = new SightseeingGroupValidator(_dbContextMock.Object);
             _maxDaysForOrder = _info.MaxTicketOrderInterval * 7;
         }

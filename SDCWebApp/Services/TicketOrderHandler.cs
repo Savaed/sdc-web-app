@@ -397,11 +397,11 @@ namespace SDCWebApp.Services
         }
 
         /// <exception cref="InternalDbServiceException"></exception>
-        private GeneralSightseeingInfo GetRecentInfo()
+        private VisitInfo GetRecentInfo()
         {
             try
             {
-                return (_dbServiceFactory[nameof(IGeneralSightseeingInfoDbService)] as IGeneralSightseeingInfoDbService)
+                return (_dbServiceFactory[nameof(IVisitInfoDbService)] as IVisitInfoDbService)
                        .GetAllAsync()
                        .Result
                        .OrderByDescending(x => x.UpdatedAt == DateTime.MinValue ? x.CreatedAt : x.UpdatedAt)
@@ -488,7 +488,7 @@ namespace SDCWebApp.Services
         /// <exception cref="InvalidOperationException"></exception>
         /// <exception cref="InternalDbServiceException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        private async Task<SightseeingGroup> HandleNonexistentGroupAsync(GeneralSightseeingInfo recentInfo, DateTime sightseeingDate, IEnumerable<ShallowTicket> shallowTickets)
+        private async Task<SightseeingGroup> HandleNonexistentGroupAsync(VisitInfo recentInfo, DateTime sightseeingDate, IEnumerable<ShallowTicket> shallowTickets)
         {
             if (shallowTickets.Count() > recentInfo.MaxAllowedGroupSize)
             {

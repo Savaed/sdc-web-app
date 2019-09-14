@@ -3,9 +3,9 @@ using SDCWebApp.Models.Dtos;
 
 namespace SDCWebApp.Data.Validation
 {
-    public class SightseeingInfoDtoValidator : AbstractValidator<SightseeingInfoDto>, ICustomValidator<SightseeingInfoDto>
+    public class VisitInfoDtoValidator : AbstractValidator<VisitInfoDto>, ICustomValidator<VisitInfoDto>
     {
-        public SightseeingInfoDtoValidator()
+        public VisitInfoDtoValidator()
         {
             RuleFor(x => x.Description)
                 .Cascade(CascadeMode.StopOnFirstFailure)

@@ -2,14 +2,14 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SDCWebApp.Models;
+using SDCWebApp.Models.Dtos;
+using SDCWebApp.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using SDCWebApp.Models;
-using SDCWebApp.Models.Dtos;
-using SDCWebApp.Services;
 
 namespace SDCWebApp.Controllers
 {

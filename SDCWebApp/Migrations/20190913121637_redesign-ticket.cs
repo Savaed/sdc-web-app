@@ -62,7 +62,7 @@ namespace SDCWebApp.Migrations
                 keyValue: "e6fb9652-a23f-4056-92d9-ce6ad63e8eb5");
 
             migrationBuilder.DeleteData(
-                table: "GeneralSightseeingInfo",
+                table: "VisitInfo",
                 keyColumn: "Id",
                 keyValue: "af003505-5043-4886-9230-f19cdbae0d15");
 
@@ -192,7 +192,7 @@ namespace SDCWebApp.Migrations
                 values: new object[] { "ce01f53a-93c7-42d0-82b5-2ac213e6ea53", new DateTime(2019, 9, 13, 12, 16, 36, 662, DateTimeKind.Utc).AddTicks(1967), "Discount only for kids under specific age.", 100, null, "ForChild", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
 
             migrationBuilder.InsertData(
-                table: "GeneralSightseeingInfo",
+                table: "VisitInfo",
                 columns: new[] { "Id", "CreatedAt", "Description", "MaxAllowedGroupSize", "MaxChildAge", "MaxTicketOrderInterval", "SightseeingDuration", "UpdatedAt" },
                 values: new object[] { "c75b36c6-d514-494e-acc4-36ec306d002e", new DateTime(2019, 9, 13, 12, 16, 36, 663, DateTimeKind.Utc).AddTicks(8880), "TL;DR", 35, 5, 4, 2f, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
 
@@ -337,7 +337,7 @@ namespace SDCWebApp.Migrations
                 keyValue: "ff0d5462-43c2-4203-8d4e-c2058ed2f52d");
 
             migrationBuilder.DeleteData(
-                table: "GeneralSightseeingInfo",
+                table: "VisitInfo",
                 keyColumn: "Id",
                 keyValue: "c75b36c6-d514-494e-acc4-36ec306d002e");
 
@@ -467,7 +467,7 @@ namespace SDCWebApp.Migrations
                 values: new object[] { "4ad1fe6d-f7e3-4b52-9b38-fbede70a655b", new DateTime(2019, 9, 12, 21, 35, 4, 30, DateTimeKind.Utc).AddTicks(3131), "Discount only for kids under specific age.", 100, null, "ForChild", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
 
             migrationBuilder.InsertData(
-                table: "GeneralSightseeingInfo",
+                table: "VisitInfo",
                 columns: new[] { "Id", "CreatedAt", "Description", "MaxAllowedGroupSize", "MaxChildAge", "MaxTicketOrderInterval", "SightseeingDuration", "UpdatedAt" },
                 values: new object[] { "af003505-5043-4886-9230-f19cdbae0d15", new DateTime(2019, 9, 12, 21, 35, 4, 32, DateTimeKind.Utc).AddTicks(1183), "TL;DR", 35, 5, 4, 2f, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
 

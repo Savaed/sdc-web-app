@@ -11,6 +11,6 @@ namespace SDCWebApp.Models
         public TimeSpan ClosingHour { get; set; }
         public DayOfWeek DayOfWeek { get; set; }
 
-        public virtual GeneralSightseeingInfo Info { get; set; }
+        public virtual VisitInfo Info { get; set; }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace SDCWebApp.Models.Dtos
 {
-    public class SightseeingTariffDto : DtoBase
+    public class VisitTariffDto : DtoBase
     {
         public string Name { get; set; }
         public ICollection<TicketTariffDto> TicketTariffs { get; set; }

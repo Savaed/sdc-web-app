@@ -24,23 +24,23 @@ namespace UnitTests.Controllers
     {
         private Mock<IIndex<string, IServiceBase>> _dbServiceFactoryMock;
         private Mock<ISightseeingGroupDbService> _groupDbServiceMock;
-        private Mock<IGeneralSightseeingInfoDbService> _infoDbServiceMock;
+        private Mock<IVisitInfoDbService> _infoDbServiceMock;
         private ILogger<GroupsController> _logger;
         private Mock<IMapper> _mapperMock;
         private SightseeingGroup _validSightseeingGroup;
         private SightseeingGroupDto _validSightseeingGroupDto;
-        private GeneralSightseeingInfo _info;
+        private VisitInfo _info;
 
 
         [OneTimeSetUp]
         public void SetUp()
         {
             _groupDbServiceMock = new Mock<ISightseeingGroupDbService>();
-            _infoDbServiceMock = new Mock<IGeneralSightseeingInfoDbService>();
+            _infoDbServiceMock = new Mock<IVisitInfoDbService>();
 
             _dbServiceFactoryMock = new Mock<IIndex<string, IServiceBase>>();
             _dbServiceFactoryMock.Setup(x => x["ISightseeingGroupDbService"]).Returns(_groupDbServiceMock.Object);
-            _dbServiceFactoryMock.Setup(x => x["IGeneralSightseeingInfoDbService"]).Returns(_infoDbServiceMock.Object);
+            _dbServiceFactoryMock.Setup(x => x["IVisitInfoDbService"]).Returns(_infoDbServiceMock.Object);
 
             _validSightseeingGroup = new SightseeingGroup
             {
@@ -233,7 +233,7 @@ namespace UnitTests.Controllers
         [Test]
         public async Task GetAvailableGroupDatesAsync__Resource_is_empty__Should_return_200OK_response_with__not_empty_IEnumerable()
         {
-            _infoDbServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new GeneralSightseeingInfo[] { _info }.AsEnumerable());
+            _infoDbServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new VisitInfo[] { _info }.AsEnumerable());
             _groupDbServiceMock.Setup(x => x.GetByAsync(It.IsAny<Expression<Func<SightseeingGroup, bool>>>())).ReturnsAsync(Enumerable.Empty<SightseeingGroup>());
             var controller = new GroupsController(_dbServiceFactoryMock.Object, _logger, _mapperMock.Object);
 
@@ -246,7 +246,7 @@ namespace UnitTests.Controllers
         [Test]
         public async Task GetAvailableGroupDatesAsync__At_least_one_element_found__Should_return_200OK_response_with_not_empty_IEnumerable()
         {
-            _infoDbServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new GeneralSightseeingInfo[] { _info }.AsEnumerable());
+            _infoDbServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new VisitInfo[] { _info }.AsEnumerable());
             _groupDbServiceMock.Setup(x => x.GetByAsync(It.IsAny<Expression<Func<SightseeingGroup, bool>>>())).ReturnsAsync(new SightseeingGroup[] { _validSightseeingGroup }.AsEnumerable());
             var controller = new GroupsController(_dbServiceFactoryMock.Object, _logger, _mapperMock.Object);
 
@@ -259,7 +259,7 @@ namespace UnitTests.Controllers
         [Test]
         public async Task GetAvailableGroupDatesAsync__There_is_group_without_available_places__Returned_IEnumerable_should_not_contain_date_of_this_group()
         {
-            _infoDbServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new GeneralSightseeingInfo[] { _info }.AsEnumerable());
+            _infoDbServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new VisitInfo[] { _info }.AsEnumerable());
             var notAvailableGroup = new SightseeingGroup { Id = "2", SightseeingDate = DateTime.Now.AddDays(1), MaxGroupSize = 1, Tickets = new Ticket[] { new Ticket { Id = "only_for_this_test" } } };
             _groupDbServiceMock.Setup(x => x.GetByAsync(It.IsAny<Expression<Func<SightseeingGroup, bool>>>()))
                 .ReturnsAsync(new SightseeingGroup[]
@@ -278,7 +278,7 @@ namespace UnitTests.Controllers
         [Test]
         public async Task GetAvailableGroupDatesAsync__Sightseeing_info_not_found__Should_return_200OK_response_with_empty_IEnumerable()
         {
-            _infoDbServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(Enumerable.Empty<GeneralSightseeingInfo>());
+            _infoDbServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(Enumerable.Empty<VisitInfo>());
             _groupDbServiceMock.Setup(x => x.GetByAsync(It.IsAny<Expression<Func<SightseeingGroup, bool>>>())).ReturnsAsync(new SightseeingGroup[] { _validSightseeingGroup }.AsEnumerable());
             var controller = new GroupsController(_dbServiceFactoryMock.Object, _logger, _mapperMock.Object);
 
@@ -291,7 +291,7 @@ namespace UnitTests.Controllers
         [Test]
         public async Task GetAvailableGroupDatesAsync__At_least_one_element_found__Should_return_200OK_response_with_distinct_groups()
         {
-            _infoDbServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new GeneralSightseeingInfo[] { _info }.AsEnumerable());
+            _infoDbServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new VisitInfo[] { _info }.AsEnumerable());
             _groupDbServiceMock.Setup(x => x.GetByAsync(It.IsAny<Expression<Func<SightseeingGroup, bool>>>())).ReturnsAsync(new SightseeingGroup[] { _validSightseeingGroup }.AsEnumerable());
             var controller = new GroupsController(_dbServiceFactoryMock.Object, _logger, _mapperMock.Object);
 

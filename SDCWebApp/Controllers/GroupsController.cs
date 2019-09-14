@@ -120,7 +120,7 @@ namespace SDCWebApp.Controllers
         }
 
         /// <summary>
-        /// Asynchronously gets available sightseeing dates and places number from now to date specified in <see cref="GeneralSightseeingInfo"/> information.
+        /// Asynchronously gets available sightseeing dates and places number from now to date specified in <see cref="VisitInfo"/> information.
         /// Returns <see cref="HttpStatusCode.OK"/> regardless if returned set is empty or not.
         /// Throws an <see cref="InternalDbServiceException"/> or <see cref="Exception"/> if any internal problem with processing data.
         /// </summary>
@@ -128,21 +128,21 @@ namespace SDCWebApp.Controllers
         [HttpGet("available-dates")]
         public async Task<IActionResult> GetAvailableGroupDatesAsync()
         {
-            GeneralSightseeingInfo recentInfo = null;
-            IGeneralSightseeingInfoDbService infoDbService = null;
+            VisitInfo recentInfo = null;
+            IVisitInfoDbService infoDbService = null;
             ISightseeingGroupDbService groupDbService = null;
             List<GroupInfo> availableDates = new List<GroupInfo>();
 
             try
             {
-                infoDbService = _dbServiceFactory[nameof(IGeneralSightseeingInfoDbService)] as IGeneralSightseeingInfoDbService;
+                infoDbService = _dbServiceFactory[nameof(IVisitInfoDbService)] as IVisitInfoDbService;
                 groupDbService = _dbServiceFactory[nameof(ISightseeingGroupDbService)] as ISightseeingGroupDbService;
 
                 recentInfo = await GetRecentSightseeingInfoAsync(infoDbService);
 
                 if (!IsSightseeingDurationSet(recentInfo))
                 {
-                    _logger.LogWarning($"{nameof(GeneralSightseeingInfo.SightseeingDuration)} is set to 0 hours.");
+                    _logger.LogWarning($"{nameof(VisitInfo.SightseeingDuration)} is set to 0 hours.");
                     return Ok(new ResponseWrapper(availableDates));
                 }
 
@@ -164,12 +164,12 @@ namespace SDCWebApp.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogWarning(ex, $"Element '{nameof(GeneralSightseeingInfo)}' not found.");
+                _logger.LogWarning(ex, $"Element '{nameof(VisitInfo)}' not found.");
                 return Ok(new ResponseWrapper(availableDates));
             }
             catch (InternalDbServiceException ex) when (recentInfo is null)
             {
-                // Exception thrown by IGeneralSightseeingInfoDbService instance.
+                // Exception thrown by IVisitInfoDbService instance.
                 LogInternalDbServiceException(ex, infoDbService.GetType());
                 throw;
             }
@@ -189,18 +189,18 @@ namespace SDCWebApp.Controllers
 
         #region Privates
 
-        private bool IsSightseeingDurationSet(GeneralSightseeingInfo info)
+        private bool IsSightseeingDurationSet(VisitInfo info)
         {
             return info.SightseeingDuration > 0.0f;
         }
 
-        private async Task<GeneralSightseeingInfo> GetRecentSightseeingInfoAsync(IGeneralSightseeingInfoDbService infoDbService)
+        private async Task<VisitInfo> GetRecentSightseeingInfoAsync(IVisitInfoDbService infoDbService)
         {
             var allInfo = await infoDbService.GetAllAsync();
             return allInfo.OrderByDescending(x => x.UpdatedAt == DateTime.MinValue ? x.CreatedAt : x.UpdatedAt).First();
         }
 
-        private IList<GroupInfo> GetDailyDates(GeneralSightseeingInfo info, DateTime dateTime, IEnumerable<SightseeingGroup> futureGroups)
+        private IList<GroupInfo> GetDailyDates(VisitInfo info, DateTime dateTime, IEnumerable<SightseeingGroup> futureGroups)
         {
             List<GroupInfo> availableDates = new List<GroupInfo>();
             var sightseeingDuration = info.SightseeingDuration;

@@ -1,11 +1,11 @@
 ﻿using FluentValidation;
-using SDCWebApp.Models.Dtos;
+using SDCWebApp.Models;
 
 namespace SDCWebApp.Data.Validation
 {
-    public class SightseeingTariffDtoValidator : AbstractValidator<SightseeingTariffDto>, ICustomValidator<SightseeingTariffDto>
+    public class VisitTariffValidator : AbstractValidator<VisitTariff>, ICustomValidator<VisitTariff>
     {
-        public SightseeingTariffDtoValidator()
+        public VisitTariffValidator()
         {
             RuleFor(s => s.Name)
                 .Cascade(CascadeMode.StopOnFirstFailure)
@@ -14,7 +14,7 @@ namespace SDCWebApp.Data.Validation
 
             RuleForEach(x => x.TicketTariffs)
                 .Cascade(CascadeMode.StopOnFirstFailure)
-                .SetValidator(new TicketTariffDtoValidator());
+                .SetValidator(new TicketTariffValidator());
         }
     }
 }

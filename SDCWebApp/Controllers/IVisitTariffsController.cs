@@ -4,13 +4,13 @@ using System.Threading.Tasks;
 
 namespace SDCWebApp.Controllers
 {
-    public interface ISightseeingTariffsController
+    public interface IVisitTariffsController
     {
         Task<IActionResult> GetTariffAsync(string id);
         Task<IActionResult> GetCurrentTariffAsync();
         Task<IActionResult> GetAllTariffsAsync();
-        Task<IActionResult> AddTariffAsync(SightseeingTariffDto tariff);
-        Task<IActionResult> UpdateTariffAsync(string id, SightseeingTariffDto tariff);
+        Task<IActionResult> AddTariffAsync(VisitTariffDto tariff);
+        Task<IActionResult> UpdateTariffAsync(string id, VisitTariffDto tariff);
         Task<IActionResult> DeleteTariffAsync(string id);
     }
 }

@@ -120,7 +120,7 @@ namespace SDCWebApp.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "GeneralSightseeingInfo",
+                name: "VisitInfo",
                 columns: table => new
                 {
                     Id = table.Column<string>(nullable: false),
@@ -136,7 +136,7 @@ namespace SDCWebApp.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_GeneralSightseeingInfo", x => x.Id);
+                    table.PrimaryKey("PK_VisitInfo", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -416,7 +416,7 @@ namespace SDCWebApp.Migrations
                 values: new object[] { "f87af06f-7949-4e63-a5cc-3cba058a18ad", new DateTime(2019, 9, 7, 19, 14, 28, 257, DateTimeKind.Utc).AddTicks(9515), "Discount for people with Family Card", 15, null, "ForFamily", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
 
             migrationBuilder.InsertData(
-                table: "GeneralSightseeingInfo",
+                table: "VisitInfo",
                 columns: new[] { "Id", "ClosingHour", "CreatedAt", "Description", "MaxAllowedGroupSize", "MaxChildAge", "MaxTicketOrderInterval", "OpeningHour", "UpdatedAt" },
                 values: new object[] { "23ded832-4d2e-4972-b5d2-d3fa673703f1", new TimeSpan(0, 18, 0, 0, 0), new DateTime(2019, 9, 7, 19, 14, 28, 261, DateTimeKind.Utc).AddTicks(809), "TL;DR", 35, 5, 4, new TimeSpan(0, 10, 0, 0, 0), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
 
@@ -549,7 +549,7 @@ namespace SDCWebApp.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "GeneralSightseeingInfo");
+                name: "VisitInfo");
 
             migrationBuilder.DropTable(
                 name: "RefreshTokens");

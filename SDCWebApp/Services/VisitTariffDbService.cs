@@ -12,15 +12,15 @@ using System.Threading.Tasks;
 namespace SDCWebApp.Services
 {
     /// <summary>
-    /// Provides methods for GET, ADD, UPDATE and DELETE operations for <see cref="SightseeingTariff"/> entities in the database.
+    /// Provides methods for GET, ADD, UPDATE and DELETE operations for <see cref="VisitTariff"/> entities in the database.
     /// </summary>
-    public class SightseeingTariffDbService : ServiceBase, ISightseeingTariffDbService
+    public class VisitTariffDbService : ServiceBase, IVisitTariffDbService
     {
-        private readonly ILogger<SightseeingTariffDbService> _logger;
+        private readonly ILogger<VisitTariffDbService> _logger;
         private readonly ApplicationDbContext _context;
 
 
-        public SightseeingTariffDbService(ApplicationDbContext context, ILogger<SightseeingTariffDbService> logger) : base(context, logger)
+        public VisitTariffDbService(ApplicationDbContext context, ILogger<VisitTariffDbService> logger) : base(context, logger)
         {
             _logger = logger;
             _context = context;
@@ -28,16 +28,16 @@ namespace SDCWebApp.Services
 
 
         /// <summary>
-        /// Asynchronously adds <see cref="SightseeingTariff"/> entity to the database. Throws an exception if 
+        /// Asynchronously adds <see cref="VisitTariff"/> entity to the database. Throws an exception if 
         /// already there is the same entity in database or any problem with saving changes occurred.
         /// </summary>
         /// <param name="tariff">The tariff to be added. Cannot be null.</param>
         /// <returns>The added entity.</returns>
         /// <exception cref="ArgumentNullException">The value of <paramref name="tariff"/> to be added is null.</exception>
         /// <exception cref="InvalidOperationException">There is the same entity that the one to be added in database.</exception>
-        /// <exception cref="InternalDbServiceException">The table with <see cref="SightseeingTariff"/> entities does not exist or it is null or 
+        /// <exception cref="InternalDbServiceException">The table with <see cref="VisitTariff"/> entities does not exist or it is null or 
         /// cannot save properly any changes made by add operation.</exception>
-        public async Task<SightseeingTariff> AddAsync(SightseeingTariff tariff)
+        public async Task<VisitTariff> AddAsync(VisitTariff tariff)
         {
             _logger.LogInformation($"Starting method '{nameof(AddAsync)}'.");
             // Call normal add mode.
@@ -45,16 +45,16 @@ namespace SDCWebApp.Services
         }
 
         /// <summary>
-        /// Asynchronously adds <see cref="SightseeingTariff"/> entity to the database. Do not allow add entity with the same Description property. Throws an exception if 
+        /// Asynchronously adds <see cref="VisitTariff"/> entity to the database. Do not allow add entity with the same Description property. Throws an exception if 
         /// already there is the same entity in database or any problem with saving changes occurred.
         /// </summary>
         /// <param name="tariff">The tariff to be added. Cannot be null.</param>
         /// <returns>The added entity.</returns>
         /// <exception cref="ArgumentNullException">The value of <paramref name="tariff"/> to be added is null.</exception>
         /// <exception cref="InvalidOperationException">There is the same entity that one to be added in database.</exception>
-        /// <exception cref="InternalDbServiceException">The table with <see cref="SightseeingTariff"/> entities does not exist or it is null or 
+        /// <exception cref="InternalDbServiceException">The table with <see cref="VisitTariff"/> entities does not exist or it is null or 
         /// cannot save properly any changes made by add operation.</exception>
-        public async Task<SightseeingTariff> RestrictedAddAsync(SightseeingTariff tariff)
+        public async Task<VisitTariff> RestrictedAddAsync(VisitTariff tariff)
         {
             _logger.LogInformation($"Starting method '{nameof(RestrictedAddAsync)}'.");
             // Call restricted add mode.
@@ -62,13 +62,13 @@ namespace SDCWebApp.Services
         }
 
         /// <summary>
-        /// Asynchronously deletes <see cref="SightseeingTariff"/> entity from the database. Throws an exception if cannot found entity 
+        /// Asynchronously deletes <see cref="VisitTariff"/> entity from the database. Throws an exception if cannot found entity 
         /// to be deleted or any problem with saving changes occurred.
         /// </summary>
         /// <param name="id">The id of entity to be deleted. Cannot be null or empty.</param>
         /// <exception cref="ArgumentException">Argument <paramref name="id"/> is null or empty string.</exception>
         /// <exception cref="InvalidOperationException">Cannot found entity with given <paramref name="id"/> for delete.</exception>
-        /// <exception cref="InternalDbServiceException">The table with <see cref="SightseeingTariff"/> entities does not exist or it is null or 
+        /// <exception cref="InternalDbServiceException">The table with <see cref="VisitTariff"/> entities does not exist or it is null or 
         /// cannot save properly any changes made by add operation.</exception>
         public async Task DeleteAsync(string id)
         {
@@ -80,23 +80,23 @@ namespace SDCWebApp.Services
             }
 
             await EnsureDatabaseCreatedAsync();
-            _ = _context?.SightseeingTariffs ?? throw new InternalDbServiceException($"Table of type '{typeof(SightseeingTariff).Name}' is null.");
+            _ = _context?.VisitTariffs ?? throw new InternalDbServiceException($"Table of type '{typeof(VisitTariff).Name}' is null.");
 
             try
             {
-                if (await _context.SightseeingTariffs.AnyAsync(x => x.Id.Equals(id)) == false)
+                if (await _context.VisitTariffs.AnyAsync(x => x.Id.Equals(id)) == false)
                 {
-                    if (_context.SightseeingTariffs.Count() == 0)
+                    if (_context.VisitTariffs.Count() == 0)
                     {
-                        throw new InvalidOperationException($"Cannot found element with id '{id}'. Resource {_context.SightseeingTariffs.GetType().Name} does not contain any element.");
+                        throw new InvalidOperationException($"Cannot found element with id '{id}'. Resource {_context.VisitTariffs.GetType().Name} does not contain any element.");
                     }
 
                     throw new InvalidOperationException($"Cannot found element with id '{id}'. Any element does not match to the one to be updated.");
                 }
 
-                var tariffToBeDeleted = await _context.SightseeingTariffs.SingleAsync(x => x.Id.Equals(id));
+                var tariffToBeDeleted = await _context.VisitTariffs.SingleAsync(x => x.Id.Equals(id));
                 _logger.LogDebug($"Starting remove sightseeing tariff with id '{tariffToBeDeleted.Id}'.");
-                _context.SightseeingTariffs.Remove(tariffToBeDeleted);
+                _context.VisitTariffs.Remove(tariffToBeDeleted);
                 await _context.TrySaveChangesAsync();
                 _logger.LogDebug("Remove data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(DeleteAsync)}'.");
@@ -115,23 +115,23 @@ namespace SDCWebApp.Services
         }
 
         /// <summary>
-        /// Asynchronously retrievs all <see cref="SightseeingTariff"/> entities from the database. 
+        /// Asynchronously retrievs all <see cref="VisitTariff"/> entities from the database. 
         /// Throws an exception if any problem with retrieving occurred.
         /// </summary>
-        /// <returns>Set of all <see cref="SightseeingTariff"/> entities from database.</returns>
+        /// <returns>Set of all <see cref="VisitTariff"/> entities from database.</returns>
         /// <exception cref="InternalDbServiceException">The resource does not exist or has a null value or any
         /// other problems with retrieving data from database occurred.</exception>
-        public async Task<IEnumerable<SightseeingTariff>> GetAllAsync()
+        public async Task<IEnumerable<VisitTariff>> GetAllAsync()
         {
             _logger.LogInformation($"Starting method '{nameof(GetAllAsync)}'.");
 
             await EnsureDatabaseCreatedAsync();
-            _ = _context?.SightseeingTariffs ?? throw new InternalDbServiceException($"Table of type '{typeof(SightseeingTariff).Name}' is null.");
+            _ = _context?.VisitTariffs ?? throw new InternalDbServiceException($"Table of type '{typeof(VisitTariff).Name}' is null.");
 
             try
             {
                 _logger.LogDebug($"Starting retrieve all sightseeing tariffs from database.");
-                var tariffs = await _context.SightseeingTariffs.Include(x => x.TicketTariffs).ToArrayAsync();
+                var tariffs = await _context.VisitTariffs.Include(x => x.TicketTariffs).ToArrayAsync();
                 _logger.LogDebug("Retrieve data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(GetAllAsync)}'. Returning '{tariffs.Count()}' elements.");
                 return tariffs.AsEnumerable();
@@ -145,7 +145,7 @@ namespace SDCWebApp.Services
         }
 
         /// <summary>
-        /// Asynchronously retrieves <see cref="SightseeingTariff"/> entity with given <paramref name="id"/> from the database. 
+        /// Asynchronously retrieves <see cref="VisitTariff"/> entity with given <paramref name="id"/> from the database. 
         /// Throws an exception if cannot found entity or any problem with retrieving occurred.
         /// </summary>
         /// <param name="id">The id of entity to be retrived. Cannot be nul or empty.</param>
@@ -154,7 +154,7 @@ namespace SDCWebApp.Services
         /// <exception cref="InvalidOperationException">Cannot found entity with given <paramref name="id"/>.</exception>
         /// <exception cref="InternalDbServiceException">The resource does not exist or has a null value or any
         /// other problems with retrieving data from database occurred.</exception>
-        public async Task<SightseeingTariff> GetAsync(string id)
+        public async Task<VisitTariff> GetAsync(string id)
         {
             _logger.LogInformation($"Starting method '{nameof(GetAsync)}'.");
 
@@ -164,19 +164,19 @@ namespace SDCWebApp.Services
             }
 
             await EnsureDatabaseCreatedAsync();
-            _ = _context?.SightseeingTariffs ?? throw new InternalDbServiceException($"Table of type '{typeof(SightseeingTariff).Name}' is null.");
+            _ = _context?.VisitTariffs ?? throw new InternalDbServiceException($"Table of type '{typeof(VisitTariff).Name}' is null.");
 
             try
             {
                 _logger.LogDebug($"Starting retrieve sighseeing tariff with id: '{id}' from database.");
-                var tariff = await _context.SightseeingTariffs.Include(x => x.TicketTariffs).SingleAsync(x => x.Id.Equals(id));
+                var tariff = await _context.VisitTariffs.Include(x => x.TicketTariffs).SingleAsync(x => x.Id.Equals(id));
                 _logger.LogDebug("Retrieve data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(GetAsync)}'.");
                 return tariff;
             }
             catch (InvalidOperationException ex)
             {
-                string message = _context.SightseeingTariffs.Count() == 0 ? $"Element not found because resource '{_context.SightseeingTariffs.GetType().Name}' does contain any elements."
+                string message = _context.VisitTariffs.Count() == 0 ? $"Element not found because resource '{_context.VisitTariffs.GetType().Name}' does contain any elements."
                     : "Element not found";
                 _logger.LogError(ex, $"{ex.GetType().Name} - {message} Operation failed.");
                 throw;
@@ -190,16 +190,16 @@ namespace SDCWebApp.Services
         }
 
         /// <summary>
-        /// Asynchronously retrieves <see cref="SightseeingTariff"/> entities with specified page size and page number.
+        /// Asynchronously retrieves <see cref="VisitTariff"/> entities with specified page size and page number.
         /// Throws an exception if arguments is out of range or any problem with retrieving occurred.
         /// </summary>
         /// <param name="pageNumber">Page number that will be retrieved. Must be greater than 0.</param>
         /// <param name="pageSize">Page size. Must be a positive number.</param>
-        /// <returns>Set of <see cref="SightseeingTariff"/> entities.</returns>
+        /// <returns>Set of <see cref="VisitTariff"/> entities.</returns>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageSize"/> is a negative number or <paramref name="pageNumber"/> is less than 1.</exception>
         /// <exception cref="InternalDbServiceException">The resource does not exist or has a null value or any
         /// other problems with retrieving data from database occurred.</exception>
-        public async Task<IEnumerable<SightseeingTariff>> GetWithPaginationAsync(int pageNumber = 1, int pageSize = 30)
+        public async Task<IEnumerable<VisitTariff>> GetWithPaginationAsync(int pageNumber = 1, int pageSize = 30)
         {
             _logger.LogInformation($"Starting method '{nameof(GetWithPaginationAsync)}'.");
 
@@ -214,14 +214,14 @@ namespace SDCWebApp.Services
             }
 
             await EnsureDatabaseCreatedAsync();
-            _ = _context?.SightseeingTariffs ?? throw new InternalDbServiceException($"Table of type '{typeof(SightseeingTariff).Name}' is null.");
+            _ = _context?.VisitTariffs ?? throw new InternalDbServiceException($"Table of type '{typeof(VisitTariff).Name}' is null.");
 
             try
             {
-                IEnumerable<SightseeingTariff> tariffs = Enumerable.Empty<SightseeingTariff>();
+                IEnumerable<VisitTariff> tariffs = Enumerable.Empty<VisitTariff>();
                 int maxNumberOfPageWithData;
 
-                int numberOfResourceElements = await _context.SightseeingTariffs.CountAsync();
+                int numberOfResourceElements = await _context.VisitTariffs.CountAsync();
                 int numberOfElementsOnLastPage = numberOfResourceElements % pageSize;
                 int numberOfFullPages = (numberOfResourceElements - numberOfElementsOnLastPage) / pageSize;
 
@@ -242,7 +242,7 @@ namespace SDCWebApp.Services
                 }
 
                 _logger.LogDebug($"Starting retrieve data. '{nameof(pageNumber)}': {pageNumber.ToString()}, '{nameof(pageSize)}': {pageSize.ToString()}.");
-                tariffs = _context.SightseeingTariffs.Include(x => x.TicketTariffs).Skip(pageSize * (pageNumber - 1)).Take(pageSize);
+                tariffs = _context.VisitTariffs.Include(x => x.TicketTariffs).Skip(pageSize * (pageNumber - 1)).Take(pageSize);
                 _logger.LogDebug("Retrieve data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(GetWithPaginationAsync)}'.");
                 return tariffs;
@@ -256,7 +256,7 @@ namespace SDCWebApp.Services
         }
 
         /// <summary>
-        /// Asynchronously updates <see cref="SightseeingTariff"/> entity. 
+        /// Asynchronously updates <see cref="VisitTariff"/> entity. 
         /// Throws an exception if cannot found entity or any problem with updating occurred.
         /// </summary>
         /// <param name="tariff">The tariff to be updated. Cannot be null or has Id property set to null or empty string.</param>
@@ -266,7 +266,7 @@ namespace SDCWebApp.Services
         /// <exception cref="InvalidOperationException">Cannot found entity to be updated.</exception>
         /// <exception cref="InternalDbServiceException">The resource does not exist or has a null value or any
         /// other problems with retrieving data from database occurred.</exception>
-        public async Task<SightseeingTariff> UpdateAsync(SightseeingTariff tariff)
+        public async Task<VisitTariff> UpdateAsync(VisitTariff tariff)
         {
             _logger.LogInformation($"Starting method '{nameof(UpdateAsync)}'.");
             // Call normal update mode.
@@ -274,7 +274,7 @@ namespace SDCWebApp.Services
         }
 
         /// <summary>
-        /// Asynchronously updates <see cref="SightseeingTariff"/> entity ignoring read-only properties like Id, CreatedAt, UpdatedAt, ConcurrencyToken. 
+        /// Asynchronously updates <see cref="VisitTariff"/> entity ignoring read-only properties like Id, CreatedAt, UpdatedAt, ConcurrencyToken. 
         /// Throws an exception if cannot found entity or any problem with updating occurred.
         /// </summary>
         /// <param name="tariff">The tariff to be updated. Cannot be null or has Id property set to null or empty string.</param>
@@ -284,7 +284,7 @@ namespace SDCWebApp.Services
         /// <exception cref="InvalidOperationException">Cannot found entity to be updated.</exception>
         /// <exception cref="InternalDbServiceException">The resource does not exist or has a null value or any
         /// other problems with retrieving data from database occurred.</exception>
-        public async Task<SightseeingTariff> RestrictedUpdateAsync(SightseeingTariff tariff)
+        public async Task<VisitTariff> RestrictedUpdateAsync(VisitTariff tariff)
         {
             _logger.LogInformation($"Starting method '{nameof(RestrictedUpdateAsync)}'.");
             // Call restricted update mode.
@@ -292,26 +292,26 @@ namespace SDCWebApp.Services
         }
 
         /// <summary>
-        /// Filters set of data of type <see cref="SightseeingTariff"/>. Returns filtered data set. Throws an exception if <paramref name="predicate"/> is null, 
+        /// Filters set of data of type <see cref="VisitTariff"/>. Returns filtered data set. Throws an exception if <paramref name="predicate"/> is null, 
         /// or if cannot filter data due to any internal problem.
         /// </summary>
         /// <typeparam name="T">The type of entity to set be filtered.</typeparam>
         /// <param name="predicate">A function to test each element for a condition.</param>
-        /// <returns>Filterd <see cref="SightseeingTariff"/> set.</returns>
+        /// <returns>Filterd <see cref="VisitTariff"/> set.</returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="predicate"/> is null.</exception>
         /// <exception cref="InvalidOperationException">Cannot filter data.</exception>
         /// <exception cref="InternalDbServiceException">The resource does not exist or has a null value or any
         /// other problems with retrieving data from database occurred.</exception>        
-        public async Task<IEnumerable<SightseeingTariff>> GetByAsync(Expression<Func<SightseeingTariff, bool>> predicate)
+        public async Task<IEnumerable<VisitTariff>> GetByAsync(Expression<Func<VisitTariff, bool>> predicate)
         {
             _logger.LogInformation($"Starting method '{nameof(GetByAsync)}'.");
 
             await EnsureDatabaseCreatedAsync();
-            _ = _context?.SightseeingTariffs ?? throw new InternalDbServiceException($"Table of type '{typeof(SightseeingTariff).Name}' is null.");
+            _ = _context?.VisitTariffs ?? throw new InternalDbServiceException($"Table of type '{typeof(VisitTariff).Name}' is null.");
 
             try
             {
-                var result = GetByPredicate<SightseeingTariff>(predicate) as IEnumerable<SightseeingTariff>;
+                var result = GetByPredicate<VisitTariff>(predicate) as IEnumerable<VisitTariff>;
                 _logger.LogInformation($"Finished method '{nameof(GetByAsync)}'.");
                 return result;
             }
@@ -338,19 +338,19 @@ namespace SDCWebApp.Services
 
         protected override async Task<bool> IsEntityAlreadyExistsAsync(BasicEntity entity)
         {
-            var allTariffs = await _context.SightseeingTariffs.ToArrayAsync();
-            return allTariffs.Any(x => x.Equals(entity as SightseeingTariff));
+            var allTariffs = await _context.VisitTariffs.ToArrayAsync();
+            return allTariffs.Any(x => x.Equals(entity as VisitTariff));
         }
 
         /// <summary>
-        /// Asynchronously updates <see cref="SightseeingTariff"/> entity. If <paramref name="isRestrict"/> set to false then no restrictions will be used and update allow entirely entity updating. 
+        /// Asynchronously updates <see cref="VisitTariff"/> entity. If <paramref name="isRestrict"/> set to false then no restrictions will be used and update allow entirely entity updating. 
         /// Otherwise the restricted mode will be using. It will ignore updating some read-only properties.
         /// </summary>
-        /// <param name="tariff">SightseeingTariff To be updated</param>
+        /// <param name="tariff">VisitTariff To be updated</param>
         /// <param name="isRestrict">If set to false then no restrictions will be used and update allow entirely entity updating. If set to true then the restricted mode will be used.
         /// It will ignore some read-only properties changes.</param>
-        /// <returns>Updated <see cref="SightseeingTariff"/> entity.</returns>
-        private async Task<SightseeingTariff> UpdateBaseAsync(SightseeingTariff tariff, bool isRestrict = false)
+        /// <returns>Updated <see cref="VisitTariff"/> entity.</returns>
+        private async Task<VisitTariff> UpdateBaseAsync(VisitTariff tariff, bool isRestrict = false)
         {
             _logger.LogDebug($"Starting method '{nameof(UpdateBaseAsync)}'.");
 
@@ -362,40 +362,40 @@ namespace SDCWebApp.Services
             }
 
             await EnsureDatabaseCreatedAsync();
-            _ = _context?.SightseeingTariffs ?? throw new InternalDbServiceException($"Table of type '{typeof(SightseeingTariff).Name}' is null.");
+            _ = _context?.VisitTariffs ?? throw new InternalDbServiceException($"Table of type '{typeof(VisitTariff).Name}' is null.");
 
             try
             {
-                if (_context.SightseeingTariffs.Count() == 0)
+                if (_context.VisitTariffs.Count() == 0)
                 {
                     throw new InvalidOperationException($"Cannot found element with id '{tariff.Id}' for update. Resource {_context.Groups.GetType().Name} does not contain any element.");
                 }
 
-                if (await _context.SightseeingTariffs.ContainsAsync(tariff) == false)
+                if (await _context.VisitTariffs.ContainsAsync(tariff) == false)
                 {
                     throw new InvalidOperationException($"Cannot found element with id '{tariff.Id}' for update. Any element does not match to the one to be updated.");
                 }
 
                 _logger.LogDebug($"Starting update tariff with id '{tariff.Id}'.");
 
-                SightseeingTariff updatedTariff = null;
+                VisitTariff updatedTariff = null;
                 tariff.UpdatedAt = DateTime.UtcNow;
 
                 if (isRestrict)
                 {
                     // Resticted update mode that ignores all changes in read-only properties like Id, CreatedAt, UpdatedAt, ConcurrencyToken and navigation properties like TicketTariffs.
-                    var originalTariff = await _context.SightseeingTariffs.SingleAsync(x => x.Id.Equals(tariff.Id));
+                    var originalTariff = await _context.VisitTariffs.SingleAsync(x => x.Id.Equals(tariff.Id));
 
                     // Set the TicketTariffs navigation property to the original value, because restricted update mode does not allow updating of TicketTariffs.
                     // For any changes from the client in TicketTariff objects, use the TicketTairiffsController methods.
                     tariff.TicketTariffs = originalTariff.TicketTariffs;
 
-                    updatedTariff = BasicRestrictedUpdate(originalTariff, tariff) as SightseeingTariff;
+                    updatedTariff = BasicRestrictedUpdate(originalTariff, tariff) as VisitTariff;
                 }
                 else
                 {
                     // Normal update mode without any additional restrictions.
-                    updatedTariff = _context.SightseeingTariffs.Update(tariff).Entity;
+                    updatedTariff = _context.VisitTariffs.Update(tariff).Entity;
                 }
 
                 await _context.TrySaveChangesAsync();
@@ -417,14 +417,14 @@ namespace SDCWebApp.Services
         }
 
         /// <summary>
-        /// Asynchronously adds <see cref="SightseeingTariff"/> entity. If <paramref name="isRestrict"/> set to false then no restrictions will be used. If set to true then the restricted mode will be used.
-        /// It will check if in database is entity with the same 'Name' value. Moreover it will does not allow to add navigation property while adding <see cref="SightseeingTariff"/>.
+        /// Asynchronously adds <see cref="VisitTariff"/> entity. If <paramref name="isRestrict"/> set to false then no restrictions will be used. If set to true then the restricted mode will be used.
+        /// It will check if in database is entity with the same 'Name' value. Moreover it will does not allow to add navigation property while adding <see cref="VisitTariff"/>.
         /// </summary>
-        /// <param name="tariff"><see cref="SightseeingTariff"/> to be added.</param>
+        /// <param name="tariff"><see cref="VisitTariff"/> to be added.</param>
         /// <param name="isRestrict">If set to false then no restrictions will be used and update allow entirely entity updating. If set to true then the restricted mode will be used.
-        /// It will check if in database is entity with the same 'Name' value. Moreover it will does not allow to add navigation property while adding <see cref="SightseeingTariff"/>.</param>
-        /// <returns>Added <see cref="SightseeingTariff"/> entity.</returns>
-        private async Task<SightseeingTariff> AddBaseAsync(SightseeingTariff tariff, bool isRestrict = false)
+        /// It will check if in database is entity with the same 'Name' value. Moreover it will does not allow to add navigation property while adding <see cref="VisitTariff"/>.</param>
+        /// <returns>Added <see cref="VisitTariff"/> entity.</returns>
+        private async Task<VisitTariff> AddBaseAsync(VisitTariff tariff, bool isRestrict = false)
         {
             _logger.LogDebug($"Starting method '{nameof(AddBaseAsync)}'.");
 
@@ -434,7 +434,7 @@ namespace SDCWebApp.Services
             }
 
             await EnsureDatabaseCreatedAsync();
-            _ = _context?.SightseeingTariffs ?? throw new InternalDbServiceException($"Table of type '{typeof(SightseeingTariff).Name}' is null.");
+            _ = _context?.VisitTariffs ?? throw new InternalDbServiceException($"Table of type '{typeof(VisitTariff).Name}' is null.");
 
             try
             {
@@ -453,14 +453,14 @@ namespace SDCWebApp.Services
                 else
                 {
                     // Normal add mode without any additional restrictions.
-                    if (_context.SightseeingTariffs.Contains(tariff))
+                    if (_context.VisitTariffs.Contains(tariff))
                     {
                         throw new InvalidOperationException($"There is already the same element in the database as the one to be added. Id of this element: '{tariff.Id}'.");
                     }
                 }
 
                 _logger.LogDebug($"Starting add tariff with id '{tariff.Id}'.");
-                var addedTariff = _context.SightseeingTariffs.Add(tariff).Entity;
+                var addedTariff = _context.VisitTariffs.Add(tariff).Entity;
                 await _context.TrySaveChangesAsync();
                 _logger.LogDebug("Add data succeeded.");
                 _logger.LogDebug($"Finished method '{nameof(AddBaseAsync)}'.");

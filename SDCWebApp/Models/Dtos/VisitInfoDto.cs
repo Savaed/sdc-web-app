@@ -2,7 +2,7 @@
 
 namespace SDCWebApp.Models.Dtos
 {
-    public class SightseeingInfoDto : DtoBase
+    public class VisitInfoDto : DtoBase
     {
         public string Description { get; set; }
         public int MaxChildAge { get; set; }

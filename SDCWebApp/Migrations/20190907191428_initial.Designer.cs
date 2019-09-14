@@ -395,7 +395,7 @@ namespace SDCWebApp.Migrations
                         });
                 });
 
-            modelBuilder.Entity("SDCWebApp.Models.GeneralSightseeingInfo", b =>
+            modelBuilder.Entity("SDCWebApp.Models.VisitInfo", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
@@ -422,7 +422,7 @@ namespace SDCWebApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("GeneralSightseeingInfo");
+                    b.ToTable("VisitInfo");
 
                     b.HasData(
                         new
@@ -510,7 +510,7 @@ namespace SDCWebApp.Migrations
                         });
                 });
 
-            modelBuilder.Entity("SDCWebApp.Models.SightseeingTariff", b =>
+            modelBuilder.Entity("SDCWebApp.Models.VisitTariff", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
@@ -733,7 +733,7 @@ namespace SDCWebApp.Migrations
 
             modelBuilder.Entity("SDCWebApp.Models.TicketTariff", b =>
                 {
-                    b.HasOne("SDCWebApp.Models.SightseeingTariff", "SightseeingTariff")
+                    b.HasOne("SDCWebApp.Models.VisitTariff", "VisitTariff")
                         .WithMany("TicketTariffs")
                         .HasForeignKey("SightseeingTariffId")
                         .OnDelete(DeleteBehavior.SetNull);

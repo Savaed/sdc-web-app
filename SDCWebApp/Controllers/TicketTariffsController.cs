@@ -13,6 +13,9 @@ using System.Threading.Tasks;
 
 namespace SDCWebApp.Controllers
 {
+    /// <summary>
+    /// Provides methods to Http verbs proccessing on <see cref="TicketTariff"/> entities.
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class TicketTariffsController : CustomApiController, ITicketTariffsController
@@ -20,11 +23,11 @@ namespace SDCWebApp.Controllers
         private const string ControllerPrefix = "ticket-tariffs";
         private readonly ILogger<TicketTariffsController> _logger;
         private readonly ITicketTariffDbService _ticketTariffDbService;
-        private readonly ISightseeingTariffDbService _sightseeingTariffDbService;
+        private readonly IVisitTariffDbService _sightseeingTariffDbService;
         private readonly IMapper _mapper;
 
 
-        public TicketTariffsController(ITicketTariffDbService ticketTariffDbService, ISightseeingTariffDbService sightseeingTariffDbService, ILogger<TicketTariffsController> logger, IMapper mapper) : base(logger)
+        public TicketTariffsController(ITicketTariffDbService ticketTariffDbService, IVisitTariffDbService sightseeingTariffDbService, ILogger<TicketTariffsController> logger, IMapper mapper) : base(logger)
         {
             _mapper = mapper;
             _logger = logger;
@@ -63,7 +66,7 @@ namespace SDCWebApp.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                return OnNotFoundError($"Cannot found element '{typeof(SightseeingTariff).Name}' with specified id: '{sightseeingTariffId}'.", ex);
+                return OnNotFoundError($"Cannot found element '{typeof(VisitTariff).Name}' with specified id: '{sightseeingTariffId}'.", ex);
             }
             catch (InternalDbServiceException ex)
             {
@@ -101,7 +104,7 @@ namespace SDCWebApp.Controllers
             }
 
             TicketTariff ticketTariffToBeAdded = null;
-            SightseeingTariff sightseeingTariff = null;
+            VisitTariff sightseeingTariff = null;
 
 
 

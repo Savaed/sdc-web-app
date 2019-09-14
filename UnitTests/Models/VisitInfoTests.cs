@@ -8,9 +8,9 @@ using UnitTests.Helpers;
 namespace UnitTests.Models
 {
     [TestFixture]
-    public class GeneralSightseeingInfoTests
+    public class VisitInfoTests
     {
-        private GeneralSightseeingInfo _info;
+        private VisitInfo _info;
 
 
         [OneTimeSetUp]
@@ -54,7 +54,7 @@ namespace UnitTests.Models
         [Test]
         public void Equals__One_info_is_null__Should_not_be_the_same()
         {
-            GeneralSightseeingInfo info1 = null;
+            SDCWebApp.Models.VisitInfo info1 = null;
             var info2 = _info;
 
             bool isEqual = info2.Equals(info1);

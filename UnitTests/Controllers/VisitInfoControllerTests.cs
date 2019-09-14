@@ -18,25 +18,25 @@ using UnitTests.Helpers;
 namespace UnitTests.Controllers
 {
     [TestFixture]
-    public class SightseeingInfoControllerTests
+    public class VisitInfoControllerTests
     {
-        private Mock<IGeneralSightseeingInfoDbService> _infoDbServiceMock;
-        private ILogger<SightseeingInfoController> _logger;
+        private Mock<IVisitInfoDbService> _infoDbServiceMock;
+        private ILogger<VisitInfoController> _logger;
         private Mock<IMapper> _mapperMock;
-        private SightseeingInfoDto[] _infoDtos;
-        private GeneralSightseeingInfo _info;
-        private SightseeingInfoDto _infoDto;
+        private VisitInfoDto[] _infoDtos;
+        private VisitInfo _info;
+        private VisitInfoDto _infoDto;
 
 
         [OneTimeSetUp]
         public void SetUp()
         {
-            _infoDbServiceMock = new Mock<IGeneralSightseeingInfoDbService>();
-            _logger = Mock.Of<ILogger<SightseeingInfoController>>();
+            _infoDbServiceMock = new Mock<IVisitInfoDbService>();
+            _logger = Mock.Of<ILogger<VisitInfoController>>();
             _mapperMock = new Mock<IMapper>();
-            _info = Helpers.CreateModel.CreateInfo();
+            _info = CreateModel.CreateInfo();
             _infoDto = CreateInfoDto(_info);
-            _infoDtos = new SightseeingInfoDto[] { _infoDto };
+            _infoDtos = new VisitInfoDto[] { _infoDto };
         }
 
 
@@ -45,7 +45,7 @@ namespace UnitTests.Controllers
         // Unexpected internal error -> throw Exception
         // Specified SightseeingInfo not found -> 404NotFound
         // Argument id is null or empty -> 400BadRequest
-        // GeneralSightseeingInfo found -> 200Ok, return this SightseeingGroup        
+        // VisitInfo found -> 200Ok, return this SightseeingGroup        
 
         [Test]
         public async Task GetInfoAsync__An_internal_error_reffered_to_the_database_occurred__Should_throw_InternalDbServiceException()
@@ -53,7 +53,7 @@ namespace UnitTests.Controllers
             // Example of these errors: database does not exist, table does not exist etc.
 
             _infoDbServiceMock.Setup(x => x.GetAsync(It.IsAny<string>())).ThrowsAsync(new InternalDbServiceException());
-            var controller = new SightseeingInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
+            var controller = new VisitInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
 
             Func<Task> result = async () => await controller.GetInfoAsync("1");
 
@@ -64,7 +64,7 @@ namespace UnitTests.Controllers
         public async Task GetInfoAsync__An_unexpected_internal_error_occurred__Should_throw_Exception()
         {
             _infoDbServiceMock.Setup(x => x.GetAsync(It.IsAny<string>())).ThrowsAsync(new Exception());
-            var controller = new SightseeingInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
+            var controller = new SDCWebApp.Controllers.VisitInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
 
             Func<Task> result = async () => await controller.GetInfoAsync("1");
 
@@ -75,7 +75,7 @@ namespace UnitTests.Controllers
         public async Task GetInfoAsync__Element_not_found__Should_return_404NotFound_response_with_error()
         {
             _infoDbServiceMock.Setup(x => x.GetAsync(It.IsNotNull<string>())).ThrowsAsync(new InvalidOperationException()).Verifiable();
-            var controller = new SightseeingInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
+            var controller = new SDCWebApp.Controllers.VisitInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
 
             var result = await controller.GetInfoAsync("1");
 
@@ -87,7 +87,7 @@ namespace UnitTests.Controllers
         public async Task GetInfoAsync__Argument_id_is_null_or_empty__Should_return_400BadRequest_response([Values(null, "")] string id)
         {
             _infoDbServiceMock.Setup(x => x.GetAsync(id)).ThrowsAsync(new ArgumentException());
-            var controller = new SightseeingInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
+            var controller = new SDCWebApp.Controllers.VisitInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
 
             var result = await controller.GetInfoAsync(id);
 
@@ -100,8 +100,8 @@ namespace UnitTests.Controllers
         {
             string id = "15891fb0-faec-43c6-9e83-04a4a17c3660";
             _infoDbServiceMock.Setup(x => x.GetAsync(It.IsNotNull<string>())).ReturnsAsync(_info);
-            _mapperMock.Setup(x => x.Map<SightseeingInfoDto>(It.IsNotNull<GeneralSightseeingInfo>())).Returns(_infoDtos[0]);
-            var controller = new SightseeingInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
+            _mapperMock.Setup(x => x.Map<VisitInfoDto>(It.IsNotNull<VisitInfo>())).Returns(_infoDtos[0]);
+            var controller = new SDCWebApp.Controllers.VisitInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
 
             var result = await controller.GetInfoAsync(id);
 
@@ -124,7 +124,7 @@ namespace UnitTests.Controllers
             // Example of these errors: database does not exist, table does not exist etc.
 
             _infoDbServiceMock.Setup(x => x.GetAllAsync()).ThrowsAsync(new InternalDbServiceException());
-            var controller = new SightseeingInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
+            var controller = new SDCWebApp.Controllers.VisitInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
 
             Func<Task> result = async () => await controller.GetAllInfoAsync();
 
@@ -135,7 +135,7 @@ namespace UnitTests.Controllers
         public async Task GetAllinfoAsync__An_unexpected_internal_error_occurred__Should_throw_Exception()
         {
             _infoDbServiceMock.Setup(x => x.GetAllAsync()).ThrowsAsync(new Exception());
-            var controller = new SightseeingInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
+            var controller = new SDCWebApp.Controllers.VisitInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
 
             Func<Task> result = async () => await controller.GetAllInfoAsync();
 
@@ -145,33 +145,33 @@ namespace UnitTests.Controllers
         [Test]
         public async Task GetAllinfoAsync__Resource_is_empty__Should_return_200OK_response_with_empty_IEnumerable()
         {
-            _infoDbServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(Enumerable.Empty<GeneralSightseeingInfo>());
-            _mapperMock.Setup(x => x.Map<IEnumerable<SightseeingInfoDto>>(It.IsNotNull<IEnumerable<GeneralSightseeingInfo>>())).Returns(Enumerable.Empty<SightseeingInfoDto>());
-            var controller = new SightseeingInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
+            _infoDbServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(Enumerable.Empty<VisitInfo>());
+            _mapperMock.Setup(x => x.Map<IEnumerable<VisitInfoDto>>(It.IsNotNull<IEnumerable<VisitInfo>>())).Returns(Enumerable.Empty<VisitInfoDto>());
+            var controller = new SDCWebApp.Controllers.VisitInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
 
             var result = await controller.GetAllInfoAsync();
 
             (result as ObjectResult).StatusCode.Should().Be(200);
-            (((result as ObjectResult).Value as ResponseWrapper).Data as IEnumerable<SightseeingInfoDto>).Should().BeEmpty();
+            (((result as ObjectResult).Value as ResponseWrapper).Data as IEnumerable<VisitInfoDto>).Should().BeEmpty();
         }
 
         [Test]
         public async Task GetAllinfoAsync__At_least_one_element_found__Should_return_200OK_response_with_not_empty_IEnumerable()
         {
-            _infoDbServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new GeneralSightseeingInfo[] { _info });
-            _mapperMock.Setup(x => x.Map<IEnumerable<SightseeingInfoDto>>(It.IsNotNull<IEnumerable<GeneralSightseeingInfo>>())).Returns(_infoDtos.AsEnumerable());
-            var controller = new SightseeingInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
+            _infoDbServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new VisitInfo[] { _info });
+            _mapperMock.Setup(x => x.Map<IEnumerable<VisitInfoDto>>(It.IsNotNull<IEnumerable<VisitInfo>>())).Returns(_infoDtos.AsEnumerable());
+            var controller = new SDCWebApp.Controllers.VisitInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
 
             var result = await controller.GetAllInfoAsync();
 
             (result as ObjectResult).StatusCode.Should().Be(200);
-            (((result as ObjectResult).Value as ResponseWrapper).Data as IEnumerable<SightseeingInfoDto>).Should().NotBeEmpty();
+            (((result as ObjectResult).Value as ResponseWrapper).Data as IEnumerable<VisitInfoDto>).Should().NotBeEmpty();
         }
 
         #endregion
 
 
-        #region AddInfoAsync(GeneralSightseeingInfo info);
+        #region AddInfoAsync(VisitInfo info);
         // Internal error refferd to the db -> throw InternalDbServiceException
         // Unexpected internal error -> throw Exception
         // Already there is the same info -> return 400BadRequest
@@ -182,9 +182,9 @@ namespace UnitTests.Controllers
         {
             // Example of these errors: database does not exist, table does not exist etc.
 
-            _infoDbServiceMock.Setup(x => x.AddAsync(It.IsAny<GeneralSightseeingInfo>())).ThrowsAsync(new InternalDbServiceException());
-            _infoDbServiceMock.Setup(x => x.RestrictedAddAsync(It.IsAny<GeneralSightseeingInfo>())).ThrowsAsync(new InternalDbServiceException());
-            var controller = new SightseeingInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
+            _infoDbServiceMock.Setup(x => x.AddAsync(It.IsAny<VisitInfo>())).ThrowsAsync(new InternalDbServiceException());
+            _infoDbServiceMock.Setup(x => x.RestrictedAddAsync(It.IsAny<VisitInfo>())).ThrowsAsync(new InternalDbServiceException());
+            var controller = new SDCWebApp.Controllers.VisitInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
             var infoDto = CreateInfoDto(CreateModel.CreateInfo());
 
             Func<Task> result = async () => await controller.AddInfoAsync(infoDto);
@@ -195,9 +195,9 @@ namespace UnitTests.Controllers
         [Test]
         public async Task AddInfoAsync__An_unexpected_internal_error_occurred__Should_throw_Exception()
         {
-            _infoDbServiceMock.Setup(x => x.AddAsync(It.IsAny<GeneralSightseeingInfo>())).ThrowsAsync(new Exception());
-            _infoDbServiceMock.Setup(x => x.RestrictedAddAsync(It.IsAny<GeneralSightseeingInfo>())).ThrowsAsync(new Exception());
-            var controller = new SightseeingInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
+            _infoDbServiceMock.Setup(x => x.AddAsync(It.IsAny<VisitInfo>())).ThrowsAsync(new Exception());
+            _infoDbServiceMock.Setup(x => x.RestrictedAddAsync(It.IsAny<VisitInfo>())).ThrowsAsync(new Exception());
+            var controller = new SDCWebApp.Controllers.VisitInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
             var infoDto = CreateInfoDto(CreateModel.CreateInfo());
 
             Func<Task> result = async () => await controller.AddInfoAsync(infoDto);
@@ -208,10 +208,10 @@ namespace UnitTests.Controllers
         [Test]
         public async Task AddInfoAsync__Already_there_is_the_same_element_in_database__Should_return_400BadRequest_response()
         {
-            _mapperMock.Setup(x => x.Map<GeneralSightseeingInfo>(_infoDto)).Returns(_info);
-            _infoDbServiceMock.Setup(x => x.AddAsync(It.IsNotNull<GeneralSightseeingInfo>())).ThrowsAsync(new InvalidOperationException());
-            _infoDbServiceMock.Setup(x => x.RestrictedAddAsync(It.IsNotNull<GeneralSightseeingInfo>())).ThrowsAsync(new InvalidOperationException());
-            var controller = new SightseeingInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
+            _mapperMock.Setup(x => x.Map<VisitInfo>(_infoDto)).Returns(_info);
+            _infoDbServiceMock.Setup(x => x.AddAsync(It.IsNotNull<VisitInfo>())).ThrowsAsync(new InvalidOperationException());
+            _infoDbServiceMock.Setup(x => x.RestrictedAddAsync(It.IsNotNull<VisitInfo>())).ThrowsAsync(new InvalidOperationException());
+            var controller = new SDCWebApp.Controllers.VisitInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
             var infoDto = CreateInfoDto(CreateModel.CreateInfo());
 
             var result = await controller.AddInfoAsync(infoDto);
@@ -223,10 +223,10 @@ namespace UnitTests.Controllers
         [Test]
         public async Task AddInfoAsync__Add_succeeded__Should_return_201OK_response_with_added_element()
         {
-            _mapperMock.Setup(x => x.Map<GeneralSightseeingInfo>(It.IsNotNull<SightseeingInfoDto>())).Returns(_info);
-            _mapperMock.Setup(x => x.Map<SightseeingInfoDto>(It.IsNotNull<GeneralSightseeingInfo>())).Returns(_infoDto);
-            _infoDbServiceMock.Setup(x => x.AddAsync(It.IsNotNull<GeneralSightseeingInfo>())).ReturnsAsync(_info);
-            var controller = new SightseeingInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
+            _mapperMock.Setup(x => x.Map<VisitInfo>(It.IsNotNull<VisitInfoDto>())).Returns(_info);
+            _mapperMock.Setup(x => x.Map<VisitInfoDto>(It.IsNotNull<VisitInfo>())).Returns(_infoDto);
+            _infoDbServiceMock.Setup(x => x.AddAsync(It.IsNotNull<VisitInfo>())).ReturnsAsync(_info);
+            var controller = new SDCWebApp.Controllers.VisitInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
             var infoDto = CreateInfoDto(CreateModel.CreateInfo());
 
             var result = await controller.AddInfoAsync(infoDto);
@@ -238,7 +238,7 @@ namespace UnitTests.Controllers
         #endregion
 
 
-        #region UpdateInfoAsync(string id, GeneralSightseeingInfo info);
+        #region UpdateInfoAsync(string id, VisitInfo info);
         // Internal error refferd to the db -> throw InternalDbServiceException
         // Unexpected internal error -> throw Exception
         // Update succeeded -> return 200OK, with updated info
@@ -249,11 +249,11 @@ namespace UnitTests.Controllers
         [Test]
         public async Task UpdateInfoAsync__Element_not_found__Should_return_404NotFound_response_with_error()
         {
-            _mapperMock.Setup(x => x.Map<GeneralSightseeingInfo>(It.IsNotNull<SightseeingInfoDto>())).Returns(_info);
-            _mapperMock.Setup(x => x.Map<SightseeingInfoDto>(It.IsNotNull<GeneralSightseeingInfo>())).Returns(_infoDto);
-            _infoDbServiceMock.Setup(x => x.UpdateAsync(It.IsNotNull<GeneralSightseeingInfo>())).ThrowsAsync(new InvalidOperationException());
-            _infoDbServiceMock.Setup(x => x.RestrictedUpdateAsync(It.IsNotNull<GeneralSightseeingInfo>())).ThrowsAsync(new InvalidOperationException());
-            var controller = new SightseeingInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
+            _mapperMock.Setup(x => x.Map<VisitInfo>(It.IsNotNull<VisitInfoDto>())).Returns(_info);
+            _mapperMock.Setup(x => x.Map<VisitInfoDto>(It.IsNotNull<VisitInfo>())).Returns(_infoDto);
+            _infoDbServiceMock.Setup(x => x.UpdateAsync(It.IsNotNull<VisitInfo>())).ThrowsAsync(new InvalidOperationException());
+            _infoDbServiceMock.Setup(x => x.RestrictedUpdateAsync(It.IsNotNull<VisitInfo>())).ThrowsAsync(new InvalidOperationException());
+            var controller = new SDCWebApp.Controllers.VisitInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
 
             var result = await controller.UpdateInfoAsync(_infoDto.Id, _infoDto);
 
@@ -266,10 +266,10 @@ namespace UnitTests.Controllers
         {
             // Example of these errors: database does not exist, table does not exist etc.
 
-            _infoDbServiceMock.Setup(x => x.UpdateAsync(It.IsAny<GeneralSightseeingInfo>())).ThrowsAsync(new InternalDbServiceException());
-            _infoDbServiceMock.Setup(x => x.RestrictedUpdateAsync(It.IsAny<GeneralSightseeingInfo>())).ThrowsAsync(new InternalDbServiceException());
-            _mapperMock.Setup(x => x.Map<GeneralSightseeingInfo>(It.IsNotNull<SightseeingInfoDto>())).Returns(_info);
-            var controller = new SightseeingInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
+            _infoDbServiceMock.Setup(x => x.UpdateAsync(It.IsAny<VisitInfo>())).ThrowsAsync(new InternalDbServiceException());
+            _infoDbServiceMock.Setup(x => x.RestrictedUpdateAsync(It.IsAny<VisitInfo>())).ThrowsAsync(new InternalDbServiceException());
+            _mapperMock.Setup(x => x.Map<VisitInfo>(It.IsNotNull<VisitInfoDto>())).Returns(_info);
+            var controller = new SDCWebApp.Controllers.VisitInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
 
             Func<Task> result = async () => await controller.UpdateInfoAsync(_infoDto.Id, _infoDto);
 
@@ -279,10 +279,10 @@ namespace UnitTests.Controllers
         [Test]
         public async Task UpdateInfoAsync__An_unexpected_internal_error_occurred__Should_throw_Exception()
         {
-            _infoDbServiceMock.Setup(x => x.UpdateAsync(It.IsAny<GeneralSightseeingInfo>())).ThrowsAsync(new Exception());
-            _infoDbServiceMock.Setup(x => x.RestrictedUpdateAsync(It.IsAny<GeneralSightseeingInfo>())).ThrowsAsync(new Exception());
-            _mapperMock.Setup(x => x.Map<GeneralSightseeingInfo>(It.IsNotNull<SightseeingInfoDto>())).Returns(_info);
-            var controller = new SightseeingInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
+            _infoDbServiceMock.Setup(x => x.UpdateAsync(It.IsAny<VisitInfo>())).ThrowsAsync(new Exception());
+            _infoDbServiceMock.Setup(x => x.RestrictedUpdateAsync(It.IsAny<VisitInfo>())).ThrowsAsync(new Exception());
+            _mapperMock.Setup(x => x.Map<VisitInfo>(It.IsNotNull<VisitInfoDto>())).Returns(_info);
+            var controller = new SDCWebApp.Controllers.VisitInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
 
             Func<Task> result = async () => await controller.UpdateInfoAsync(_infoDto.Id, _infoDto);
 
@@ -292,7 +292,7 @@ namespace UnitTests.Controllers
         [Test]
         public async Task UpdateInfoAsync__Argument_id_is_null_or_empty__Should_return_400BadRequest_response([Values(null, "")] string id)
         {
-            var controller = new SightseeingInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
+            var controller = new SDCWebApp.Controllers.VisitInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
             var infoDto = CreateInfoDto(CreateModel.CreateInfo());
             infoDto.Id = id;
 
@@ -305,7 +305,7 @@ namespace UnitTests.Controllers
         [Test]
         public async Task UpdateInfoAsync__Argument_id_and_id_property_in_element_to_be_updated_mismatches__Should_return_400BadRequest_response()
         {
-            var controller = new SightseeingInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
+            var controller = new SDCWebApp.Controllers.VisitInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
             var infoDto = _infoDtos[0];
             string id = infoDto.Id + "_mismatched_id";
 
@@ -318,12 +318,12 @@ namespace UnitTests.Controllers
         [Test]
         public async Task UpdateInfoAsync__Update_succeeded__Should_return_200OK_response_with_updated_element()
         {
-            _mapperMock.Setup(x => x.Map<GeneralSightseeingInfo>(It.IsNotNull<SightseeingInfoDto>())).Returns(_info);
-            _mapperMock.Setup(x => x.Map<SightseeingInfoDto>(It.IsNotNull<GeneralSightseeingInfo>())).Returns(_infoDto);
-            _infoDbServiceMock.Setup(x => x.UpdateAsync(It.IsNotNull<GeneralSightseeingInfo>())).ReturnsAsync(_info);
-            _infoDbServiceMock.Setup(x => x.RestrictedUpdateAsync(It.IsNotNull<GeneralSightseeingInfo>())).ReturnsAsync(_info);
-            _mapperMock.Setup(x => x.Map<SightseeingInfoDto>(It.IsNotNull<GeneralSightseeingInfo>())).Returns(_infoDto);
-            var controller = new SightseeingInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
+            _mapperMock.Setup(x => x.Map<VisitInfo>(It.IsNotNull<VisitInfoDto>())).Returns(_info);
+            _mapperMock.Setup(x => x.Map<VisitInfoDto>(It.IsNotNull<VisitInfo>())).Returns(_infoDto);
+            _infoDbServiceMock.Setup(x => x.UpdateAsync(It.IsNotNull<VisitInfo>())).ReturnsAsync(_info);
+            _infoDbServiceMock.Setup(x => x.RestrictedUpdateAsync(It.IsNotNull<VisitInfo>())).ReturnsAsync(_info);
+            _mapperMock.Setup(x => x.Map<VisitInfoDto>(It.IsNotNull<VisitInfo>())).Returns(_infoDto);
+            var controller = new SDCWebApp.Controllers.VisitInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
 
             var result = await controller.UpdateInfoAsync(_infoDto.Id, _infoDto);
 
@@ -347,7 +347,7 @@ namespace UnitTests.Controllers
             // Example of these errors: database does not exist, table does not exist etc.
 
             _infoDbServiceMock.Setup(x => x.DeleteAsync(It.IsAny<string>())).ThrowsAsync(new InternalDbServiceException());
-            var controller = new SightseeingInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
+            var controller = new SDCWebApp.Controllers.VisitInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
 
             Func<Task> result = async () => await controller.DeleteInfoAsync("1");
 
@@ -358,7 +358,7 @@ namespace UnitTests.Controllers
         public async Task DeleteInfoAsync__An_unexpected_internal_error_occurred__Should_throw_Exception()
         {
             _infoDbServiceMock.Setup(x => x.DeleteAsync(It.IsAny<string>())).ThrowsAsync(new Exception());
-            var controller = new SightseeingInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
+            var controller = new SDCWebApp.Controllers.VisitInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
 
             Func<Task> result = async () => await controller.DeleteInfoAsync("1");
 
@@ -370,7 +370,7 @@ namespace UnitTests.Controllers
         {
             string id = "-1";
             _infoDbServiceMock.Setup(x => x.DeleteAsync(id)).ThrowsAsync(new InvalidOperationException());
-            var controller = new SightseeingInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
+            var controller = new SDCWebApp.Controllers.VisitInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
 
             var result = await controller.DeleteInfoAsync(id);
 
@@ -382,7 +382,7 @@ namespace UnitTests.Controllers
         public async Task DeleteInfoAsync__Argument_id_is_null_or_empty__Should_return_400BadRequest_response([Values(null, "")] string id)
         {
             _infoDbServiceMock.Setup(x => x.DeleteAsync(id)).ThrowsAsync(new ArgumentException());
-            var controller = new SightseeingInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
+            var controller = new SDCWebApp.Controllers.VisitInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
 
             var result = await controller.DeleteInfoAsync(id);
 
@@ -395,7 +395,7 @@ namespace UnitTests.Controllers
         {
             var emptyResponse = new ResponseWrapper();
             _infoDbServiceMock.Setup(x => x.DeleteAsync(It.IsNotNull<string>()));
-            var controller = new SightseeingInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
+            var controller = new SDCWebApp.Controllers.VisitInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
 
             var result = await controller.DeleteInfoAsync("123");
 
@@ -408,9 +408,9 @@ namespace UnitTests.Controllers
 
         #region Privates
 
-        private SightseeingInfoDto CreateInfoDto(GeneralSightseeingInfo info)
+        private VisitInfoDto CreateInfoDto(VisitInfo info)
         {
-            var infoDto = new SightseeingInfoDto
+            var infoDto = new VisitInfoDto
             {
                 Id = info.Id,
                 Description = info.Description,

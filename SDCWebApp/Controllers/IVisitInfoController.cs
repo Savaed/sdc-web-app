@@ -4,11 +4,11 @@ using System.Threading.Tasks;
 
 namespace SDCWebApp.Controllers
 {
-    public interface ISightseeingInfoController
+    public interface IVisitInfoController
     {
-        Task<IActionResult> AddInfoAsync(SightseeingInfoDto info);
+        Task<IActionResult> AddInfoAsync(VisitInfoDto info);
         Task<IActionResult> DeleteInfoAsync(string id);
-        Task<IActionResult> UpdateInfoAsync(string id, SightseeingInfoDto info);
+        Task<IActionResult> UpdateInfoAsync(string id, VisitInfoDto info);
         Task<IActionResult> GetAllInfoAsync();
         Task<IActionResult> GetInfoAsync(string id);
     }

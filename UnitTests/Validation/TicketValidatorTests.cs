@@ -21,7 +21,7 @@ namespace UnitTests.Validation
         {
             var info = CreateModel.CreateInfo();
             _dbContextMock = new Mock<ApplicationDbContext>();
-            _dbContextMock.Setup(x => x.GeneralSightseeingInfo).Returns(CreateMock.CreateDbSetMock<GeneralSightseeingInfo>(new GeneralSightseeingInfo[] { info }).Object);
+            _dbContextMock.Setup(x => x.Info).Returns(CreateMock.CreateDbSetMock<VisitInfo>(new VisitInfo[] { info }).Object);
             _validator = new TicketValidator(_dbContextMock.Object);
         }
 

@@ -26,7 +26,6 @@ namespace SDCWebApp.Controllers
         private readonly ILogger<DiscountsController> _logger;
         private readonly IDiscountDbService _discountDbService;
         private readonly IMapper _mapper;
-        private readonly IUserActivityLogger _activityLogger;
 
 
         //public DiscountsController(IDiscountDbService discountDbService, ILogger<DiscountsController> logger, IMapper mapper, IUserActivityLogger activityLogger) : base(logger)

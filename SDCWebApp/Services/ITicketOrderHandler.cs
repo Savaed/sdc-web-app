@@ -1,8 +1,8 @@
-﻿using System;
+﻿using SDCWebApp.Models;
+using SDCWebApp.Models.Dtos;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using SDCWebApp.Models;
-using SDCWebApp.Models.Dtos;
 
 namespace SDCWebApp.Services
 {

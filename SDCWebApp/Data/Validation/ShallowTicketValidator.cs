@@ -10,7 +10,7 @@ namespace SDCWebApp.Data.Validation
     {
         public ShallowTicketValidator(ApplicationDbContext dbContext)
         {
-            var recentInfo = dbContext.GeneralSightseeingInfo.Include(x => x.OpeningHours).OrderByDescending(x => x.UpdatedAt == DateTime.MinValue ? x.CreatedAt : x.UpdatedAt).First();
+            var recentInfo = dbContext.Info.Include(x => x.OpeningHours).OrderByDescending(x => x.UpdatedAt == DateTime.MinValue ? x.CreatedAt : x.UpdatedAt).First();
 
             RuleFor(x => x.SightseeingDate)
                .Cascade(CascadeMode.StopOnFirstFailure)

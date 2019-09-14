@@ -5,10 +5,10 @@ namespace UnitTests.Helpers
 {
     public static class CreateModel
     {
-        public static GeneralSightseeingInfo CreateInfo(string id = "1", string description = "test", int maxChildAge = 5, int maxAllowedGroupSize = 30,
+        public static VisitInfo CreateInfo(string id = "1", string description = "test", int maxChildAge = 5, int maxAllowedGroupSize = 30,
             int maxTicketOrderInterval = 4, int sightseeingDuration = 2)
         {
-            return new GeneralSightseeingInfo
+            return new VisitInfo
             {
                 Id = id,
                 Description = description,

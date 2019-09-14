@@ -325,10 +325,10 @@ namespace SDCWebApp.Services
 
         #region Privates
 
-        protected override Task<bool> IsEntityAlreadyExistsAsync(BasicEntity entity)
+        protected override async Task<bool> IsEntityAlreadyExistsAsync(BasicEntity entity)
         {
-            // TODO Add this.
-            throw new NotImplementedException();
+            // This implementation uses default equality comparer.
+            return await _dbContext.Tickets.ContainsAsync(entity as Ticket);
         }
 
         #endregion
