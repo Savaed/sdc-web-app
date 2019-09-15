@@ -75,7 +75,7 @@ namespace SDCWebApp.Controllers
         /// Throws an <see cref="InternalDbServiceException"/> or <see cref="Exception"/> if any internal problem with processing data.
         /// </summary>
         /// <returns>The most recent <see cref="VisitTariff"/>.</returns>
-        [HttpGet("current")]
+        [HttpGet("recent")]
         [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

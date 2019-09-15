@@ -9,7 +9,5 @@ namespace SDCWebApp.Models.Dtos
         public string Description { get; set; }
         public int DiscountValueInPercentage { get; set; }
         public int? GroupSizeForDiscount { get; set; }
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public ICollection<TicketDto> Tickets { get; set; }
     }
 }

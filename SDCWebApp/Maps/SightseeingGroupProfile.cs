@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using SDCWebApp.Models;
 using SDCWebApp.Models.Dtos;
+using SDCWebApp.Helpers.Extensions;
 using System;
 
 namespace SDCWebApp.Maps
@@ -10,12 +11,13 @@ namespace SDCWebApp.Maps
         public SightseeingGroupProfile()
         {
             CreateMap<SightseeingGroup, SightseeingGroupDto>()
-               .ForMember(x => x.UpdatedAt, options => options.AddTransform(d => d.Equals(DateTime.MinValue) ? null : d));
+                .ForMember(dest => dest.UpdatedAt, options => options.AddTransform(datetime => datetime != null ? datetime.Truncate(TimeSpan.FromSeconds(1)) : null))
+                .ForMember(dest => dest.UpdatedAt, options => options.AddTransform(datetime => datetime.Equals(DateTime.MinValue) ? null : datetime));
 
             CreateMap<SightseeingGroupDto, SightseeingGroup>()
-                .ForMember(x => x.ConcurrencyToken, options => options.Ignore())
-                .ForMember(x => x.UpdatedAt, options => options.Ignore())
-                .ForMember(x => x.CreatedAt, options => options.Ignore());
+                .ForMember(dest => dest.ConcurrencyToken, options => options.Ignore())
+                .ForMember(dest => dest.CreatedAt, options => options.Ignore())
+                .ForMember(dest => dest.UpdatedAt, options => options.Ignore());
         }
     }
 }

@@ -1,8 +1,18 @@
-﻿namespace SDCWebApp.Models.Dtos
+﻿using System;
+
+namespace SDCWebApp.Models.Dtos
 {
-    public class RefreshTokenDto : IAuthToken
+    public class RefreshTokenDto
     {
         public string Token { get; set; }
-        public int ExpiryIn { get; set; }
+        public DateTime ExpiryIn { get; set; }
+
+        public RefreshTokenDto() { }
+
+        public RefreshTokenDto(string token, int expiryInUnixEpochFormat)
+        {
+            Token = token;
+            ExpiryIn = DateTimeOffset.FromUnixTimeSeconds(expiryInUnixEpochFormat).UtcDateTime;
+        }
     }
 }

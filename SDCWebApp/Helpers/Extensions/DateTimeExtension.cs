@@ -40,5 +40,10 @@ namespace SDCWebApp.Helpers.Extensions
 
             return dateTime.Value.AddTicks(-(dateTime.Value.Ticks % timeSpan.Value.Ticks));
         }
+
+        public static long ToUnixSeconds(this DateTime dateTime)
+        {
+            return new DateTimeOffset(dateTime).ToUnixTimeSeconds();
+        }      
     }
 }

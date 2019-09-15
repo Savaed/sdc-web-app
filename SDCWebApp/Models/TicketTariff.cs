@@ -12,7 +12,7 @@ namespace SDCWebApp.Models
         public float DefaultPrice { get; set; }
 
         public virtual ICollection<Ticket> Tickets { get; set; }
-        public virtual VisitTariff SightseeingTariff { get; set; }
+        public virtual VisitTariff VisitTariff { get; set; }
 
 
         public object Clone()

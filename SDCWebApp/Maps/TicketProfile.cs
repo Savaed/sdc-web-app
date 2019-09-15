@@ -12,13 +12,13 @@ namespace SDCWebApp.Maps
         public TicketProfile()
         {
             CreateMap<Ticket, TicketDto>()
-                .ForMember(x => x.CreatedAt, options => options.AddTransform(d => d.Truncate(TimeSpan.FromSeconds(1))))
-                .ForMember(x => x.Links, options => options.MapFrom<TicketLinksResolver>()).ReverseMap();
+                .ForMember(dest => dest.CreatedAt, options => options.AddTransform(datetime => datetime.Truncate(TimeSpan.FromSeconds(1))))
+                .ForMember(dest => dest.Links, options => options.MapFrom<TicketLinksResolver>()).ReverseMap();
 
             CreateMap<TicketDto, Ticket>()
-                .ForMember(x => x.ConcurrencyToken, options => options.Ignore())
-                .ForMember(x => x.UpdatedAt, options => options.Ignore())
-                .ForMember(x => x.CreatedAt, options => options.Ignore());
+                .ForMember(dest => dest.ConcurrencyToken, options => options.Ignore())
+                .ForMember(dest => dest.UpdatedAt, options => options.Ignore())
+                .ForMember(dest => dest.CreatedAt, options => options.Ignore());
         }
     }
 }

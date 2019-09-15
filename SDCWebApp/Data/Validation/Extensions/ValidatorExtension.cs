@@ -42,7 +42,7 @@ namespace SDCWebApp.Data.Validation.Extensions
         /// </summary>
         public static IRuleBuilderOptions<T, string> BeValidPassword<T>(this IRuleBuilder<T, string> ruleBuilder)
         {
-            return ruleBuilder.Must(password => new Regex(@"^(?=.*[A - Z])(?=.*[a - z])(?=.*\d)(?=.*[!#$%&'()*+,\-.\/:;<=>?@[\\\]^_`{|}~])(?=.{8,})").IsMatch(password));
+            return ruleBuilder.Must(password => new Regex(@"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!#$%&'()*+,\-.\/:;<=>?@[\\\]^_`{|}~]).{8,}$").IsMatch(password));
         }
 
         /// <summary>

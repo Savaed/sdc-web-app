@@ -1,15 +1,17 @@
-﻿namespace SDCWebApp.Models.Dtos
+﻿using System;
+
+namespace SDCWebApp.Models.Dtos
 {
     public class AccessToken : IAuthToken
     {
         public string Token { get; set; }
-        public int ExpiryIn { get; set; }
+        public DateTime ExpiryIn { get; set; }
 
 
-        public AccessToken(string token, int expiryIn)
+        public AccessToken(string token, long expiryInUnixEpochFormat)
         {
             Token = token;
-            ExpiryIn = expiryIn;
+            ExpiryIn = DateTimeOffset.FromUnixTimeSeconds(expiryInUnixEpochFormat).UtcDateTime;
         }
     }
 }

@@ -9,6 +9,8 @@ namespace SDCWebApp.Models
         public virtual ICollection<TicketTariff> TicketTariffs { get; set; }
 
 
+        #region Helper methods
+
         public object Clone()
         {
             return MemberwiseClone();
@@ -51,5 +53,8 @@ namespace SDCWebApp.Models
 
             return Name.GetHashCode() * 0x00011000;
         }
+
+        #endregion
+
     }
 }

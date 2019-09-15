@@ -144,7 +144,7 @@ namespace UnitTests.Controllers
             var savedRefreshToken = new RefreshToken { Id = "1", Token = _refreshToken, ExpiryIn = (int)new DateTimeOffset(DateTime.UtcNow.AddDays(2)).ToUnixTimeSeconds() };
             var newRefreshToken = new RefreshToken { Id = "2", Token = "newRefreshToken", ExpiryIn = (int)new DateTimeOffset(DateTime.UtcNow.AddDays(2)).ToUnixTimeSeconds() };
             SetUpMocksForSucceed(newJwtToken, newAccessToken, savedRefreshToken, newRefreshToken);
-            _mapperMock.Setup(x => x.Map<RefreshTokenDto>(It.IsNotNull<RefreshToken>())).Returns(new RefreshTokenDto { ExpiryIn = newRefreshToken.ExpiryIn, Token = newRefreshToken.Token });
+            _mapperMock.Setup(x => x.Map<RefreshTokenDto>(It.IsNotNull<RefreshToken>())).Returns(new RefreshTokenDto(newRefreshToken.Token, newRefreshToken.ExpiryIn));
             var controller = new AuthController(_jwtTokenHandlerMock.Object, _refreshTokenManagerMock.Object, _logger, _mapperMock.Object);
             var refreshRequestBody = new RefreshTokenViewModel { AccessToken = _validAccessToken, RefreshToken = _refreshToken };
 

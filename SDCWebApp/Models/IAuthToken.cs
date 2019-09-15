@@ -1,8 +1,10 @@
-﻿namespace SDCWebApp.Models
+﻿using System;
+
+namespace SDCWebApp.Models
 {
     public interface IAuthToken
     {
         string Token { get; set; }
-        int ExpiryIn { get; set; }
+        DateTime ExpiryIn { get; set; }
     }
 }
