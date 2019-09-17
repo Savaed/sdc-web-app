@@ -55,7 +55,7 @@ namespace SDCWebApp.Controllers
                 info.Id = null;
 
                 var infoToBeAdded = MapToDomainModel(info);
-                var addedInfo = await _infoDbService.AddAsync(infoToBeAdded);
+                var addedInfo = await _infoDbService.RestrictedAddAsync(infoToBeAdded);
 
                 // Reverse map only for response to the client.
                 var addedInfoDto = MapToDto(addedInfo);

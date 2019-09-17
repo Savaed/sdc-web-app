@@ -23,6 +23,8 @@ namespace SDCWebApp.Models
         public virtual ICollection<Ticket> Tickets { get; set; }
 
 
+        #region Helper methods
+
         public object Clone()
         {
             return MemberwiseClone();
@@ -59,5 +61,7 @@ namespace SDCWebApp.Models
 
             return Type.GetHashCode() + Description.GetHashCode() + DiscountValueInPercentage.GetHashCode() + GroupSizeForDiscount.Value.GetHashCode();
         }
+
+        #endregion
     }
 }

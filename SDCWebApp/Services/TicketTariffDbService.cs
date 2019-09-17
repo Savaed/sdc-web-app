@@ -253,7 +253,6 @@ namespace SDCWebApp.Services
                 throw new ArgumentOutOfRangeException(nameof(pageSize), $"'{pageSize}' is not valid value for argument '{nameof(pageSize)}'. Only number greater or equals to 0 is valid.");
             }
 
-            // TODO Create only for unit tests purposes. In debug and later should be Migrate()!!!
             await EnsureDatabaseCreatedAsync();
             _ = _context?.TicketTariffs ?? throw new InternalDbServiceException($"Table of type '{typeof(TicketTariff).Name}' is null.");
 

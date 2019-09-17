@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SDCWebApp.Data;
 using System;
 using System.Data.Common;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace UnitTests.Helpers
@@ -31,6 +32,8 @@ namespace UnitTests.Helpers
                 {
                     await context.Database.EnsureCreatedAsync();
 
+                    ClearSeedData(context);
+
                     // For enable migration uncomment following line
                     //context.Database.MigrateAsync()
                 }
@@ -56,6 +59,25 @@ namespace UnitTests.Helpers
         private DbContextOptions<ApplicationDbContext> CreateOptions()
         {
             return new DbContextOptionsBuilder<ApplicationDbContext>().UseSqlite(_connection).Options;
+        }
+
+        private void ClearSeedData(ApplicationDbContext context)
+        {
+            // Clear seed data. For unit test purposes it's not needed.
+            var propeties = context
+                .GetType()
+                .GetProperties()
+                .Where(x => x.Name != nameof(ApplicationDbContext.ChangeTracker)
+                    && x.Name != nameof(ApplicationDbContext.Database)
+                    && x.Name != nameof(ApplicationDbContext.Model));
+
+            foreach (var property in propeties)
+            {
+                context.Database.BeginTransaction();
+                const string x = "TRUNCATE TABLE [Groups]";
+                context.Database.ExecuteSqlCommand(x);
+                context.Database.CommitTransaction();
+            }
         }
 
         #endregion

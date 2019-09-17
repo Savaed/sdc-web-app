@@ -94,33 +94,7 @@ namespace SDCWebApp.Controllers
                 _logger.LogInformation($"Finished method '{nameof(LoginAsync)}'.");
                 return Ok(response);
             }
-        }
-
-        [HttpPost("logout")]
-        [Authorize(ApiConstants.ApiUserPolicy)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> LogoutAsync()
-        {
-            //Microsoft.Extensions.Primitives.StringValues authorizationHeaderValue;
-
-            //if (Request.Headers.TryGetValue("Authorization", out authorizationHeaderValue))
-            //{
-            //    // ok, mamy token
-            //    string accessToken = authorizationHeaderValue.ToString();
-            //    var userPrincipal = _jwtTokenHandler.GetPrincipalFromJwtToken(accessToken);
-
-            //    string userId = userPrincipal.FindFirstValue(JwtRegisteredClaimNames.NameId);
-            //    string username = userPrincipal.FindFirstValue(JwtRegisteredClaimNames.Sub);
-
-            //    var activityLogger = new UserActivityLogger(null, null);
-            //    await activityLogger.LoggActivityAsync(username, "User logout", ActivityLog.ActivityType.LogOut);
-            //}
-
-            // badrequest
-
-            throw new NotImplementedException();
-        }
+        }      
 
         /// <summary>
         /// Asynchronously register a new user. Returns <see cref="HttpStatusCode.BadRequest"/> if request is malformed 
@@ -129,7 +103,7 @@ namespace SDCWebApp.Controllers
         /// <param name="registerData">User data passed during registration by the client. It is a JSON request body. Cannot be null.</param>
         /// <returns>New registered user datailed info.</returns>
         [HttpPost("register")]
-        //[Authorize(ApiConstants.ApiAdminPolicy)]
+        [Authorize(ApiConstants.ApiAdminPolicy)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

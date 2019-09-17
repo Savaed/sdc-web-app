@@ -28,9 +28,18 @@
         #endregion
 
 
-        #region Db conections
+        #region Database settings
 
         public const string DefaultConnectionString = "DefaultConnection";
+        public const string DbPassword = "Db:DbPassword";
+        public const string DbUserId = "Db:DbUserId";
+
+        #endregion
+
+
+        #region Azure App Configuration
+
+        public const string AzureAppConfigEndpoint = "https://sdc-app-config.azconfig.io";
 
         #endregion
 

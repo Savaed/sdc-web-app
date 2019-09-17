@@ -1,8 +1,11 @@
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using NLog.Web;
 using System;
+using SDCWebApp.Helpers.Constants;
+using System.Threading.Tasks;
 
 namespace SDCWebApp
 {
@@ -35,6 +38,15 @@ namespace SDCWebApp
                     configuration.ClearProviders();
                     configuration.SetMinimumLevel(LogLevel.Trace);
                 })
-                .UseNLog();
+                .UseNLog()
+                .ConfigureAppConfiguration((hostContext, config) =>
+                {
+                    // Add Azure App Configuration service only if the app is deployed in the cloud i.e. not in the development environment.
+                    // Otherwise use locally stored secrets.
+                    if (!hostContext.HostingEnvironment.IsDevelopment())
+                    {
+                        config.AddAzureAppConfiguration(x => x.ConnectWithManagedIdentity(ApiConstants.AzureAppConfigEndpoint)).Build();
+                    }
+                });
     }
 }

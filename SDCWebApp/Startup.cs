@@ -87,8 +87,11 @@ namespace SDCWebApp
                 });
             });
 
-            // Set DbContext for app.
+            // Set DbContext for app.         
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(GetConnectionString(ApiConstants.DefaultConnectionString)));
+
+            // Automatically perform database migration
+            services.BuildServiceProvider().GetService<ApplicationDbContext>().Database.Migrate();
 
             // Set user requirements.
             services.AddIdentity<IdentityUser, IdentityRole>(config =>
@@ -177,16 +180,17 @@ namespace SDCWebApp
             app.UseAuthentication();
 
             // Seed roles and users for testing.
-            if (env.IsDevelopment())
-            {
-                IdentityDataInitializer.SeedData(userManager, roleManager);
-            }
+            //if (env.IsDevelopment())
+            //{
+            //}
+
+            IdentityDataInitializer.SeedData(userManager, roleManager);
 
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    template: "{controller}/{action=Index}/{id?}");
             });
 
             app.UseSpa(spa =>
@@ -215,8 +219,11 @@ namespace SDCWebApp
 
         private string GetConnectionString(string connectionStringName)
         {
+            // HACK If environment is not Development then settings from Azure App Configuration service are used.
+            // But for this to work, the names of the secrets and all local settings as well as those on the azure MUST be the same.
             var builder = new SqlConnectionStringBuilder(Configuration.GetConnectionString(connectionStringName));
-            builder.Password = Configuration["DbPassword"];
+            builder.Password = Configuration[ApiConstants.DbPassword];
+            builder.UserID = Configuration[ApiConstants.DbUserId];
             return builder.ConnectionString;
         }
 
