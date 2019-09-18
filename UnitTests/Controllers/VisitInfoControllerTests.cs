@@ -171,6 +171,87 @@ namespace UnitTests.Controllers
         #endregion
 
 
+        #region GetRecentInfoAsync();
+        // pusta lista i nie mozna pobrac -> 404
+        // znaleziono -> 200 ok, najbardziej aktualny cennik wraz z lista cennikow biletow
+        // aktualny cennik jest najpozniej stworzony, ale najwczesniej zaktualizowany (chodzi o to, ze powinno patrzec po update, jesli update jest null, to wtedy na created)
+        // any internal error refferd to the db occurred -> throws internal db service exc
+        // any unexpected internal error occurred -> throws exc
+
+        [Test]
+        public async Task GetRecentInfoAsync__An_internal_error_reffered_to_the_database_occurred__Should_throw_InternalDbServiceException()
+        {
+            // Example of these errors: database does not exist, table does not exist etc.
+
+            _infoDbServiceMock.Setup(x => x.GetAllAsync()).ThrowsAsync(new InternalDbServiceException());
+            var controller = new VisitInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
+
+            Func<Task> result = async () => await controller.GetRecentInfoAsync();
+
+            await result.Should().ThrowExactlyAsync<InternalDbServiceException>();
+        }
+
+        [Test]
+        public async Task GetRecentInfoAsync__An_unexpected_internal_error_occurred__Should_throw_Exception()
+        {
+            _infoDbServiceMock.Setup(x => x.GetAllAsync()).ThrowsAsync(new Exception());
+            var controller = new VisitInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
+
+            Func<Task> result = async () => await controller.GetRecentInfoAsync();
+
+            await result.Should().ThrowExactlyAsync<Exception>();
+        }
+
+        [Test]
+        public async Task GetRecentInfoAsync__Element_not_found__Should_return_404NotFound_response_with_error()
+        {
+            _infoDbServiceMock.Setup(x => x.GetAllAsync()).ThrowsAsync(new InvalidOperationException()).Verifiable();
+            var controller = new VisitInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
+
+            var result = await controller.GetRecentInfoAsync();
+
+            (result as ObjectResult).StatusCode.Should().Be(404);
+            ((result as ObjectResult).Value as ResponseWrapper).Error.Should().NotBeNull();
+        }
+
+        [Test]
+        public async Task GetRecentInfoAsync__Some_Infos_have_been_edited_since_the_creation_and_are_the_most_Recent__Should_return_200Ok_response_with_the_most_Recent_Info()
+        {
+            // NOTE Some Infos may have been edited after creation, but there are other newer, unedited Infos.
+            // Regardless of that the latest updated Info is the most Recent even if there are other, newer creted, but not updated (or updated latter) Infos.
+            // Example :
+            //          Info 1: created at: 12.12.2018, updated at: 12.6.2019  --> THIS IS THE MOST Recent Info
+            //          Info 2: created at: 23.3.2019,  updated at: null       --> THIRD
+            //          Info 3: created at: 23.12.2015, updated at 11.6.2019   --> SECOND 
+
+            // _Infos[1] is the most Recent in this test case.
+            var RecentInfoDto = CreateInfoDto(_info);
+            _infoDbServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new VisitInfo[] { _info }).Verifiable();
+            _mapperMock.Setup(x => x.Map<VisitInfoDto>(It.IsNotNull<VisitInfo>())).Returns(RecentInfoDto);
+            var controller = new VisitInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
+
+            var result = await controller.GetRecentInfoAsync();
+
+            (result as ObjectResult).StatusCode.Should().Be(200);
+            ((result as ObjectResult).Value as ResponseWrapper).Data.Should().BeEquivalentTo(RecentInfoDto);
+        }
+
+        [Test]
+        public async Task GetRecentInfoAsync__Data_retrieve_succeeded__Should_return_200Ok_response_with_data()
+        {
+            _infoDbServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new VisitInfo[] { _info });
+            _mapperMock.Setup(x => x.Map<VisitInfoDto>(It.IsNotNull<VisitInfo>())).Returns(new VisitInfoDto { Id = "1",  Description = "mapped from Info to DTO" });
+            var controller = new VisitInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
+
+            var result = await controller.GetRecentInfoAsync();
+
+            (result as ObjectResult).StatusCode.Should().Be(200);
+            ((result as ObjectResult).Value as ResponseWrapper).Data.Should().NotBeNull();
+        }
+
+        #endregion
+
+
         #region AddInfoAsync(VisitInfo info);
         // Internal error refferd to the db -> throw InternalDbServiceException
         // Unexpected internal error -> throw Exception
@@ -225,8 +306,9 @@ namespace UnitTests.Controllers
         {
             _mapperMock.Setup(x => x.Map<VisitInfo>(It.IsNotNull<VisitInfoDto>())).Returns(_info);
             _mapperMock.Setup(x => x.Map<VisitInfoDto>(It.IsNotNull<VisitInfo>())).Returns(_infoDto);
-            _infoDbServiceMock.Setup(x => x.AddAsync(It.IsNotNull<VisitInfo>())).ReturnsAsync(_info);
-            var controller = new SDCWebApp.Controllers.VisitInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
+            _infoDbServiceMock.Setup(x => x.AddAsync(It.IsAny<VisitInfo>())).ReturnsAsync(_info);
+            _infoDbServiceMock.Setup(x => x.RestrictedAddAsync(It.IsAny<VisitInfo>())).ReturnsAsync(_info);
+            var controller = new VisitInfoController(_infoDbServiceMock.Object, _logger, _mapperMock.Object);
             var infoDto = CreateInfoDto(CreateModel.CreateInfo());
 
             var result = await controller.AddInfoAsync(infoDto);

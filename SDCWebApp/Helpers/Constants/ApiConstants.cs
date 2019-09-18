@@ -50,5 +50,13 @@
 
         #endregion
 
+
+        #region Api identity settings
+
+        public const string AdminSeedPassword = "IdentitySeed:AdminPassword";
+        public const string ModeratorSeedPassword = "IdentitySeed:ModeratorPassword";
+
+        #endregion
+
     }
 }

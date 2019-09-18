@@ -11,5 +11,6 @@ namespace SDCWebApp.Controllers
         Task<IActionResult> UpdateInfoAsync(string id, VisitInfoDto info);
         Task<IActionResult> GetAllInfoAsync();
         Task<IActionResult> GetInfoAsync(string id);
+        Task<IActionResult> GetRecentInfoAsync();
     }
 }

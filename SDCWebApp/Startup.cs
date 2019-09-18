@@ -90,7 +90,7 @@ namespace SDCWebApp
             // Set DbContext for app.         
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(GetConnectionString(ApiConstants.DefaultConnectionString)));
 
-            // Automatically perform database migration
+            // Automatically perform database migration.
             services.BuildServiceProvider().GetService<ApplicationDbContext>().Database.Migrate();
 
             // Set user requirements.
@@ -179,12 +179,11 @@ namespace SDCWebApp
             app.UseSpaStaticFiles();
             app.UseAuthentication();
 
-            // Seed roles and users for testing.
-            //if (env.IsDevelopment())
-            //{
-            //}
-
-            IdentityDataInitializer.SeedData(userManager, roleManager);
+            // Seed roles and users for testing on development and staging environment.
+            if (!env.IsProduction())
+            {
+                IdentityDataInitializer.SeedData(userManager, roleManager, Configuration);
+            }
 
             app.UseMvc(routes =>
             {

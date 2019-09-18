@@ -9,6 +9,7 @@ using SDCWebApp.Models.Dtos;
 using SDCWebApp.Services;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -206,6 +207,46 @@ namespace SDCWebApp.Controllers
         }
 
         /// <summary>
+        /// Asynchronously gets the most recent <see cref="VisitInfo"/> wrapped in <see cref="ResponseWrapper"/>.
+        /// Returns <see cref="HttpStatusCode.OK"/> response if the most recent <see cref="VisitInfo"/> found or 
+        /// <see cref="HttpStatusCode.NotFound"/> response if none <see cref="VisitInfo"/> exist. 
+        /// Throws an <see cref="InternalDbServiceException"/> or <see cref="Exception"/> if any internal problem with processing data.
+        /// </summary>
+        /// <returns>The most recent <see cref="VisitInfo"/>.</returns>
+        [HttpGet("recent")]
+        [AllowAnonymous]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetRecentInfoAsync()
+        {
+            _logger.LogInformation($"Starting method '{nameof(GetRecentInfoAsync)}'.");
+
+            try
+            {
+                var allInfo = await _infoDbService.GetAllAsync();
+                var recentInfo = allInfo.OrderByDescending(x => x.UpdatedAt == DateTime.MinValue ? x.CreatedAt : x.UpdatedAt).First();
+                var recentInfoDto = MapToDto(recentInfo);
+                var response = new ResponseWrapper(recentInfoDto);
+                _logger.LogInformation($"Finished method '{nameof(GetRecentInfoAsync)}'.");
+                return Ok(response);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return OnNotFoundError($"Cannot found element {typeof(VisitInfo).Name}.", ex);
+            }
+            catch (InternalDbServiceException ex)
+            {
+                LogInternalDbServiceException(ex, _infoDbService.GetType());
+                throw;
+            }
+            catch (Exception ex)
+            {
+                LogUnexpectedException(ex);
+                throw;
+            }
+        }
+
+        /// <summary>
         /// Asynchronously updates <see cref="VisitInfo"/>.
         /// Returns <see cref="HttpStatusCode.OK"/> response if <see cref="VisitInfo"/> update succeeded,
         /// <see cref="HttpStatusCode.BadRequest"/> response if the request is malformed or
@@ -260,8 +301,6 @@ namespace SDCWebApp.Controllers
             }
         }
 
-
-        // TODO add get recent info
 
         #region Privates
 
