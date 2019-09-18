@@ -45,7 +45,6 @@ namespace SDCWebApp.Controllers
         /// </summary>
         /// <returns><see cref="IEnumerable{VisitTariff}"/>.</returns>
         [HttpGet]
-        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllTariffsAsync()
         {

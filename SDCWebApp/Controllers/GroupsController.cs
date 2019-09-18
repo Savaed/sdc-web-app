@@ -1,8 +1,10 @@
 ﻿using Autofac.Features.Indexed;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SDCWebApp.Helpers.Constants;
 using SDCWebApp.Models;
 using SDCWebApp.Models.Dtos;
 using SDCWebApp.Services;
@@ -18,6 +20,7 @@ namespace SDCWebApp.Controllers
     /// Provides methods to Http verbs proccessing on <see cref="SightseeingGroup"/> entities.
     /// </summary>
     [Route("api/[controller]")]
+    [Authorize(ApiConstants.ApiUserPolicy)]
     [ApiController]
     public class GroupsController : CustomApiController, IGroupsController
     {
@@ -40,7 +43,7 @@ namespace SDCWebApp.Controllers
         /// Throws an <see cref="InternalDbServiceException"/> or <see cref="Exception"/> if any internal problem with processing data.
         /// </summary>
         /// <returns><see cref="IEnumerable{SightseeingGroup}"/>.</returns>
-        [HttpGet()]
+        [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetAllGroupsAsync()
@@ -126,6 +129,8 @@ namespace SDCWebApp.Controllers
         /// </summary>
         /// <returns><see cref="IEnumerable{GroupInfo}"/> that contains available sightseeing dates.</returns>
         [HttpGet("available-dates")]
+        [AllowAnonymous]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAvailableGroupDatesAsync()
         {
             VisitInfo recentInfo = null;

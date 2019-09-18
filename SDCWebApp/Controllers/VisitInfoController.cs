@@ -133,7 +133,6 @@ namespace SDCWebApp.Controllers
         /// </summary>
         /// <returns><see cref="IEnumerable{VisitInfo}"/>.</returns>
         [HttpGet]
-        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllInfoAsync()
         {
@@ -261,6 +260,8 @@ namespace SDCWebApp.Controllers
             }
         }
 
+
+        // TODO add get recent info
 
         #region Privates
 

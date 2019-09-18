@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SDCWebApp.Helpers.Constants;
 using SDCWebApp.Models;
 using SDCWebApp.Models.Dtos;
 using SDCWebApp.Services;
@@ -17,6 +19,7 @@ namespace SDCWebApp.Controllers
     /// Provides methods to Http verbs proccessing on <see cref="Ticket"/> entities.
     /// </summary>
     [Route("api")]
+    [Authorize(ApiConstants.ApiUserPolicy)]
     [ApiController]
     public class TicketsController : CustomApiController, ITicketsController
     {

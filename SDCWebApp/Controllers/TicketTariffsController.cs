@@ -153,7 +153,6 @@ namespace SDCWebApp.Controllers
         /// </summary>
         /// <returns><see cref="IEnumerable{TicketTariff}"/>.</returns>
         [HttpGet("api/ticket-tariffs")]
-        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllTicketTariffsAsync()
         {
