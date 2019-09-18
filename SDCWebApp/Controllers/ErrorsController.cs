@@ -15,6 +15,8 @@ namespace SDCWebApp.Controllers
         private const string InternalServerErrorMessage = "An unexpected internal error occurred. Will be logged.";
         private const string UnauthorizedErrorMessage = "No valid access token was passed.";
         private const string ForbiddenErrorMessage = "The access token passed does not have sufficient permissions.";
+        private const string BadRequestErrorMessage = "Malformed request. This is the generic message, most used when no specific message is available for this type of error.";
+
 
         /// <summary>
         /// Generate custom error response.
@@ -29,6 +31,9 @@ namespace SDCWebApp.Controllers
 
             switch (code)
             {
+                case 400:
+                    genericErrorMessage = BadRequestErrorMessage;
+                    break;
                 case 401:
                     genericErrorMessage = UnauthorizedErrorMessage;
                     break;

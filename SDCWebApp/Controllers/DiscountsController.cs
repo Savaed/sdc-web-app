@@ -28,14 +28,6 @@ namespace SDCWebApp.Controllers
         private readonly IMapper _mapper;
 
 
-        //public DiscountsController(IDiscountDbService discountDbService, ILogger<DiscountsController> logger, IMapper mapper, IUserActivityLogger activityLogger) : base(logger)
-        //{
-        //    _mapper = mapper;
-        //    _logger = logger;
-        //    _discountDbService = discountDbService;
-        //    _activityLogger = activityLogger;
-        //}
-
         public DiscountsController(IDiscountDbService discountDbService, ILogger<DiscountsController> logger, IMapper mapper) : base(logger)
         {
             _mapper = mapper;

@@ -1,8 +1,10 @@
-﻿using AutoMapper;
+﻿
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SDCWebApp.Helpers.Constants;
 using SDCWebApp.Models;
 using SDCWebApp.Models.Dtos;
 using SDCWebApp.Services;
@@ -18,7 +20,7 @@ namespace SDCWebApp.Controllers
     /// Provides methods to Http verbs proccessing on <see cref="VisitTariff"/> entities.
     /// </summary>
     [Route("api/visit-tariffs")]
-    [Authorize(Helpers.Constants.ApiConstants.ApiUserPolicy)]
+    [Authorize(ApiConstants.ApiUserPolicy)]
     [ApiController]
     public class VisitTariffsController : CustomApiController, IVisitTariffsController
     {
@@ -43,6 +45,7 @@ namespace SDCWebApp.Controllers
         /// </summary>
         /// <returns><see cref="IEnumerable{VisitTariff}"/>.</returns>
         [HttpGet]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllTariffsAsync()
         {
@@ -120,6 +123,7 @@ namespace SDCWebApp.Controllers
         /// <param name="id">The id of searching <see cref="VisitTariff"/>. Cannot be null or empty.</param>
         /// <returns>An specified <see cref="VisitTariff"/>.</returns>
         [HttpGet("{id}")]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

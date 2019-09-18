@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SDCWebApp.Helpers.Constants;
 using SDCWebApp.Models;
 using SDCWebApp.Models.Dtos;
 using SDCWebApp.Services;
@@ -17,6 +18,7 @@ namespace SDCWebApp.Controllers
     /// Provides methods to Http verbs proccessing on <see cref="VisitInfo"/> entities.
     /// </summary>
     [Route("api/info")]
+    [Authorize(ApiConstants.ApiUserPolicy)]
     [ApiController]
     public class VisitInfoController : CustomApiController, IVisitInfoController
     {
