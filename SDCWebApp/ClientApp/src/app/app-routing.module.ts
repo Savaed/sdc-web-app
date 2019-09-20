@@ -4,6 +4,7 @@ import { FooterLoginComponent } from './footer-login/footer-login.component';
 import { FooterLogoutComponent } from './footer-logout/footer-logout.component';
 import { TicketTariffComponent } from './ticket-tariff/ticket-tariff.component';
 import { HomeComponent } from './home/home.component';
+import { ArticlesComponent } from './articles/articles.component';
 
 
 const routes: Routes = [
@@ -11,6 +12,7 @@ const routes: Routes = [
   { path: 'ticket-tariff', component: TicketTariffComponent },
   { path: 'footer-login', component: FooterLoginComponent },
   { path: 'footer-logout', component: FooterLogoutComponent },
+  { path: 'articles', component: ArticlesComponent },
   { path: '**', pathMatch: 'full', redirectTo: 'home' }
 ];
 

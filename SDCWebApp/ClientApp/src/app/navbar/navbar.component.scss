@@ -1,9 +1,18 @@
 .navbar{
-    height: 8vh !important; 
+    height: 7vh !important; 
     font-size: medium;
     padding-left: 15px;
+    z-index: 3;
 
     .navbar-bg-light{
         background-color: whitesmoke;
-    }
+    }    
+}
+
+p.text-open-hours{
+    font-weight: 600;
+}
+
+.btn-login{
+    padding: 5px 20px;  
 }

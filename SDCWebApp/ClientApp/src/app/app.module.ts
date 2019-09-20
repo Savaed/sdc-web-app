@@ -8,6 +8,7 @@ import { FooterLogoutComponent } from './footer-logout/footer-logout.component';
 import { TicketTariffComponent } from './ticket-tariff/ticket-tariff.component';
 import { HomeComponent } from './home/home.component';
 import { NavbarComponent } from './navbar/navbar.component';
+import { ArticlesComponent } from './articles/articles.component';
 
 
 
@@ -18,7 +19,8 @@ import { NavbarComponent } from './navbar/navbar.component';
     FooterLogoutComponent,
     TicketTariffComponent,
     HomeComponent,
-    NavbarComponent
+    NavbarComponent,
+    ArticlesComponent
   ],
   imports: [
     BrowserModule,
