@@ -1,12 +1,25 @@
 .footer-link{
     margin: 0px;
     font-size: 14px;
-    color: rgba(0, 0, 0, 0.75);
+    color: #757575de;
 }
 
 .fab{
     align-self: center;
     margin-right: 10px;
     font-size: 34px;
-    color: rgba(128, 128, 128, 0.5);
+    color: #7575757c;
+}
+
+.social-media{
+    &>a{
+        width: 45px;
+        height: 45px;
+        text-align: center;
+        margin-top: 11px;        
+
+        &>i:before{
+            align-self: center !important;
+        }
+    }
 }

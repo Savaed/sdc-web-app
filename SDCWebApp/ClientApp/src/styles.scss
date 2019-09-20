@@ -1,59 +1,159 @@
+// Global CSS styles.
 
-@import url('https://fonts.googleapis.com/css?family=Roboto&display=swap');
-@import url('https://fonts.googleapis.com/css?family=Montserrat&display=swap');
+// Fonts.
+@import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700,900&display=swap');
 @import "../node_modules//@fortawesome/fontawesome-free/css/all.min.css";
 
-label{
+*{
+    margin: 0px;
+    padding: 0px;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+    font-size: large;
+    color: #212121;
+}
+
+div, .row, .container, .container-fluid{
+    padding: 0;
+    margin: 0;
+}
+
+// Texts
+h1.header{
+    font-size: 45px;
     font-weight: 600;
+    color: #212121;
+
+    &-light{
+        color: #FFFFFF;
+    }
 }
 
-.bg-gray{
-    background-color: #f6f8fa;
+.text {
+    font-size: medium;
+    font-weight: 400;
+    color: #212121;
+
+    &-gray{
+        color: #757575;
+    }
+
+    &-light{
+        color: #FFFFFF;
+    }
+
+    &-mono{
+        font-size: 16px;
+        font-family: SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace;
+    }
 }
 
-.text-gray{
-    color: #6a737d;
+// Colors
+.dark-primary-color    { background: #455A64; }
+.default-primary-color { background: #607D8B; }
+.light-primary-color   { background: #CFD8DC; }
+.text-primary-color    { color: #FFFFFF; }
+.accent-color          { background: #448AFF; }
+.primary-text-color    { color: #212121; }
+.secondary-text-color  { color: #757575; }
+.divider-color         { border-color: #BDBDBD; }
+.bg-gray               { background-color: #f1f3f4; }
+
+
+// Dividers
+div.divider{
+    background-color: #FFFFFF;
+    width: 50px;
+    height: 5px;
 }
 
-.text-mono {
-    font-family: SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace;
-}
-
-.graysacale{
+// Filters
+.grayscale{
     filter: grayscale(100%);
 }
 
-.border{
-    border: 1px solid rgba(33, 33, 33, .2);
-    border-radius: 5px;
-    padding: 20px;
+// Forms
+
+// Buttons
+button.btn-accent{ 
+    padding: 15px 20px;
+    transition: background-color .3s linear;
+    border: none;
+    border-radius: 2px;
+    background-color: #448AFF;
+    color: #FFFFFF;
+    font-weight: 400; 
+    text-transform: uppercase;
+    font-size: medium;
+
+    &:hover{
+        transition: background-color .3s linear;
+        background-color: rgb(52, 119, 235);
+    }
 }
 
-.main-header{
-    font-size: 48px;
-    font-weight: 500;
-}
-
-.header-subtitle{
-    font-size: 20px;
+button.btn-link{
     font-weight: 400;
+    transition: translate .3s ease-out;
+    transform: translateX(-5px);  
+    background-color: #448AFF;  
+    
+    &:hover, &:focus{
+        text-decoration: none;
+        text-shadow: none;
+        background-color: rgb(62, 122, 224);
+        color: #FFFFFF;
+
+        &>i{
+            transition: transform .3s ease-out;
+            transform: translateX(5px);
+        }       
+    }
 }
 
-.card-highlight{
-    font-size: 54px;
-    font-weight: 500;
-    text-align: center;
+button.btn-accent-outline{ 
+    padding: 15px 20px;
+    transition: all .3s linear;
+    border: 1px solid rgba(0, 79, 216, .7);
+    color: rgba(0, 79, 216, .7);
+    border-radius: 2px;
+    background-color: transparent;
+    font-weight: 400; 
+    font-size: medium;
+    
+    &:hover{
+        background-color: transparent;
+        transition: all .3s linear;
+        border-color: rgb(0, 79, 216);
+        color: rgb(0, 79, 216);
+    }
 }
 
-.btn{
-    border-radius: 3px !important;
-    font-weight: 600;
+div.custom-card{
+    text-align: left;
+    background: #fff;
+    margin-bottom: 45px;
+    margin-right: 17px;
+    position: relative;
+    box-shadow: 0 2px 4px 2px rgba(0,0,0,.1);
+    -webkit-transition: all 300ms ease-out;
+    -moz-transition: all 300ms ease-out;
+    -o-transition: all 300ms ease-out;
+    -ms-transition: all 300ms ease-out;
+    transition: all 300ms ease-out;
+    border-radius: 8px;   
 
-    &-danger{
-        border: 1px solid rgb(155, 8, 8);
+    div.card-body{
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
     }
 
-    &-success{
-        border: 1px solid rgb(3, 78, 19);
+    &:hover{
+        transition: all .3s ease-out;
+        box-shadow: 0 2px 20px 10px rgba(0,0,0,.1);
     }
 }
