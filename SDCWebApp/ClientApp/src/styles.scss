@@ -22,7 +22,7 @@ div, .row, .container, .container-fluid{
 }
 
 // Texts
-h1.header{
+.header{
     font-size: 45px;
     font-weight: 600;
     color: #212121;
@@ -86,12 +86,12 @@ button.btn-accent{
     background-color: #448AFF;
     color: #FFFFFF;
     font-weight: 400; 
-    text-transform: uppercase;
     font-size: medium;
 
     &:hover{
-        transition: background-color .3s linear;
+        transition: all .3s linear;
         background-color: rgb(52, 119, 235);
+        color: #FFFFFF;
     }
 }
 
@@ -155,5 +155,25 @@ div.custom-card{
     &:hover{
         transition: all .3s ease-out;
         box-shadow: 0 2px 20px 10px rgba(0,0,0,.1);
+    }
+}
+
+form{
+    background-color: white;
+
+    label{
+        font-size: small;
+        font-weight: 500;
+    }
+
+    input{
+        border-radius: 5px;
+    }
+    
+    p.form-control-note{
+        margin: 10px 0 5px 0; 
+        font-size: 13px;
+        color: #212121b2;
+        line-height: 1.5; 
     }
 }

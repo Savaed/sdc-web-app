@@ -1,0 +1,62 @@
+<div class="login-container bg-gray">
+
+    <!-- LOGIN BOX START -->
+    <div class="col-7 d-flex mx-auto py-5 login-box">
+
+        <!-- SCD PLATFORM INFO START -->
+        <div class="col-7 sdc-platform-welcome">
+            <div class="welcome-container">
+                <h2 class="header mb-4">
+                    Welcome to SDC Platform
+                </h2>
+                <p class="text">
+                    The SDC platform is a place where every moderator or administrator can manage all types of resources
+                    available on the main SDC website. From informative articles, through ticket pricelists, to
+                    information on visiting museums, such as the maximum allowed group size and even the maximum age of
+                    the customer who can get a discount for the child.
+                </p>
+
+                <p class="text">
+                    You do not have access to the platform? This system is only for SDC employees who have registered
+                    accounts.
+                </p>
+
+                <p class="text">
+                    If you are not an SDC employee, check out our career section where you can start a fascinating
+                    adventure with the glass world.
+                </p>
+                <p class="text-gray text-mono">
+                    The platform uses the SDC API, which is documented <a href="https://documenter.getpostman.com/view/8564183/SVmvTyga">here</a>.
+                </p>
+            </div>
+        </div>
+        <!-- SCD PLATFORM INFO END -->
+
+        <!-- LOGIN FORM START -->
+        <div class="col-5">
+            <form class="login-form" method="POST">
+                <div class="alert alert-danger alert-dismissible fade show mt-5" hidden="true" role="alert">
+                    <small>Incorect username or password</small>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="form-group">
+                    <label for="user-username">User name</label>
+                    <input type="text" name="user-username" id="user-username" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="user-password">Password</label>
+                    <input type="password" class="form-control" name="user-password" id="user-password">
+                </div>
+                <button type="submit" class="btn btn-block btn-lg btn-accent mt-4 py-3">Login to SDC Platform</button>
+                <p class="form-control-note">
+                    If you are an employee and need an account, please contact your SDC agency administrator.
+                </p>
+            </form>
+        </div>
+        <!-- LOGIN FORM END -->
+
+    </div>
+    <!-- LOGIN BOX END -->
+</div>

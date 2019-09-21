@@ -9,6 +9,7 @@ import { TicketTariffComponent } from './ticket-tariff/ticket-tariff.component';
 import { HomeComponent } from './home/home.component';
 import { NavbarComponent } from './navbar/navbar.component';
 import { ArticlesComponent } from './articles/articles.component';
+import { LoginComponent } from './login/login.component';
 
 
 
@@ -20,7 +21,8 @@ import { ArticlesComponent } from './articles/articles.component';
     TicketTariffComponent,
     HomeComponent,
     NavbarComponent,
-    ArticlesComponent
+    ArticlesComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,
