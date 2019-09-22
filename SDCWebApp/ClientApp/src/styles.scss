@@ -96,10 +96,9 @@ button.btn-accent{
 }
 
 button.btn-link{
-    font-weight: 400;
     transition: translate .3s ease-out;
     transform: translateX(-5px);  
-    background-color: #448AFF;  
+    background-color: #448AFF; 
     
     &:hover, &:focus{
         text-decoration: none;
@@ -114,14 +113,29 @@ button.btn-link{
     }
 }
 
+button.btn-flat{
+    background-color: transparent;
+    color: #212121;
+    font-weight: 400;
+    font-size: 20px;
+    border: none;
+
+    &:hover{
+        background-color: transparent;
+        color: #212121;
+        font-weight: 400;
+        border: none;
+    }
+}
+
 button.btn-accent-outline{ 
     padding: 15px 20px;
     transition: all .3s linear;
     border: 1px solid rgba(0, 79, 216, .7);
     color: rgba(0, 79, 216, .7);
-    border-radius: 2px;
+    border-radius: 3px;
     background-color: transparent;
-    font-weight: 400; 
+    font-weight: 500; 
     font-size: medium;
     
     &:hover{
@@ -176,4 +190,11 @@ form{
         color: #212121b2;
         line-height: 1.5; 
     }
+}
+
+.tiny-divider{
+    width: 200px;
+    height: 1px;
+    margin-top: 30px;
+    margin-bottom: 30px;
 }
