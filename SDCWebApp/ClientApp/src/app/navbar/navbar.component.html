@@ -15,13 +15,13 @@
                 <a class="nav-link mx-lg-3 mx-xl-5" [routerLink]="[ '/articles' ]">DISCOVER</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" [routerLink]="[ '/partnership' ]">JOIN</a>
+                <a class="nav-link" [routerLink]="[ '/partners' ]">JOIN</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link mx-lg-3 mx-xl-5" href="../visit-sdc/visit-sdc.component.html#ticket-tariffs">TICKETS</a>
+                <a class="nav-link mx-lg-3 mx-xl-5" [routerLink]="[ '/ticket-order' ]">TICKETS</a>
             </li>
             <li class="nav-item mr-lg-auto">
-                <a class="nav-link" [routerLink]="[ '/user-dashboard' ]">ADMIN PANEL</a>
+                <a class="nav-link" hidden="true" [routerLink]="[ '/user-dashboard' ]">ADMIN PANEL</a>
             </li>
         </ul>
         <div class="pr-4 d-none d-lg-flex align-items-center">

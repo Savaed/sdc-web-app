@@ -13,76 +13,106 @@
                 presenting
                 the subject of glass industry and glass works.
             </p>
-            <button class="btn btn-accent-outline btn-lg btn-link mt-3">
+            <button class="btn btn-accent-outline btn-lg btn-link mt-3" [routerLink]="[ '/ticket-order' ]">
                 Choose a ticket for you
                 <i class="fas fa-long-arrow-alt-right ml-2"></i>
             </button>
         </div>
 
-        <div class="row col-6 mx-auto">
+        <!-- VISIT INFO CARDS SECTION START -->
+        <div>
+            <div class="row col-6 mx-auto">
 
-            <div class="d-flex flex-nowrap mx-auto">
-                <div class="col-5 card custom-card visit-card-img">
-                    <div class="card-body p-0">
-                        <img src="../../assets/images/glass-rod.jpg" class="card-img" alt="artistic broken glass">
+                <div class="d-flex flex-nowrap mx-auto">
+                    <div class="col-5 card custom-card visit-card-img">
+                        <div class="card-body p-0">
+                            <img src="../../assets/images/glass-rod.jpg" class="card-img" alt="artistic broken glass">
+                        </div>
+                    </div>
+
+                    <div class="col-7 text-left px-5 align-self-center">
+                        <h4>
+                            Opening hours
+                        </h4>
+                        <p class="text">
+                            In the SDC, we value the availability of our resources for anyone willing to visit them,
+                            which is why our museum is currently open:
+                        </p>
+                        <p class="text">
+                            <strong>Monday to Sunday from 9:00 to 17:00</strong>
+                        </p>
                     </div>
                 </div>
-
-                <div class="col-7 text-left px-5 align-self-center">
-                    <h4>
-                        Informative lectures
-                    </h4>
-                    <p class="text">
-                        Our visitors can not only admire the beauty of glass art and the craftsmanship of glass artists
-                        but above all learn the secrets of production and decorative techniques in which they can take
-                        an active part.
-                    </p>
-                </div>
             </div>
-        </div>
 
-        <div class="row py-5 col-6 mx-auto">
-
-            <div class="d-flex flex-nowrap mx-auto">
-                <div class="col-7 text-left px-5 align-self-center">
-                    <h4>
-                        Two buildings
-                    </h4>
-                    <p class="text">
-                        We offer an amazing journey through the world of glass. Our Center consists of two facilities -
-                        the main building located at Blich 2 street and the cellars, connect in
-                        front of the western frontage of the Krosno Market Square.
-                    </p>
-                </div>
-                <div class="col-5 card custom-card visit-card-img">
-                    <div class="card-body p-0">
-                        <img src="../../assets/images/artistic-glass-broken.jpg" class="card-img"
-                            alt="artistic broken glass">
+            <div class="row py-5 col-6 mx-auto">
+                <div class="d-flex flex-nowrap mx-auto">
+                    <div class="col-7 text-left px-5 align-self-center">
+                        <h4>
+                            Informative lectures
+                        </h4>
+                        <p class="text">
+                            Our visitors can not only admire the beauty of glass art and the craftsmanship of glass
+                            artists
+                            but above all learn the secrets of production and decorative techniques in which they can
+                            take
+                            an active part.
+                        </p>
+                    </div>
+                    <div class="col-5 card custom-card visit-card-img">
+                        <div class="card-body p-0">
+                            <img src="../../assets/images/artistic-glass-broken.jpg" class="card-img"
+                                alt="artistic broken glass">
+                        </div>
                     </div>
                 </div>
-
             </div>
-        </div>
 
-        <div class="row col-6 mx-auto">
-            <div class="d-flex flex-nowrap mx-auto">
-                <div class="col-5 card custom-card visit-card-img">
-                    <div class="card-body p-0">
-                        <img src="../../assets/images/art-glass-ball.jpg" class="card-img" alt="artistic broken glass">
+            <div class="row col-6 mx-auto">
+                <div class="d-flex flex-nowrap mx-auto">
+                    <div class="col-5 card custom-card visit-card-img">
+                        <div class="card-body p-0">
+                            <img src="../../assets/images/art-glass-ball.jpg" class="card-img"
+                                alt="artistic broken glass">
+                        </div>
+                    </div>
+                    <div class="col-7 text-left px-5 align-self-center">
+                        <h4>
+                            Perfect visit duration
+                        </h4>
+                        <p class="text">
+                            Visiting both the main Center building and basements takes about 2 hours and the main
+                            building
+                            itself about 1.5 hours. The tour takes place under the guidance of a guide.
+                        </p>
                     </div>
                 </div>
+            </div>
 
-                <div class="col-7 text-left px-5 align-self-center">
-                    <h4>
-                        Perfect visit duration
-                    </h4>
-                    <p class="text">
-                        Visiting both the main Center building and basements takes about 2 hours and the main building
-                        itself about 1.5 hours. The tour takes place under the guidance of a guide.
-                    </p>
+            <div class="row py-5 col-6 mx-auto">
+                <div class="d-flex flex-nowrap mx-auto">
+                    <div class="col-7 text-left px-5 align-self-center">
+                        <h4>
+                            Two buildings
+                        </h4>
+                        <p class="text">
+                            We offer an amazing journey through the world of glass. Our Center consists of two
+                            facilities -
+                            the main building located at Blich 2 street and the cellars, connect in
+                            front of the western frontage of the Krosno Market Square.
+                        </p>
+                    </div>
+                    <div class="col-5 card custom-card visit-card-img">
+                        <div class="card-body p-0">
+                            <img src="../../assets/images/artistic-glass-broken.jpg" class="card-img"
+                                alt="artistic broken glass">
+                        </div>
+                    </div>
                 </div>
             </div>
+
         </div>
+        <!-- VISIT INFO CARDS SECTION END -->
 
     </div>
     <!-- MAIN HEADER END -->
@@ -196,22 +226,6 @@
             </div>
         </div>
     </div>
-    <!-- MAIN ATRACTIONS SECTION END -->
-
-    <!-- DISCOUNT INFO START -->
-    <!-- <div class="col-10 col-lg-5 text-center mx-auto mt-4 mb-5">
-        <p class="text-gray text-mono" id="ticket-tariffs">
-            Pricing
-        </p>
-        <h1 class="header mb-4">
-            Choose a ticket for you
-        </h1>
-        <p class="text-gray col-11 mx-auto">
-            One type of ticket on offer is definitely not enough. That's why in sdc you can choose among many types of
-            tickets.
-        </p>
-        
-    </div> -->
-    <!-- DISCOUNT INFO END -->
+    <!-- MAIN ATRACTIONS SECTION END --> 
 
 </div>

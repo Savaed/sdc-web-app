@@ -15,7 +15,7 @@
                     only
                     tells the story of for decades in Poland and the world of Krosno glass but also creates it.
                 </p>
-                <button type="button" class="btn btn-lg btn-primary btn-accent">
+                <button type="button" [routerLink]="[ '/ticket-order' ]" class="btn btn-lg btn-primary btn-accent">
                     <i class="far fa-money-bill-alt mr-2"></i>
                     Order tickets
                 </button>
@@ -42,8 +42,8 @@
 
             <!-- INFO CARD SECTION START -->
             <div class="row">
-                <div class="d-block col-12 col-md-7 align-items-end mx-auto pb-5">
-                    <div class="p-3 col-12 col-md-6 visiti-info">
+                <div class="d-block col-12 col-md-7 align-items-end mx-auto pb-5 info-cards">
+                    <div class="p-3 col-12 col-md-6 ">
                         <a href="#">
                             <div class="d-flex">
                                 <div>
@@ -60,7 +60,7 @@
                         </a>
                     </div>
 
-                    <div class="p-3 col-12 col-md-6 visiti-info">
+                    <div class="p-3 col-12 col-md-6">
                         <a href="#">
                             <div class="d-flex">
                                 <div>
@@ -76,7 +76,7 @@
                             </div>
                         </a>
                     </div>
-                    <div class="p-3 col-12 col-md-6 visiti-info">
+                    <div class="p-3 col-12 col-md-6">
                         <a href="#">
                             <div class="d-flex">
                                 <div>
@@ -111,7 +111,7 @@
             </h1>
             <p class="text-gray col-11 mx-auto">
                 At SDC, we try to keep our clients informed about events in the life of the company as well as inform
-                about the most interesting industry events.               
+                about the most interesting industry events.
             </p>
         </div>
 
@@ -147,7 +147,9 @@
                     <h5 class="card-title">Card title</h5>
                     <p class="card-text">This is a wider card with supporting text below as a natural lead-in to
                         additional content. This card has even longer content than the first to show that equal height
-                        action.</p>
+                        action. This is a wider card with supporting text below as a natural lead-in to
+                        additional content. This card has even longer content than the first to show that equal height.
+                    </p>
                     <small><a href="#">Read more</a></small>
                 </div>
             </div>
@@ -159,7 +161,7 @@
 
     <!-- DISCOUNTS INFO SECTION START -->
     <div class="container-fluid pb-4">
-        <div class="container col-12 col-md-10 mx-auto mb-md-3">
+        <div class="container col-12 col-md-10 mx-auto mb-md-5">
             <div class="ml-lg-4 my-4">
                 <h1 class="header my-5 pl-3 pl-lg-0">
                     Everybody <i class="fas fa-heart"></i> discounts
@@ -167,9 +169,9 @@
                 <div class="row discounts-info">
                     <div class="col-12 col-lg-4 pl-3 pl-lg-0 pr-lg-3">
                         <img src="../../assets/images/old-man.png">
-                        <h4>
+                        <h3>
                             For seniors
-                        </h4>
+                        </h3>
                         <p class="text-gray">
                             Seniors often do not sit at home at all, instead, they travel, sightseeing, get konw new
                             places and people ao for such people the SDC team has prepared discounts for sightseeing the
@@ -178,9 +180,9 @@
                     </div>
                     <div class="col-12 col-lg-4 px-lg-3 ">
                         <img src="../../assets/images/student.png">
-                        <h4>
+                        <h3>
                             For children
-                        </h4>
+                        </h3>
                         <p class="text-gray">
                             Every child who visits the SDC gets a lot of knowledge about the glass heritage from these
                             visits. These children may be the next artists who will present their exhibitions in the SDC
@@ -190,9 +192,9 @@
                     </div>
                     <div class="col-12 col-lg-4 pl-lg-3 pr-0">
                         <img src="../../assets/images/group.png">
-                        <h4>
+                        <h3>
                             For groups
-                        </h4>
+                        </h3>
                         <p class="text-gray">
                             Why not go sightseeing with friends, family or partner? Or maybe organize a school trip? No
                             matter who you go with, there are always discounts on tickets for organized groups.
@@ -200,7 +202,18 @@
                     </div>
                 </div>
             </div>
+        </div>
 
+        <div class="col-6 mx-auto pb-5">
+            <div class="tiny-divider bg-gray mx-auto"></div>
+
+            <div class="col-7 mx-auto text-center">
+                <h4>Something for everyone</h4>
+                <small class="text-muted">
+                    Discounts available in SDC are tailored to our customers. No matter how old you are, whether you
+                    want to explore alone or in a group, with us you will always find something just right for you.
+                </small>
+            </div>
         </div>
     </div>
     <!-- DISCOUNTS INFO SECTION END -->
@@ -218,7 +231,7 @@
             gaining influences and long-lasting friendships, and ending with earning opportunities.
         </p>
 
-        <button type="button" class="my-3 btn btn-lg btn-accent-outline btn-link">Become a SDC partner
+        <button type="button" [routerLink]="[ '/partners' ]" class="my-3 btn btn-lg btn-accent-outline btn-link">Become a SDC partner
             <i class="fas fa-long-arrow-alt-right ml-2"></i>
         </button>
 
@@ -234,5 +247,7 @@
             </div>
         </div>
         <small class="text-gray partners-banner-text">*On August 2019</small>
-        <!-- PARTNERS SECTION END -->
     </div>
+    <!-- PARTNERS SECTION END -->
+
+</div>

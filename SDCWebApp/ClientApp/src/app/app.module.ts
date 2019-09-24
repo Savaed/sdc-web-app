@@ -11,8 +11,10 @@ import { NavbarComponent } from './navbar/navbar.component';
 import { ArticlesComponent } from './articles/articles.component';
 import { LoginComponent } from './login/login.component';
 import { VisitSdcComponent } from './visit-sdc/visit-sdc.component';
-
-
+import { PartnersComponent } from './partners/partners.component';
+import { HttpClientModule } from '@angular/common/http';
+import { TicketOrderComponent } from './ticket-order/ticket-order.component';
+import { TicketOrderCalendarComponent } from './ticket-order-calendar/ticket-order-calendar.component';
 
 @NgModule({
   declarations: [
@@ -24,10 +26,14 @@ import { VisitSdcComponent } from './visit-sdc/visit-sdc.component';
     NavbarComponent,
     ArticlesComponent,
     LoginComponent,
-    VisitSdcComponent
+    VisitSdcComponent,
+    PartnersComponent,
+    TicketOrderComponent,
+    TicketOrderCalendarComponent
   ],
   imports: [
     BrowserModule,
+    HttpClientModule,
     AppRoutingModule
   ],
   providers: [],
