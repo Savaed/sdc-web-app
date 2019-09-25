@@ -4,6 +4,7 @@
 @import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700,900&display=swap');
 @import "../node_modules//@fortawesome/fontawesome-free/css/all.min.css";
 
+// General
 *{
     margin: 0px;
     padding: 0px;
@@ -21,7 +22,12 @@ div, .row, .container, .container-fluid{
     margin: 0;
 }
 
-// Texts
+button:active, button:focus{
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+// Text
 .header{
     font-size: 45px;
     font-weight: 600;
@@ -62,7 +68,6 @@ div, .row, .container, .container-fluid{
 .divider-color         { border-color: #BDBDBD; }
 .bg-gray               { background-color: #f1f3f4; }
 
-
 // Dividers
 div.divider{
     background-color: #FFFFFF;
@@ -76,6 +81,25 @@ div.divider{
 }
 
 // Forms
+form {
+    background-color: white;
+
+    label{
+        font-size: small;
+        font-weight: 500;
+    }
+
+    input{
+        border-radius: 5px;
+    }
+    
+    p.form-control-note{
+        margin: 10px 0 5px 0; 
+        font-size: 13px;
+        color: #212121b2;
+        line-height: 1.5; 
+    }
+}
 
 // Buttons
 button.btn-accent{ 
@@ -150,6 +174,7 @@ button.btn-accent-outline{
     }
 }
 
+// Cards
 div.custom-card{
     text-align: left;
     background: #fff;
@@ -176,36 +201,8 @@ div.custom-card{
     }
 }
 
-form{
-    background-color: white;
-
-    label{
-        font-size: small;
-        font-weight: 500;
-    }
-
-    input{
-        border-radius: 5px;
-    }
-    
-    p.form-control-note{
-        margin: 10px 0 5px 0; 
-        font-size: 13px;
-        color: #212121b2;
-        line-height: 1.5; 
-    }
-}
-
-.tiny-divider{
-    width: 200px;
-    height: 1px;
-    margin-top: 30px;
-    margin-bottom: 30px;
-}
-
 .info-cards{
     &>div{
-        //box-shadow: 0 2px 4px 2px rgba(0,0,0,.1);
         border-radius: 8px;
         transition: all .3s ease-out;
         margin: 5px;
@@ -224,6 +221,15 @@ form{
     }
 }
 
+// Dividers
+.tiny-divider{
+    width: 200px;
+    height: 1px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+// Banners
 .partners-banner{  
     height: 100px;  
     align-content: center;  
@@ -248,9 +254,4 @@ form{
 
 small.partners-banner-text{
     margin-top: 50px;
-}
-
-button:active, button:focus{
-    outline: none !important;
-    box-shadow: none !important;
 }

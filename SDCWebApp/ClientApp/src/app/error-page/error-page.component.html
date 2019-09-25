@@ -1,0 +1,16 @@
+<div class="error-page">
+    <div class="col-6 my-auto">
+        <p class="error-header">
+            Oops!
+        </p>
+        <p class="error-code-highlight"> Erorr code <strong>{{errorCode}}</strong> </p>
+        <div class="col-8 p-0">
+            <p class="error-message text-gray">{{ errorGeneralMessage | async }}</p>
+            <p class="error-message text-gray">{{ errorSpecificMessage | async }}</p>
+            <button class="btn btn-lg btn-accent px-5 mt-2" [routerLink]="[ '/home' ]">Go Home</button>
+        </div>
+    </div>
+    <div>
+        <!-- Placeholder for future image -->
+    </div>
+</div>

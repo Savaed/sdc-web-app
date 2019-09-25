@@ -1,0 +1,24 @@
+.error-page{
+    width: 100% !important;
+    height: 100vh !important;
+    display: flex;
+    justify-content: center;
+
+    .error-header{
+        font-size: 140px;
+        color: #212121;
+        font-weight: 600;
+    }
+
+    .error-code-highlight{
+        font-size: x-large;
+        font-weight: 500;
+        margin: 0;
+    }
+
+    .error-message{
+        font-size: large;
+        margin: 20px 0;
+        padding: 0 20px 0 0;
+    }
+}
