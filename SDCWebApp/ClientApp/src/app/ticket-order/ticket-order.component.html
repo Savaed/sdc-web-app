@@ -1,0 +1,16 @@
+<div class="m-5 col-10 mx-auto">
+    <!-- ORDER STEPS START -->
+    <ul class="list-group list-group-horizontal order-steps">
+        <li class="list-group-item" [class.active-steps]="orderService?.ticketOrderStep === 0"><small><strong>Step 1: </strong>Choose ticket</small> </li>
+        <li class="list-group-item" [class.active-steps]="orderService?.ticketOrderStep === 1"><small><strong>Step 2: </strong>Fill the form</small></li>
+        <li class="list-group-item" [class.active-steps]="orderService?.ticketOrderStep === 2"><small class="text-muted"><strong>Step 3: </strong>Order and pay</small></li>
+    </ul>
+    <!-- ORDER STEPS END -->
+
+    <div class="custom-shadow-lg mt-5 row order-container">
+        <app-ticket-order-form class="col-6"></app-ticket-order-form>
+        <app-order-summary class="col-6"></app-order-summary>
+    </div>
+
+
+</div>

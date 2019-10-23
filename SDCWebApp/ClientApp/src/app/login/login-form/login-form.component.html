@@ -1,0 +1,45 @@
+<div class="col-12">
+    <form class="custom-shadow-lg" [formGroup]="loginForm">
+
+
+        <div *ngIf="serverErrorResponse | async" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <small>{{ serverErrorResponse | async }}</small>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
+        <div class="form-group">
+            <label for="user-username">User name</label>
+            <input type="text" maxlength="20" autocomplete="username" [class.is-invalid]="username.invalid && username.touched" name="user-username" id="user-username" class="form-control" formControlName="username">
+
+            <!-- USERNAME VALIDATION ERRORS -->
+            <div *ngIf="username.invalid && username.touched">
+                <small *ngIf="username.errors?.pattern && !username.errors?.required" placement="right" ngbPopover="test" class="text-danger">Username may contain only lowercase letters</small>
+                <small *ngIf="username.errors?.required && !username.errors?.pattern && !username.errors?.minlength" class="text-danger">Username is required</small>
+                <small *ngIf="username.errors?.minlength && !username.errors?.pattern && !username.errors?.required" class="text-danger">Username must be at least 2 characters</small>
+            </div>
+
+        </div>
+
+        <div class="form-group">
+            <label for="user-password">Password</label>
+            <input type="password" autocomplete="current-password" maxlength="20" [class.is-invalid]="password.invalid && password.touched" class="form-control" name="user-password" id="user-password" formControlName="password">
+
+
+            <!-- PASSWORD VALIDATION ERRORS -->
+            <div>
+                <p class="form-control-note">
+                    Make the sure password <span [class.text-success]="!password.errors?.minlength && !password.errors?.required"
+                        [class.text-danger]="(password.errors?.required || password.errors?.minlength) && password.touched">
+                        at least 8 characters </span>including <span [class.text-success]="!password.errors?.pattern && !password.errors?.required && password.touched"
+                        [class.text-danger]="(password.errors?.pattern || password.errors?.required) && password.touched">a number, a
+                        lowercase, and uppercase letter and special symbol e.g ! or @</span>
+                </p>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-block btn-lg btn-accent mt-4 py-3" (click)="login()">Login to SDC Platform</button>
+        <p class="form-control-note"> If you are an employee and need an account, please contact SDC agency administrator in order to generate an account. </p>
+    </form>
+</div>

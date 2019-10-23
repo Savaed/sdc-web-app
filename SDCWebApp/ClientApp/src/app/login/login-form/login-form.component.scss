@@ -1,0 +1,11 @@
+.form-control-note {
+    .text{
+        &-danger {
+            font-weight: 600 !important;
+        }
+    
+        &-success {
+            font-weight: 600 !important;
+        }
+    }
+}

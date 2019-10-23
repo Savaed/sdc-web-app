@@ -1,0 +1,61 @@
+.discount-value {
+    margin: 0 0 0 15px;
+    color: rgb(39, 180, 34);
+    font-weight: 500;
+}
+
+.ticket-name {
+    font-weight: 500;
+}
+
+.ticket-price {
+    font-weight: 500;
+}
+
+.ticket-card-divider {
+    height: 1px;
+    width: 100%;
+    background-color: rgba(128, 128, 128, 0.3);
+    margin: 5px 0;
+}
+
+.cart-bg {
+    background-image: url(../../../assets/images/empty-cart.png);
+    width: 200px;
+    height: 200px;
+    background-position: center;
+    background-size: contain;;
+}
+
+.fa-shopping-cart {
+    position: relative;
+    top: 4px;
+    font-size: 20px;
+    color: #212121;
+}
+
+.far {
+    font-size: 25px;
+    position: relative;
+    top: 0px;
+    color: #2121219f;
+
+    &:hover {
+        cursor: pointer;
+        color: #212121;
+    }
+}
+
+.card-body {
+    &:hover {
+        cursor: pointer;    
+
+        .far {
+            display: flex !important;
+        }
+
+        p.ticket-price {
+            display: none;
+        }
+    }
+}

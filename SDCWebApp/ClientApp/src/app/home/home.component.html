@@ -1,0 +1,267 @@
+<div>
+    <!-- HEADER START -->
+    <div class="row home-foto text-center align-items-center home-filter">
+        <div class="col-6 col-md-4 text-md-left ml-5 mr-auto text-primary-color home-container">
+            <div class="ml-lg-4 mt-lg-5 px-0 pt-lg-5">
+                <div class="mb-3">
+                    <ng-container *ngIf="isOpenNow | async; else elseTemplate">
+                        <p class="mt-0 mb-1">OPEN NOW</p>
+                    </ng-container>
+                    <ng-template #elseTemplate>
+                        <p class="mt-0 mb-1">CLOSE NOW</p>
+                    </ng-template>
+                    <div class="divider"></div>
+                </div>
+                <h1 class="home-header m-0">
+                    The glass heritage of Fakecity
+                </h1>
+                <p class="text-light my-3">
+                    Thanks to the achievements of modern museology and modern techniques, the Glass Heritage Center not
+                    only
+                    tells the story of for decades in Poland and the world of Fakecity glass but also creates it.
+                </p>
+                <button type="button" [routerLink]="[ '/pricing' ]" class="btn btn-lg btn-primary btn-accent">
+                    <i class="far fa-money-bill-alt mr-2"></i>
+                    Order tickets
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- HEADER END -->
+
+    <!-- MAIN INFO SECTION START -->
+    <div class="row pt-4 mb-3">
+        <div class="container-fluid align-items-center">
+            <div class="col-10 col-lg-5 text-center mx-auto mt-4 mb-5">
+                <p class="text-gray text-mono">
+                    Explore the SDC
+                </p>
+                <h1 class="header mb-4">
+                    The famous glass heritage
+                </h1>
+                <p class="text-gray col-11 mx-auto">
+                    In the basement of the entrance door and the temporary exhibition room you can see exhibitions
+                    presenting art glass, made both by the best Polish artists and those from abroad.
+                </p>
+            </div>
+
+            <!-- INFO CARD SECTION START -->
+            <div class="row mb-5">
+                <div class="col-8 mx-auto mt-5">
+                    <div class="p-4 col-12 col-md-6 custom-bordered-card" id="visit-card">
+                        <a [routerLink]="[ '/visit-sdc' ]">
+                            <div class="d-flex">
+                                <div>
+                                    <h5>Museum visits </h5>
+                                    <small>
+                                        If you are wondering how the glass is produced, what is the history of
+                                        glassmaking and who first came up with the idea of melting sand until it becomes a transparent surface,
+                                        visit SDC.
+                                    </small>
+                                </div>
+                                <i class=" my-auto ml-5 fas fa-caret-right"></i>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="p-4 col-12 col-md-6 custom-bordered-card" id="opening-hours-card">
+                        <a href="/">
+                            <div class="d-flex">
+                                <div>
+                                    <h5>Opening hours</h5>
+                                    <small>
+                                        At SDC, we make sure that everyone can visit and see our exhibitions and shows at their convenience.
+                                        That is why we have selected opening hours so that they can serve everyone.
+                                    </small>
+                                </div>
+                                <i class=" my-auto ml-5 fas fa-caret-right"></i>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="p-4 col-12 col-md-6 custom-bordered-card" id="join-card">
+                        <a [routerLink]="[ '/partners' ]">
+                            <div class="d-flex">
+                                <div>
+                                    <h5>Work in the SDC</h5>
+                                    <small>
+                                        Have you ever wondered what it's like to work in a museum, give tours,
+                                        participate and tell visitors about shows? If so, now you can make your
+                                        dreams come true by joining the SDC.
+                                    </small>
+                                </div>
+                                <i class=" my-auto ml-5 fas fa-caret-right"></i>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div id="info" style="position: absolute; right: 0; top: 0;">
+                        <div class="d-table">
+
+                            <div id="opening-hours-info">
+                                <div id="visit-info">
+                                    <!-- <div class="visit-img"></div> -->
+                                </div>
+
+                                <table class="table table-bordered text-center">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Day of week</th>
+                                            <th scope="col">Opening hour</th>
+                                            <th scope="col">Closing hour</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let hour of (recentVisitInfo | async)?.openingHours">
+                                            <td class="text-left">{{ hour.dayOfWeek }}</td>
+                                            <td>{{ hour.openingHour | slice:0:5 }}</td>
+                                            <td>{{ hour.closingHour | slice:0:5 }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div id="join-info">
+                                <p>test3</p>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <!-- INFO CARD SECTION END -->
+    </div>
+    <!-- MAIN INFO SECTION END -->
+
+
+    <!-- ARTICLES SECTION START -->
+    <div class="container-fluid pt-4 pb-5 bg-gray align-items-center">
+        <div class="col-10 col-lg-5 text-center mx-auto mt-4 mb-5">
+            <p class="text-gray text-mono">
+                The glass news
+            </p>
+            <h1 class="header mb-4">
+                Stay up to date with SDC
+            </h1>
+            <p class="text-gray col-11 mx-auto">
+                At SDC, we try to keep our clients informed about events in the life of the company as well as inform
+                about the most interesting industry events.
+            </p>
+        </div>
+
+        <!-- ARTICLE CARDS START -->
+        <div class="card-deck col-12 col-md-10 mx-auto mb-md-3">
+            <div class="card custom-card" *ngFor="let article of topThreeArticles | async">
+                <img src="../../assets/images/glass-rod.jpg" class="card-img-top" alt="glass rod">
+                <div class="card-body">
+                    <div>
+                        <h5 class="card-title">{{ article.title }}</h5>
+                        <p class="card-text text">{{ article.text | slice:0:270 }}...</p>
+                    </div>
+                    <div class="row mt-3">
+                        <a [routerLink]="[ '/news', article.title ]"><small>Read more</small></a>
+                        <small class="text-muted my-0 ml-auto">{{ article.createdAt | date: 'dd LLLL yyyy, H:mm' }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ARTICLE CARD END -->
+
+    </div>
+    <!-- ARTICLES SECTION END -->
+
+    <!-- DISCOUNTS INFO SECTION START -->
+    <div class="container-fluid py-4">
+        <div class="container col-12 col-md-10 mx-auto mb-md-5">
+            <div class="ml-lg-4 my-4">
+                <h1 class="header my-5 pl-3 pl-lg-0">
+                    Everybody <i class="fas fa-heart"></i> discounts
+                </h1>
+                <div class="row discounts-info">
+                    <div class="col-12 col-lg-4 pl-3 pl-lg-0 pr-lg-3">
+                        <img src="../../assets/images/old-man.png">
+                        <h3>
+                            For seniors
+                        </h3>
+                        <p class="text-gray">
+                            Seniors often do not sit at home at all, instead, they travel, sightseeing, get konw new
+                            places and people ao for such people the SDC team has prepared discounts for sightseeing the
+                            cellars and the Centrum Dziedzictwa Szkla.
+                        </p>
+                    </div>
+                    <div class="col-12 col-lg-4 px-lg-3 ">
+                        <img src="../../assets/images/student.png">
+                        <h3>
+                            For children
+                        </h3>
+                        <p class="text-gray">
+                            Every child who visits the SDC gets a lot of knowledge about the glass heritage from these
+                            visits. These children may be the next artists who will present their exhibitions in the SDC
+                            in
+                            the future. Therefore, one of the major discounts at SDC applies to children
+                        </p>
+                    </div>
+                    <div class="col-12 col-lg-4 pl-lg-3 pr-0">
+                        <img src="../../assets/images/group.png">
+                        <h3>
+                            For groups
+                        </h3>
+                        <p class="text-gray">
+                            Why not go sightseeing with friends, family or partner? Or maybe organize a school trip? No
+                            matter who you go with, there are always discounts on tickets for organized groups.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 mx-auto pb-5">
+            <div class="tiny-divider bg-gray mx-auto"></div>
+
+            <div class="col-7 mx-auto text-center">
+                <h4>Something for everyone</h4>
+                <small class="text-muted">
+                    Discounts available in SDC are tailored to our customers. No matter how old you are, whether you
+                    want to explore alone or in a group, with us you will always find something just right for you.
+                </small>
+            </div>
+        </div>
+    </div>
+    <!-- DISCOUNTS INFO SECTION END -->
+
+    <!-- PARTNERS SECTION START -->
+    <div class="col-10 col-lg-5 text-center mx-auto mt-4 mb-5">
+        <p class="text-gray text-mono">
+            Partnerships
+        </p>
+        <h1 class="header mb-4">
+            Become our partner
+        </h1>
+        <p class="text-gray col-11 mx-auto mt-4">
+            Partnership with SDC brings many benefits. From the opportunity to show the world your artistic talents, by
+            gaining influences and long-lasting friendships, and ending with earning opportunities.
+        </p>
+
+        <button type="button" [routerLink]="[ '/partners' ]" class="my-3 btn btn-lg btn-accent-outline btn-link">Become a SDC partner
+            <i class="fas fa-long-arrow-alt-right ml-2"></i>
+        </button>
+
+        <div class="container col-12 col-md-10 mx-auto align-items-center my-5 pb-1">
+            <div class="d-flex justify-content-center partners-banner">
+                <img src="../../assets/images/atom.png" alt="atom logo" placement="top" ngbTooltip="Atom">
+                <img src="../../assets/images/circleci.png" style="position: relative; top: 50%" alt="circleci logo" placement="top" ngbTooltip="Circle CI">
+                <img src="../../assets/images/codeclimate.png" alt="codeclimate logo" placement="top" ngbTooltip="Code Climate ">
+                <img src="../../assets/images/ac-dc.png" style="position: relative; top: 50%" alt="ac/dc logo" placement="top" ngbTooltip="AC/DC">
+                <img src="../../assets/images/travis-ci.png" alt="travis-ci logo" placement="top" ngbTooltip="Travis CI">
+                <img src="../../assets/images/zenhubio.png" style="position: relative; top: 50%" alt="zenhubio logo" placement="top" ngbTooltip="Zenhubio">
+                <img src="../../assets/images/google.png" alt="google logo" placement="top" ngbTooltip="Google">
+            </div>
+        </div>
+        <small class="text-gray partners-banner-text">*On {{ now | date: 'MMMM yyyy' }}</small>
+    </div>
+    <!-- PARTNERS SECTION END -->
+
+</div>

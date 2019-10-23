@@ -91,7 +91,7 @@ namespace SDCWebApp
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(GetConnectionString(ApiConstants.DefaultConnectionString)));
 
             // Automatically perform database migration.
-            services.BuildServiceProvider().GetService<ApplicationDbContext>().Database.Migrate();
+            //services.BuildServiceProvider().GetService<ApplicationDbContext>().Database.Migrate();
 
             // Set user requirements.
             services.AddIdentity<IdentityUser, IdentityRole>(config =>

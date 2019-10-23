@@ -1,8 +1,10 @@
 // Global CSS styles.
 
-// Fonts.
-@import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700,900&display=swap');
+// Fonts
+@import url('https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,900&display=swap');
 @import "../node_modules//@fortawesome/fontawesome-free/css/all.min.css";
+
+@import '@angular/material/prebuilt-themes/deeppurple-amber.css';
 
 // General
 *{
@@ -51,6 +53,18 @@ button:active, button:focus{
         color: #FFFFFF;
     }
 
+    &-orange {
+        color: rgb(224, 73, 17);
+    }
+
+    &-green {
+        color: rgb(3, 121, 3);
+    }
+
+    &-blue {
+        color: rgb(28, 51, 153);
+    }
+
     &-mono{
         font-size: 16px;
         font-family: SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace;
@@ -67,13 +81,9 @@ button:active, button:focus{
 .secondary-text-color  { color: #757575; }
 .divider-color         { border-color: #BDBDBD; }
 .bg-gray               { background-color: #f1f3f4; }
-
-// Dividers
-div.divider{
-    background-color: #FFFFFF;
-    width: 50px;
-    height: 5px;
-}
+.bg-orange             { background-color: rgb(224, 73, 17); }
+.bg-green              { background-color: rgb(3, 121, 3); }
+.bg-blue               { background-color: rgb(28, 51, 153); }
 
 // Filters
 .grayscale{
@@ -99,6 +109,10 @@ form {
         color: #212121b2;
         line-height: 1.5; 
     }
+
+    small{
+        font-size: 13px !important;
+    }
 }
 
 // Buttons
@@ -106,7 +120,7 @@ button.btn-accent{
     padding: 15px 20px;
     transition: background-color .3s linear;
     border: none;
-    border-radius: 2px;
+    border-radius: 4px;
     background-color: #448AFF;
     color: #FFFFFF;
     font-weight: 400; 
@@ -116,7 +130,24 @@ button.btn-accent{
         border-radius: 50%;
     }
 
-    &:hover{
+    &-tight {
+        padding: 5px 20px;
+        transition: background-color .3s linear;
+        border: none;
+        border-radius: 4px;
+        background-color: #448AFF;
+        color: #FFFFFF;
+        font-weight: 400; 
+        font-size: medium;
+
+        &:hover, &:active {
+            transition: all .3s linear;
+            background-color: rgb(52, 119, 235);
+            color: #FFFFFF;
+        }
+    }
+
+    &:hover {
         transition: all .3s linear;
         background-color: rgb(52, 119, 235);
         color: #FFFFFF;
@@ -128,7 +159,7 @@ button.btn-link{
     transform: translateX(-5px);  
     background-color: #448AFF; 
     
-    &:hover, &:focus{
+    &:hover, &:focus, &:active{
         text-decoration: none;
         text-shadow: none;
         background-color: rgb(62, 122, 224);
@@ -161,12 +192,12 @@ button.btn-accent-outline{
     transition: all .3s linear;
     border: 1px solid rgba(0, 79, 216, .7);
     color: rgba(0, 79, 216, .7);
-    border-radius: 3px;
+    border-radius: 4px;
     background-color: transparent;
     font-weight: 500; 
     font-size: medium;
     
-    &:hover{
+    &:hover, &:active{
         background-color: transparent;
         transition: all .3s linear;
         border-color: rgb(0, 79, 216);
@@ -175,6 +206,27 @@ button.btn-accent-outline{
 }
 
 // Cards
+.custom-bordered-card {
+    border-radius: 8px;
+    transition: all 0.2s ease-out;
+    margin: 5px;
+    border: 1px solid transparent;
+
+    &>a{
+         text-decoration: none;
+         color: #212121;
+    }
+
+    &:hover{
+         cursor: pointer;
+         transition: all .3s ease-out;
+         box-shadow: 0 2px 8px 6px rgba(0,0,0,.1);
+         border: 1px solid rgba(128, 128, 128, 0.3);
+    }
+}
+    
+
+
 div.custom-card{
     text-align: left;
     background: #fff;
@@ -204,7 +256,7 @@ div.custom-card{
 .info-cards{
     &>div{
         border-radius: 8px;
-        transition: all .3s ease-out;
+        transition: all 0.2s ease-out;
         margin: 5px;
         border: 1px solid transparent;
 
@@ -214,6 +266,7 @@ div.custom-card{
         }
 
         &:hover{
+            cursor: pointer;
             transition: all .3s ease-out;
             box-shadow: 0 2px 8px 6px rgba(0,0,0,.1);
             border: 1px solid rgba(128, 128, 128, 0.3);
@@ -227,6 +280,12 @@ div.custom-card{
     height: 1px;
     margin-top: 30px;
     margin-bottom: 30px;
+}
+
+div.divider{
+    background-color: #FFFFFF;
+    width: 50px;
+    height: 5px;
 }
 
 // Banners
@@ -254,4 +313,129 @@ div.custom-card{
 
 small.partners-banner-text{
     margin-top: 50px;
+}
+
+// Badges
+.info-circle-badge {     
+    &-sm {
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        text-align: center;
+        display: inline-block;
+        justify-content: center;
+        color: whitesmoke;
+        font-weight: 500;
+        transition: all 0.2s ease-out;
+
+        &:hover {
+            transform:scale(1.05);
+            transition: all .2s ease-in; 
+            cursor: pointer;
+        }
+
+        p {
+            font-size: xx-large;     
+            margin: 0;        
+        }
+    }
+
+    &-md {
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        text-align: center;
+        display: inline-block;
+        justify-content: center;
+        color: whitesmoke;
+        font-weight: 500;
+        transition: all 0.2s ease-out;
+
+        &:hover {
+            transform:scale(1.05);
+            transition: all .2s ease-in; 
+            cursor: pointer;
+        }
+
+        p {
+            font-size: xx-large; 
+            margin: 0;     
+        }
+    }
+
+    &-lg {
+        width: 250px;
+        height: 250px;
+        border-radius: 50%;
+        text-align: center;
+        display: inline-block;
+        justify-content: center;
+        color: whitesmoke;
+        font-weight: 500;
+        transition: all 0.2s ease-out;
+
+        &:hover {
+            transform:scale(1.05);
+            transition: all .2s ease-in; 
+            cursor: pointer;
+        }
+
+        p {
+            font-size: xx-large;  
+            margin: 0;           
+        }
+    }        
+}
+
+// Shadows
+.custom-shadow-lg{
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid rgba(128, 128, 128, 0.5);
+    box-shadow: 0 2px 4px 2px rgba(0, 0, 0, 0.1);     
+}
+
+// Datepickers
+input.datepicker {
+    color: #212121;
+    border: 1px solid #ced4da;
+    padding: 6px 12px;
+    font-size: 1rem;
+    width: 40%;
+}
+
+// Forms validation
+form {
+    .form-control.is-invalid, .was-validated .form-control:invalid {
+        background-image: url(../src/assets/images/validation-error.png) !important;
+    }
+
+    .form-control.ng-valid {
+        background-image: url(../src/assets/images/validation-success.png) !important;
+        background-repeat: no-repeat;      
+        background-position: center right calc(.375em + .1875rem);
+        background-size: calc(.75em + .375rem) calc(.75em + .375rem);
+    }
+
+    i.fas {
+        font-size: small;
+        color: #2121218a;
+        margin: 0 0 0 5px;
+
+        &:hover {
+            cursor: pointer;
+            color: #212121a9;
+        }
+    }
+
+    i.far {
+        font-size: small;
+        color: #2121218a;
+        margin: 0 0 0 5px;
+
+        &:hover {
+            cursor: pointer;
+            color: #212121a9;
+        }
+    }
 }

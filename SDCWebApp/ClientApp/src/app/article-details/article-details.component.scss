@@ -1,0 +1,27 @@
+.far {   
+    margin-right: 7px;
+    color: gray;
+}
+
+.article-header {
+    color: #212121;
+    font-weight: 400;
+}
+
+.article-divider {
+    height: 1px;
+    width: 100%;
+    background-color: rgb(212, 212, 212);
+}
+
+.next-articles {
+    padding: 0 50px;
+}
+
+.card-img {
+    border-radius: 0;
+}
+
+.custom-card:hover {
+    cursor: pointer;
+}

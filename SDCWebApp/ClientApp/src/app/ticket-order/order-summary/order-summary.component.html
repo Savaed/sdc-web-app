@@ -1,0 +1,31 @@
+<div class="card">
+    <div class="card-header mb-3">
+        <div class="row">
+            <i class="fas fa-shopping-cart mr-3"></i>
+            <p class="card-title m-0"> Ticket cart </p>
+        </div>
+    </div>
+
+    <ng-container *ngIf="isCartEmpty | async; else elseTemplate">
+        <h4 class="text-body mx-auto my-auto">Your tickets will be displayed here. You do not have any tickets added to your cart at this time.</h4>
+        </ng-container>
+
+    <ng-template #elseTemplate>
+        <div class="card-body py-2" *ngFor="let ticket of ticketCart | async">
+            <div class="row">
+                <p class="ticket-name m-0">{{ ticket.amount }}</p>
+                <p class="ticket-name m-0"> x {{ ticket.ticket.ticketTariff.title }}</p>
+                <p *ngIf="ticket.ticket.mostProfitableDiscount.discountValueInPercentage > 0" class="discount-value">
+                    -{{ ticket.ticket.mostProfitableDiscount.discountValueInPercentage }}%
+                </p>
+                <p class="ticket-price m-0 ml-auto">{{ ticket.ticketPrice }} PLN</p>
+                <i class="far fa-trash-alt ml-auto d-none" (click)="removeTicket(ticket)" placement="bottom" ngbTooltip="Remove"></i>
+            </div>
+            <small class="text-gray">{{ ticket.ticket.ticketTariff.overview }}</small>
+            <div class="ticket-card-divider"></div>
+        </div>
+        <div class="card-footer mt-3 d-flex">
+            <p class="ml-auto m-0">Summary: <strong>{{ overallCartPrice | async }}</strong> PLN</p>
+        </div>
+    </ng-template>
+</div>

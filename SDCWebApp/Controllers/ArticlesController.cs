@@ -18,7 +18,7 @@ namespace SDCWebApp.Controllers
     /// Provides methods to Http verbs proccessing on <see cref="Article"/> entities.
     /// </summary>
     [Route("api/[controller]")]
-    [Authorize(ApiConstants.ApiUserPolicy)]
+    //[Authorize(ApiConstants.ApiUserPolicy)]
     [ApiController]
     public class ArticlesController : CustomApiController, IArticlesController
     {

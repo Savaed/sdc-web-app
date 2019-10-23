@@ -1,0 +1,59 @@
+<div class="row m-5 col-7 mx-auto">
+    <div>
+        <!-- TITLE -->
+        <h1 class="article-header mb-4">{{ (readArticle | async)?.title }}</h1>
+
+        <!-- ARTICLE BASE INFO -->
+        <div>
+            <p class="mb-4">{{ (readArticle | async)?.author }}</p>
+            <div class="row">
+                <i class="far fa-calendar"></i>
+                <small *ngIf="((readArticle | async)?.updatedAt) !== null; else notUpdatedArticle" class="text-muted">{{ (readArticle | async)?.updatedAt | date: 'dd LLLL yyyy, H:mm' }}</small>
+                <ng-template #notUpdatedArticle>
+                    <small class="text-muted">{{ (readArticle | async)?.createdAt | date: 'dd LLLL yyyy, H:mm' }}</small>
+                </ng-template>
+            </div>
+        </div>
+    </div>
+
+    <div class="article-divider my-4">
+        <div class="tiny-divider bg-success m-0"></div>
+    </div>
+
+    <div class="row">
+        <!-- ARTICLE TEXT -->
+        <div class="col-8 pl-0">
+
+            <div class="row mb-4">
+                <img src="../../assets/images/glass-rod.jpg" alt="article phot" class="card-img shadow-sm">
+            </div>
+            <p>{{ (readArticle | async)?.text }}</p>
+        </div>
+
+        <!-- NEXT ARTICLES -->
+        <div class="col-4 next-articles">
+            <p class="text-muted">Next article</p>
+
+            <div *ngIf="nextArticle | async; let article">
+                <div class="card custom-card border-0 m-0 mb-2" (click)="navigateToArticle(article.title)">
+                    <img class="card-img-top" src="../../assets/images/artistic-glass-broken.jpg" alt="article photo">
+                    <div class="card-body">
+                        <h6 class="card-title">{{ article.title }}</h6>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tiny-divider article-divider"></div>
+
+            <div *ngFor="let article of otherArticles | async; let i = index">
+                <div *ngIf="i > 0" class="card custom-card border-0 m-0 my-4" (click)="navigateToArticle(article.title)">
+                    <img class="card-img-top" src="../../assets/images/artistic-glass-broken.jpg" alt="article photo">
+                    <div class="card-body">
+                        <h6 class="card-title">{{ article.title }}</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

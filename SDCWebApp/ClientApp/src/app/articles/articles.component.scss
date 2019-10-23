@@ -1,0 +1,15 @@
+.card-deck-divider{
+    margin: 15px 0;
+}
+
+.btn-custom-link {
+    font-size: large;
+    color: #0366d6;
+    padding: 0;
+    border: none;
+    background-color: transparent;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}

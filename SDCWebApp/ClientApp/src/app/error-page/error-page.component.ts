@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ErrorHandler } from '../ErrorHandler';
+import { ErrorHandler } from '../interceptors/ErrorHandler';
 import { Observable } from 'rxjs';
+import { Title } from '@angular/platform-browser';
 
 @Component({
     selector: 'app-error-page',
@@ -13,10 +14,13 @@ export class ErrorPageComponent implements OnInit {
     private errorGeneralMessage: Observable<string>;
     private errorSpecificMessage: Observable<string>;
 
-    constructor(private activatedRoute: ActivatedRoute, private errorHandler: ErrorHandler) { }
+    constructor(private activatedRoute: ActivatedRoute, private errorHandler: ErrorHandler, private titleService: Title) {
+        this.errorCode = this.activatedRoute.snapshot.params.errorStatusCode;
+        this.titleService.setTitle(`Error - ${this.errorCode.toString()}`);
+    }
 
     ngOnInit() {
-        this.errorCode = this.activatedRoute.snapshot.params.errorStatusCode;
+
         this.errorSpecificMessage = this.errorHandler.errorSpecificMessage;
         this.errorGeneralMessage = this.errorHandler.errorGeneralMessage;
     }

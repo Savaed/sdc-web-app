@@ -174,7 +174,7 @@ namespace SDCWebApp.Services
             try
             {
                 _logger.LogDebug($"Starting retrieve all sightseeing groups from the database.");
-                var groups = await _context.Groups.ToArrayAsync();
+                var groups = await _context.Groups.Include(x => x.Tickets).ToArrayAsync();
                 _logger.LogDebug("Retrieve data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(GetAllAsync)}'. Returning {groups.Count()} elements.");
                 return groups.AsEnumerable();
@@ -212,7 +212,7 @@ namespace SDCWebApp.Services
             try
             {
                 _logger.LogDebug($"Starting retrieve sighseeing group with id: '{id}' from the database.");
-                var group = await _context.Groups.SingleAsync(x => x.Id.Equals(id));
+                var group = await _context.Groups.Include(x => x.Tickets).SingleAsync(x => x.Id.Equals(id));
                 _logger.LogDebug("Retrieve data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(GetAsync)}'.");
                 return group;

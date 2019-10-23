@@ -1,0 +1,20 @@
+.cookie-alert {
+    z-index: 4;
+    background-color: rgb(55, 107, 197); 
+    padding: 10px 200px;   
+}
+
+.cookie-img {
+    height: 90px;
+    width: 90px;
+    background-image: url(../../assets/images/cookie.png);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.cookie-info {
+    font-weight: 300;
+    font-size: small;
+    color: whitesmoke;
+}

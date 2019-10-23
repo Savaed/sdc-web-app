@@ -19,7 +19,8 @@ namespace SDCWebApp.Controllers
     /// Provides methods to Http verbs proccessing on <see cref="VisitInfo"/> entities.
     /// </summary>
     [Route("api/info")]
-    [Authorize(ApiConstants.ApiUserPolicy)]
+    [AllowAnonymous]
+    //[Authorize(ApiConstants.ApiUserPolicy)]
     [ApiController]
     public class VisitInfoController : CustomApiController, IVisitInfoController
     {

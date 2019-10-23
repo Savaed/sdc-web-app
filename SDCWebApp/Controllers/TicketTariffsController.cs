@@ -19,7 +19,7 @@ namespace SDCWebApp.Controllers
     /// Provides methods to Http verbs proccessing on <see cref="TicketTariff"/> entities.
     /// </summary>
     [ApiController]
-    [Authorize(ApiConstants.ApiUserPolicy)]
+    //[Authorize(ApiConstants.ApiAdminPolicy)]
     public class TicketTariffsController : CustomApiController, ITicketTariffsController
     {
         private const string ControllerPrefix = "ticket-tariffs";
@@ -90,6 +90,7 @@ namespace SDCWebApp.Controllers
         /// <returns>An added <see cref="TicketTariffDto"/>.</returns>
         ///  [HttpPost]
         [HttpPost("api/visit-tariffs/{visitTariffId:required}/ticket-tariffs")]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> AddVisitsTicketTariffAsync(string visitTariffId, [FromBody] TicketTariffDto ticketTariff)

@@ -19,6 +19,7 @@ namespace SDCWebApp.Controllers
     /// Provides methods to Http verbs proccessing on <see cref="Ticket"/> entities.
     /// </summary>
     [Route("api")]
+    //[AllowAnonymous]
     [Authorize(ApiConstants.ApiUserPolicy)]
     [ApiController]
     public class TicketsController : CustomApiController, ITicketsController

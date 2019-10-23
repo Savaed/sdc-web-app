@@ -1,0 +1,45 @@
+{{ ticketOrder | async | json }}
+
+<div id="orderedTickets">
+    <table class="table table-bordered m-5" *ngFor="let ticket of (ticketOrder | async).tickets">
+        <tbody>
+            <tr>
+                <td>
+                    <p class="cell-header text-gray">Ticket</p>
+                    <p class="cell-text">{{ (getTicketTariff(ticket) | async ).title }}</p>
+                </td>
+                <td>
+                    <p class="cell-header text-gray">Sightseeing date</p>
+                    <p class="cell-text"> {{ ticket.validFor | date: 'dd LLLL yyyy, H:mm' }} </p>
+                </td>
+                <td>
+                    <p class="cell-header text-gray"> Ticket price </p>
+                    <p class="cell-text"> {{ ticket.price }} PLN </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="cell-header text-gray"> Ticket ID </p>
+                    <p class="cell-text"> {{ ticket.ticketUniqueId | slice:0:8 }} </p>
+                </td>
+                <td>
+                    <p class="cell-header text-gray"> Purchase date </p>
+                    <p class="cell-text"> {{ ticket.purchaseDate | date: 'dd LLLL yyyy, H:mm' }} </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="cell-header text-gray"> Discount name </p>
+                    <p class="cell-text"> {{ (getDiscount(ticket) | async).type | discountType }} </p>
+                </td>
+
+                <td>
+                    <p class="cell-header text-gray"> Discount value </p>
+                    <p class="cell-text"> -{{ (getDiscount(ticket) | async).discountValueInPercentage }}% </p>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<button (click)="saveOrderAsPdf()">pdf</button>

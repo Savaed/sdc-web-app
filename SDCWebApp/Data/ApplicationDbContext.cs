@@ -67,7 +67,7 @@ namespace SDCWebApp.Data
 
             // Seed OpeningHours
             builder.Entity<OpeningHours>().HasData(
-            new 
+            new
             {
                 Id = "1",
                 InfoId = "1",
@@ -140,7 +140,7 @@ namespace SDCWebApp.Data
 
             // Seed ActivityLog.
             builder.Entity<ActivityLog>().HasData(
-                new 
+                new
                 {
                     Id = Guid.NewGuid().ToString(),
                     Type = ActivityLog.ActivityType.LogIn,
@@ -150,7 +150,7 @@ namespace SDCWebApp.Data
                     UpdatedAt = DateTime.MinValue,
                     Date = DateTime.UtcNow
                 },
-                new 
+                new
                 {
                     Id = Guid.NewGuid().ToString(),
                     Type = ActivityLog.ActivityType.LogOut,
@@ -163,7 +163,7 @@ namespace SDCWebApp.Data
 
             // Seed Article.
             builder.Entity<Article>().HasData(
-                new 
+                new
                 {
                     Id = Guid.NewGuid().ToString(),
                     Author = "Jack Sparrow",
@@ -172,7 +172,7 @@ namespace SDCWebApp.Data
                     UpdatedAt = DateTime.MinValue,
                     CreatedAt = DateTime.UtcNow
                 },
-                new 
+                new
                 {
                     Id = Guid.NewGuid().ToString(),
                     Author = "Hektor Barbossa",
@@ -180,7 +180,7 @@ namespace SDCWebApp.Data
                     Text = "BlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearlBlackPearl",
                     UpdatedAt = DateTime.MinValue,
                     CreatedAt = DateTime.UtcNow
-                });         
+                });
 
             // Seed VisitTariff.
             builder.Entity<VisitTariff>(entity =>
@@ -190,7 +190,7 @@ namespace SDCWebApp.Data
                       .OnDelete(DeleteBehavior.SetNull);
 
                 entity.HasData(
-                    new 
+                    new
                     {
                         Id = "1",
                         Name = "BasicTickets",
@@ -205,19 +205,36 @@ namespace SDCWebApp.Data
                 {
                     Id = "1",
                     VisitTariffId = "1",
-                    Description = "Ticket tariff 1",
+                    Description = "[title]Centrum Dziedzictwa Szkla;;[overview]You will only visit the SDC main building;;" +
+                                  "[features]Spectacular shows of glass production;Glass workshops;Glass products exhibitions;Anamorphic painting(3D);" +
+                                  "Cinema and conference room;Glass souvenir shop;2 hours sightseeing duration;;",
+                    DefaultPrice = 24.0f,
+                    CreatedAt = DateTime.UtcNow,
+                    IsPerHour = false,
+                    UpdatedAt = DateTime.MinValue,
+                    IsPerPerson = true
+                },
+                new
+                {
+                    Id = "2",
+                    VisitTariffId = "1",
+                    Description = "[title]Piwnice Przedprozne;;[overview]You will only visit SDC basements;;" +
+                                  "[features]Exhibition of glass art works;The \"Glass in physics\" room;Independent experiments on glass props;" +
+                                  "Examples of local glass products;2 hours sightseeing duration;;",
                     DefaultPrice = 20.0f,
                     CreatedAt = DateTime.UtcNow,
                     IsPerHour = false,
                     UpdatedAt = DateTime.MinValue,
                     IsPerPerson = true
                 },
-                new 
+                new
                 {
-                    Id = "2",
+                    Id = "3",
                     VisitTariffId = "1",
-                    Description = "Ticket tariff 2",
-                    DefaultPrice = 20.0f,
+                    Description = "[title]SDC and Piwnice Przedprozne;;[overview]You will visit the entire SDC and basements;;" +
+                                  "[features]Combination of SDC and basements tickets;Opportunity to learn about glass production;Visiting the entire complex in less time;" +
+                                  "The most affordable offer;2 hours sightseeing duration;;",
+                    DefaultPrice = 40.0f,
                     CreatedAt = DateTime.UtcNow,
                     IsPerHour = false,
                     UpdatedAt = DateTime.MinValue,
@@ -226,7 +243,7 @@ namespace SDCWebApp.Data
 
             // Seed Discount.
             builder.Entity<Discount>().HasData(
-                 new 
+                 new
                  {
                      Id = "1",
                      Type = Discount.DiscountType.ForGroup,
@@ -236,7 +253,7 @@ namespace SDCWebApp.Data
                      UpdatedAt = DateTime.MinValue,
                      CreatedAt = DateTime.UtcNow
                  },
-                 new 
+                 new
                  {
                      Id = "2",
                      Type = Discount.DiscountType.ForFamily,
@@ -248,17 +265,17 @@ namespace SDCWebApp.Data
 
             // Seed SightseeingGroup.
             builder.Entity<SightseeingGroup>().HasData(
-                new 
+                new
                 {
                     Id = "1",
-                    SightseeingDate = sightseeingDate,
+                    SightseeingDate = sightseeingDate.AddHours(2),
                     MaxGroupSize = 30,
                     CurrentGroupSize = 29,
                     IsAvailablePlace = true,
                     UpdatedAt = DateTime.MinValue,
                     CreatedAt = DateTime.UtcNow
                 },
-                new 
+                new
                 {
                     Id = "2",
                     SightseeingDate = sightseeingDate,
@@ -271,7 +288,7 @@ namespace SDCWebApp.Data
 
             // Seed Customer
             builder.Entity<Customer>().HasData(
-                new 
+                new
                 {
                     Id = "1",
                     DateOfBirth = DateTime.Now.AddYears(-23),
@@ -282,7 +299,7 @@ namespace SDCWebApp.Data
                     UpdatedAt = DateTime.MinValue,
                     CreatedAt = DateTime.UtcNow
                 },
-                new 
+                new
                 {
                     Id = "2",
                     DateOfBirth = DateTime.Now.AddYears(-4),

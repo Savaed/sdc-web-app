@@ -20,7 +20,8 @@ namespace SDCWebApp.Controllers
     /// Provides methods to Http verbs proccessing on <see cref="SightseeingGroup"/> entities.
     /// </summary>
     [Route("api/[controller]")]
-    [Authorize(ApiConstants.ApiUserPolicy)]
+    [AllowAnonymous]
+    //[Authorize(ApiConstants.ApiUserPolicy)]
     [ApiController]
     public class GroupsController : CustomApiController, IGroupsController
     {
