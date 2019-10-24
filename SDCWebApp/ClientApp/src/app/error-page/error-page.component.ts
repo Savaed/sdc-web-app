@@ -20,7 +20,6 @@ export class ErrorPageComponent implements OnInit {
     }
 
     ngOnInit() {
-
         this.errorSpecificMessage = this.errorHandler.errorSpecificMessage;
         this.errorGeneralMessage = this.errorHandler.errorGeneralMessage;
     }

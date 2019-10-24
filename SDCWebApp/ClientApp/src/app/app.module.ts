@@ -28,6 +28,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { CookiesAlertComponent } from './cookies-alert/cookies-alert.component';
 import { ArticleDetailsComponent } from './article-details/article-details.component';
 import { Title } from '@angular/platform-browser';
+import { AuthInterceptorProvider } from './interceptors/AuthInterceptor';
+import { ExchangeTokenInterceptorProvider } from './interceptors/ExchangeTokenInterceptor';
 
 
 @NgModule({
@@ -64,7 +66,12 @@ import { Title } from '@angular/platform-browser';
         MatNativeDateModule,
         NgbModule
     ],
-    providers: [HttpErrorInterceptorProvider, Title],
+    providers: [
+        AuthInterceptorProvider,
+        ExchangeTokenInterceptorProvider,
+        HttpErrorInterceptorProvider,
+        Title
+    ],
     bootstrap: [AppComponent]
 })
 export class AppModule { }

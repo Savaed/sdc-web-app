@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AccountService } from 'src/app/services/account.service';
+import { AuthService } from 'src/app/services/auth.service';
 import { map } from 'rxjs/operators';
 import { observable, Observable, Subject, BehaviorSubject } from 'rxjs';
 import { ApiError } from '../../models/ApiResponse';
@@ -25,7 +25,7 @@ export class LoginFormComponent implements OnInit {
         return this.loginForm.get('password');
     }
 
-    constructor(private formBuilder: FormBuilder, private accountService: AccountService, private router: Router) { }
+    constructor(private formBuilder: FormBuilder, private accountService: AuthService, private router: Router) { }
 
     ngOnInit() {
         this.loginForm = this.formBuilder.group({

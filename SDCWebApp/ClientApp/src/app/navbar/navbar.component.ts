@@ -1,6 +1,6 @@
 import { Component, OnInit, DoCheck } from '@angular/core';
 import { Subject, BehaviorSubject } from 'rxjs';
-import { AccountService } from 'src/app/services/account.service';
+import { AuthService } from 'src/app/services/auth.service';
 import { VisitInfoService } from 'src/app/services/visit-info.service';
 import { Router } from '@angular/router';
 
@@ -14,9 +14,9 @@ export class NavbarComponent implements OnInit, DoCheck {
     private closingHour = new BehaviorSubject<string>(undefined);
     private isUserLogged = new BehaviorSubject<boolean>(false);
 
-    get isLogged(): BehaviorSubject<boolean> { return this.accountService.isLogged; }
+    get isLogged(): BehaviorSubject<boolean> { return this.authService.isLogged; }
 
-    constructor(private accountService: AccountService, private infoService: VisitInfoService, private router: Router) { }
+    constructor(private authService: AuthService, private infoService: VisitInfoService, private router: Router) { }
 
     ngOnInit() {
         this.infoService.getRecentInfo().subscribe(info => {
@@ -27,6 +27,10 @@ export class NavbarComponent implements OnInit, DoCheck {
     }
 
     ngDoCheck() {
-        this.accountService.isLogged.subscribe(logged => this.isLogged.next(logged));
+        this.authService.isLogged.subscribe(logged => this.isLogged.next(logged));
+    }
+
+    private logout() {
+        this.authService.logout();
     }
 }
