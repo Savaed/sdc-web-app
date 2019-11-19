@@ -1,0 +1,18 @@
+<div class="resource-details">
+    <small>Resource ID</small>
+    <p>{{ group.id }}</p>
+    <small>Sightseeing date</small>
+    <p>{{ group.sightseeingDate | date:'dd LLLL yyyy, HH:mm' }}</p>
+    <small>Max group size</small>
+    <p>{{ group.maxGroupSize }}</p>
+    <small>Current group size</small>
+    <p>{{ group.currentGroupSize }}</p>
+    <small>Available place</small>
+    <p>{{ group.isAvailablePlace}} ({{ group.maxGroupSize - group.currentGroupSize }})</p>
+    <div *ngIf="group.updatedAt !== null">
+        <small>Last modified</small>
+        <p>{{ group.updatedAt | date: 'dd LLLL yyyy, HH:mm:ss' }} GMT</p>
+    </div>
+    <small>Created at</small>
+    <p>{{ group.createdAt | date: 'dd LLLL yyyy, HH:mm:ss' }} GMT</p>
+</div>

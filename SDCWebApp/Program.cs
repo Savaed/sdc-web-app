@@ -5,7 +5,6 @@ using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using NLog.Web;
 using System;
 using SDCWebApp.Helpers.Constants;
-using System.Threading.Tasks;
 
 namespace SDCWebApp
 {
@@ -21,7 +20,7 @@ namespace SDCWebApp
             }
             catch (Exception ex)
             {
-                logger.Error(ex, "Stoped program because of exception,");
+                logger.Error(ex, "Stoped program because of exception.");
                 throw;
             }
             finally

@@ -2,6 +2,7 @@
     <button class="navbar-toggler ml-auto" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
+
     <!-- NAV MENU START -->
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav text-center mr-auto">
@@ -20,24 +21,32 @@
             <li class="nav-item">
                 <a class="nav-link mx-lg-3 mx-xl-5" [routerLink]="[ '/pricing' ]">TICKETS</a>
             </li>
-            <li *ngIf="isUserLogged | async" class="nav-item mr-lg-auto">
-                <a class="nav-link" hidden="true" [routerLink]="[ '/' ]">ADMIN PANEL</a>
+            <li *ngIf="isLogged | async" class="nav-item mr-lg-auto">
+
+                <ng-container *ngIf="authService.userRole === 'administrator'; else elseTemplate">
+                    <a class="nav-link" [routerLink]="[ '/admin/dashboard' ]">ADMIN PANEL</a>
+                </ng-container>
+                <ng-template #elseTemplate>
+                    <a *ngIf="authService.userRole === 'moderator'" class="nav-link" [routerLink]="[ '/mod/dashboard' ]">MODERATOR PANEL</a>
+                </ng-template>
+
             </li>
         </ul>
         <div class="pr-4 d-none d-lg-flex align-items-center">
 
             <!-- OPENING HOUR INFO -->
-            <p *ngIf="(closingHour |async ) !== undefined && (openingHour | async ) !== undefined; else closeInfo" class="m-0 text-open-hours mr-lg-4 mr-xl-5" href="#">OPEN TODAY 10:00-18:00</p>
+            <p *ngIf="(closingHour | async ) !== undefined && (openingHour | async ) !== undefined; else closeInfo" class="m-0 text-open-hours mr-lg-4 mr-xl-5">OPEN TODAY
+                {{ openingHour | async  | slice:0:5 }}-{{ closingHour | async | slice:0:5 }}</p>
             <ng-template #closeInfo>
                 <p class="m-0 text-open-hours mr-lg-4 mr-xl-5" href="#">CLOSE TODAY</p>
             </ng-template>
 
             <!-- LOGIN/LOGOUT BUTTON -->
-            <ng-container *ngIf="!(isUserLogged | async); else logout">
+            <ng-container *ngIf="!(isLogged | async); else logoutTemplate">
                 <button type="button" class="my-3 btn btn-accent-outline btn-login" [routerLink]="[ '/login' ]">Login</button>
             </ng-container>
 
-            <ng-template #logout>
+            <ng-template #logoutTemplate>
                 <button type="button" class="my-3 btn btn-accent-outline btn-login" [routerLink]="[ '/' ]" (click)="logout()">Logout</button>
             </ng-template>
         </div>

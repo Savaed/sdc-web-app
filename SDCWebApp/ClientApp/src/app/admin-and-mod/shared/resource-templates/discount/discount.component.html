@@ -1,0 +1,23 @@
+<div class="resource-details">
+    <small>Resource ID</small>
+    <p>{{ discount.id }}</p>
+    <small>Type</small>
+    <p>{{ discount.type }}</p>
+    <small>Description</small>
+    <p>{{ discount.description }}</p>
+    <small>Discount value</small>
+    <p>{{ discount.discountValueInPercentage }}% </p>
+    <small>Min group size</small>
+    <ng-container *ngIf="discount.groupSizeForDiscount !== null; else elseTemplate">
+        <p>{{ discount.groupSizeForDiscount }} </p>
+    </ng-container>
+    <ng-template #elseTemplate>
+        <p>-</p>
+    </ng-template>
+    <div *ngIf="discount.updatedAt !== null">
+        <small>Last modified</small>
+        <p>{{ discount.updatedAt | date: 'dd LLLL yyyy, HH:mm:ss' }} GMT</p>
+    </div>
+    <small>Created at</small>
+    <p>{{ discount.createdAt | date: 'dd LLLL yyyy, HH:mm:ss' }} GMT</p>
+</div>

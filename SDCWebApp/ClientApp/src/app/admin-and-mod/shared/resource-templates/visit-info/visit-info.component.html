@@ -1,0 +1,27 @@
+<div class="resource-details">
+    <small>Resource ID</small>
+    <p>{{ info.id }}</p>
+    <small>Description</small>
+    <p>{{ info.description }}</p>
+    <small>Max child age for discount</small>
+    <p>{{ info.maxChildAge }} years</p>
+    <small>Max allowed group size</small>
+    <p>{{ info.maxAllowedGroupSize }} persons</p>
+    <small>Max ticket order interval</small>
+    <p>{{ info.maxTicketOrderInterval }} weeks</p>
+    <small>Sightseeing duration</small>
+    <p>{{ info.sightseeingDuration }} h</p>
+
+    <div *ngIf="info.openingHours.length > 0">
+        <small>Company opening hours</small>
+        <p *ngFor="let hour of info.openingHours" class="m-0"> {{ hour.dayOfWeek }}: {{ hour.openingHour | slice:0:5 }} - {{ hour.closingHour | slice:0:5 }} </p>
+    </div>
+
+    <p></p>
+    <div *ngIf="info.updatedAt !== null">
+        <small>Last modified</small>
+        <p>{{ info.updatedAt | date: 'dd LLLL yyyy, HH:mm:ss' }} GMT</p>
+    </div>
+    <small>Created at</small>
+    <p>{{ info.createdAt | date: 'dd LLLL yyyy, HH:mm:ss' }} GMT</p>
+</div>

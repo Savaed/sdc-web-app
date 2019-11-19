@@ -25,7 +25,7 @@ Date.prototype.toUtc = (date: Date) => {
 // Convert the weekday numeric representation to the appropriate string.
 Date.prototype.dayToString = function(this: Date): string {
     const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', ' Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    return daysOfWeek[(this.getUTCDay() + 1) % 7];
+    return daysOfWeek[(this.getUTCDay()) % 7];
 };
 
 export { };

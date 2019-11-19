@@ -12,7 +12,8 @@ namespace SDCWebApp.Maps
         public TicketProfile()
         {
             CreateMap<Ticket, TicketDto>()
-                .ForMember(dest => dest.CreatedAt, options => options.AddTransform(datetime => datetime.Truncate(TimeSpan.FromSeconds(1))))
+                .ForMember(dest => dest.UpdatedAt, options => options.AddTransform(datetime => datetime != null ? datetime : null))
+                .ForMember(dest => dest.UpdatedAt, options => options.AddTransform(datetime => datetime.Equals(DateTime.MinValue) ? null : datetime))
                 .ForMember(dest => dest.Links, options => options.MapFrom<TicketLinksResolver>()).ReverseMap();
 
             CreateMap<TicketDto, Ticket>()

@@ -1,0 +1,27 @@
+<div class="resource-details">
+    <small>Resource ID</small>
+    <p>{{ ticketTariff.id }}</p>
+    <small>Visit tariff ID</small>
+    <p>{{ ticketTariff.visitTariffId }}</p>
+    <small>Name</small>
+    <p>{{ ticketTariff.title }}</p>
+    <small>Description</small>
+    <p>{{ ticketTariff.overview }}</p>
+    <small>Default price</small>
+    <p>{{ ticketTariff.defaultPrice }} PLN</p>
+    <small>Ticket features</small>
+    <p class="m-0" *ngFor="let feature of ticketTariff.features">
+        {{ feature }}
+    </p>
+    <p> </p>
+    <small>Is per hour</small>
+    <p>{{ ticketTariff.isPerHour }}</p>
+    <small>Is per person</small>
+    <p>{{ ticketTariff.isPerPerson }}</p>
+    <div *ngIf="ticketTariff.updatedAt !== null">
+        <small>Last modified</small>
+        <p>{{ ticketTariff.updatedAt | date: 'dd LLLL yyyy, HH:mm:ss' }} GMT</p>
+    </div>
+    <small>Created at</small>
+    <p>{{ ticketTariff.createdAt | date: 'dd LLLL yyyy, HH:mm:ss' }} GMT</p>
+</div>

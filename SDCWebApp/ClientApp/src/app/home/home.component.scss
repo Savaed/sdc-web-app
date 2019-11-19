@@ -52,41 +52,56 @@
 }
 
 #join-info {
+    display: none;
     opacity: 0;
     transition: all .3s ease-out;
     
 }
 
 #visit-info {
+    display: none;
     opacity: 0;
     transition: all .3s ease-out;
 }
 
 #opening-hours-info {
+    display: none;
     opacity: 0;
     transition: all .3s ease-out;
-
 }
 
 #join-card:hover ~ #info #join-info {
+    display: inline;
     opacity: 1;
-    transition: all .3s ease-in;    
+    transition: opacity .3s ease-in;    
 }
 
 #opening-hours-card:hover ~ #info #opening-hours-info {
+    display: inline;
     opacity: 1;
-    transition: all .3s ease-in;   
+    transition: opacity .3s ease-in;   
 }
 
 #visit-card:hover ~ #info #visit-info {
+    display: inline;
     opacity: 1;  
-    transition: all .3s ease-in;    
+    transition: opacity .3s ease-in;    
 }
 
 .visit-img {
-    width: 200px;
-    height: 200px;
+    width: 600px;
+    height: 400px;
+    background-image: url(../../assets/images/art-glass-ball.jpg);
+    background-repeat: no-repeat;
+    background-size: contain;
+    border-radius: 8px;
+}
+
+.join-img {
+    width: 600px;
+    height: 398px;
     background-image: url(../../assets/images/glass-rod.jpg);
     background-repeat: no-repeat;
     background-size: contain;
+    border-radius: 8px;
 }

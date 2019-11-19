@@ -1,0 +1,45 @@
+<div class="resource-details">
+    <form [formGroup]="articleForm">
+        <div class="row">
+            <div class="col-6 p-0">
+                <div class="form-group mr-2">
+                    <label for="articleText">Title</label>
+                    <input type="text" class="form-control" name="articleText" id="articleText" [class.is-invalid]="title.invalid && title.touched" formControlName="title">
+
+                    <!-- TITLE VALIDATION ERRORS -->
+                    <div *ngIf="title.invalid && title.touched">
+                        <small *ngIf="title.errors?.required" placement="right" ngbPopover="test" class="text-danger">Article title is required</small>
+                        <small *ngIf="title.errors?.maxlength" class="text-danger">Article title must be max 50 characters</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 p-0">
+                <div class="form-group ml-2">
+                    <label for="articleText">Author</label>
+                    <input type="text" class="form-control" name="articleText" id="articleText" [class.is-invalid]="author.invalid && author.touched" formControlName="author">
+
+                    <!-- AUTHOR VALIDATION ERRORS -->
+                    <div *ngIf="author.invalid && author.touched">
+                        <small *ngIf="author.errors?.maxlength" class="text-danger">Author must be max 50 characters</small>
+                        <small *ngIf="title.errors?.required" placement="right" ngbPopover="test" class="text-danger">Author is required</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="articleText">Text</label>
+            <textarea class="form-control" name="articleText" id="articleText" formControlName="text" [class.is-invalid]="text.invalid && text.touched" id="exampleFormControlTextarea1"
+                rows="5"></textarea>
+
+            <!-- TEXT VALIDATION ERRORS -->
+            <div *ngIf="text.invalid && text.touched">
+                <small *ngIf="text.errors?.required" placement="right" ngbPopover="test" class="text-danger">Article text is required</small>
+                <small *ngIf="text.errors?.maxlength" class="text-danger">Article text must be max 5000 characters</small>
+            </div>
+        </div>
+
+        <button class="btn btn-accent-tight mr-3" [disabled]="!articleForm.valid" (click)="testCRUD()"> OK </button>
+    </form>
+</div>

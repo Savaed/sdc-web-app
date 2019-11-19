@@ -16,7 +16,7 @@ import { OrderDetailsComponent } from './ticket-order/order-details/order-detail
 import { OrderPaymentComponent } from './ticket-order/order-payment/order-payment.component';
 
 const routes: Routes = [
-    { path: 'home', component: HomeComponent },
+    { path: '', component: HomeComponent },
     { path: 'footer-login', component: FooterLoginComponent },
     { path: 'footer-logout', component: FooterLogoutComponent },
     { path: 'news', component: ArticlesComponent },
@@ -29,7 +29,7 @@ const routes: Routes = [
     { path: 'news/:articleName', component: ArticleDetailsComponent },
     { path: 'order/:id', component: OrderDetailsComponent },
     { path: 'payment', component: OrderPaymentComponent },
-    { path: '**', pathMatch: 'full', redirectTo: 'home' }
+    { path: '**', pathMatch: 'full', redirectTo: '' }
 ];
 
 @NgModule({

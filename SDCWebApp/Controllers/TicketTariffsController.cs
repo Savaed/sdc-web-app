@@ -125,6 +125,7 @@ namespace SDCWebApp.Controllers
                 var response = new ResponseWrapper(addedTariffDto);
                 string addedTicketTariffUrl = $"{ControllerPrefix}/{addedTicketTariff.Id}";
                 _logger.LogInformation($"Finished method '{nameof(AddVisitsTicketTariffAsync)}'.");
+                
                 return Created(addedTicketTariffUrl, response);
             }
             catch (InvalidOperationException ex) when (visitTariff is null)

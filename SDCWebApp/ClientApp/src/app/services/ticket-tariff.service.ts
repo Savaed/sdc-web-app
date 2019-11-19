@@ -6,6 +6,7 @@ import { ServerUrl } from '../helpers/Constants';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { VisitTariff } from '../models/VisitTariff';
+import { ReturnStatement } from '@angular/compiler';
 
 @Injectable({
     providedIn: 'root'
@@ -14,6 +15,12 @@ export class TicketTariffService {
 
     constructor(private http: HttpClient) { }
 
+
+    public getAllVisitTariffs(): Observable<VisitTariff[]> {
+        return this.http.get<ApiResponse<VisitTariff[]>>(`${ServerUrl}/visit-tariffs`)
+            .pipe(map(response => response.data));
+    }
+
     public getAllTicketTariffs(): Observable<TicketTariff[]> {
         return this.http.get<ApiResponse<TicketTariffJson[]>>(`${ServerUrl}/ticket-tariffs`)
             .pipe(
@@ -21,11 +28,16 @@ export class TicketTariffService {
             );
     }
 
-    public getRecentTicketTariffs(): Observable<TicketTariff[]> {
+    public getRecentTicketTariffs(): Observable<{ tariffs: TicketTariff[], visitTariffId: string }> {
         return this.http.get<ApiResponse<VisitTariff>>(`${ServerUrl}/visit-tariffs/recent`)
             .pipe(
-                map(response => response.data.ticketTariffs.map(ticketTariffJson => TicketTariff.mapToTicketTariff(ticketTariffJson)))
-            );
+                map(response => {
+                    const x = {
+                        tariffs: response.data.ticketTariffs.map(ticketTariffJson => TicketTariff.mapToTicketTariff(ticketTariffJson)),
+                        visitTariffId: response.data.id
+                    };
+                    return x;
+                }));
     }
 
     public addTicketTariff(visitTariffId: string, ticketTariff: TicketTariff): Observable<TicketTariff> {

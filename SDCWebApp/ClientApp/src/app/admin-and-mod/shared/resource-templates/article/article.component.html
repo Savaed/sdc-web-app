@@ -1,0 +1,16 @@
+<div class="resource-details">
+    <small>Resource ID</small>
+    <p>{{ article.id }}</p>
+    <small>Title</small>
+    <p>{{ article.title }}</p>
+    <small>Author</small>
+    <p>{{ article.author }}</p>
+    <small>Article text</small>
+    <p>{{ article.text }} </p>
+    <div *ngIf="article.updatedAt !== null">
+        <small>Last modified</small>
+        <p>{{ article.updatedAt | date: 'dd LLLL yyyy, HH:mm:ss' }} GMT</p>
+    </div>
+    <small>Created at</small>
+    <p>{{ article.createdAt | date: 'dd LLLL yyyy, HH:mm:ss' }} GMT</p>
+</div>

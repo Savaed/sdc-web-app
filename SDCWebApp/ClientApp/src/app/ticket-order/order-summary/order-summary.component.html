@@ -18,14 +18,14 @@
                 <p *ngIf="ticket.ticket.mostProfitableDiscount.discountValueInPercentage > 0" class="discount-value">
                     -{{ ticket.ticket.mostProfitableDiscount.discountValueInPercentage }}%
                 </p>
-                <p class="ticket-price m-0 ml-auto">{{ ticket.ticketPrice }} PLN</p>
-                <i class="far fa-trash-alt ml-auto d-none" (click)="removeTicket(ticket)" placement="bottom" ngbTooltip="Remove"></i>
+                <p class="ticket-price m-0 ml-auto">{{ ticket.ticketPrice | number:'1.2-2' }} PLN</p>
+                <i class="far fa-trash-alt ml-auto d-none" (click)="removeTicket(ticket)" placement="bottom" ngbTooltip="Remove" tooltipClass="custom-tooltip"></i>
             </div>
             <small class="text-gray">{{ ticket.ticket.ticketTariff.overview }}</small>
             <div class="ticket-card-divider"></div>
         </div>
         <div class="card-footer mt-3 d-flex">
-            <p class="ml-auto m-0">Summary: <strong>{{ overallCartPrice | async }}</strong> PLN</p>
+            <p class="ml-auto m-0">Summary: <strong>{{ overallCartPrice | async | number:'1.2-2' }}</strong> PLN</p>
         </div>
     </ng-template>
 </div>

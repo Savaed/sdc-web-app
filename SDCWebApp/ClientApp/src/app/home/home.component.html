@@ -32,7 +32,7 @@
     <!-- MAIN INFO SECTION START -->
     <div class="row pt-4 mb-3">
         <div class="container-fluid align-items-center">
-            <div class="col-10 col-lg-5 text-center mx-auto mt-4 mb-5">
+            <div class="col-12 col-lg-5 text-center mx-auto mt-4 mb-5">
                 <p class="text-gray text-mono">
                     Explore the SDC
                 </p>
@@ -47,7 +47,7 @@
 
             <!-- INFO CARD SECTION START -->
             <div class="row mb-5">
-                <div class="col-8 mx-auto mt-5">
+                <div class="col-12 col-md-10 mx-auto mt-5 align-items-center">
                     <div class="p-4 col-12 col-md-6 custom-bordered-card" id="visit-card">
                         <a [routerLink]="[ '/visit-sdc' ]">
                             <div class="d-flex">
@@ -59,7 +59,7 @@
                                         visit SDC.
                                     </small>
                                 </div>
-                                <i class=" my-auto ml-5 fas fa-caret-right"></i>
+                                <i class="my-auto ml-auto fas fa-caret-right"></i>
                             </div>
                         </a>
                     </div>
@@ -95,14 +95,14 @@
                         </a>
                     </div>
 
-                    <div id="info" style="position: absolute; right: 0; top: 0;">
+                    <div id="info" style="position: absolute; right: 0; top: 50px;">
                         <div class="d-table">
 
-                            <div id="opening-hours-info">
-                                <div id="visit-info">
-                                    <!-- <div class="visit-img"></div> -->
-                                </div>
+                            <div id="visit-info">
+                                <div class="visit-img shadow-lg"></div>
+                            </div>
 
+                            <div id="opening-hours-info" style="position: relative; right: 80px;">
                                 <table class="table table-bordered text-center">
                                     <thead>
                                         <tr>
@@ -122,7 +122,7 @@
                             </div>
 
                             <div id="join-info">
-                                <p>test3</p>
+                                <div class="join-img shadow-lg"></div>
                             </div>
 
                         </div>
@@ -139,7 +139,7 @@
 
     <!-- ARTICLES SECTION START -->
     <div class="container-fluid pt-4 pb-5 bg-gray align-items-center">
-        <div class="col-10 col-lg-5 text-center mx-auto mt-4 mb-5">
+        <div class="col-12 col-lg-5 text-center mx-auto mt-4 mb-5">
             <p class="text-gray text-mono">
                 The glass news
             </p>
@@ -154,7 +154,7 @@
 
         <!-- ARTICLE CARDS START -->
         <div class="card-deck col-12 col-md-10 mx-auto mb-md-3">
-            <div class="card custom-card" *ngFor="let article of topThreeArticles | async">
+            <div class="card custom-card" *ngFor="let article of topThreeArticles | async">             
                 <img src="../../assets/images/glass-rod.jpg" class="card-img-top" alt="glass rod">
                 <div class="card-body">
                     <div>
@@ -166,6 +166,7 @@
                         <small class="text-muted my-0 ml-auto">{{ article.createdAt | date: 'dd LLLL yyyy, H:mm' }}</small>
                     </div>
                 </div>
+
             </div>
         </div>
         <!-- ARTICLE CARD END -->
@@ -176,8 +177,8 @@
     <!-- DISCOUNTS INFO SECTION START -->
     <div class="container-fluid py-4">
         <div class="container col-12 col-md-10 mx-auto mb-md-5">
-            <div class="ml-lg-4 my-4">
-                <h1 class="header my-5 pl-3 pl-lg-0">
+            <div class="ml-md-4 my-4">
+                <h1 class="header my-5 pl-3 pl-md-0 text-center text-md-left">
                     Everybody <i class="fas fa-heart"></i> discounts
                 </h1>
                 <div class="row discounts-info">
@@ -218,10 +219,10 @@
             </div>
         </div>
 
-        <div class="col-6 mx-auto pb-5">
+        <div class="col-12 col-md-6 mx-auto pb-5">
             <div class="tiny-divider bg-gray mx-auto"></div>
 
-            <div class="col-7 mx-auto text-center">
+            <div class="col-11 col-md-7 mx-auto text-center">
                 <h4>Something for everyone</h4>
                 <small class="text-muted">
                     Discounts available in SDC are tailored to our customers. No matter how old you are, whether you
@@ -233,7 +234,7 @@
     <!-- DISCOUNTS INFO SECTION END -->
 
     <!-- PARTNERS SECTION START -->
-    <div class="col-10 col-lg-5 text-center mx-auto mt-4 mb-5">
+    <div class="col-12 col-lg-5 text-center mx-auto mt-4 mb-5">
         <p class="text-gray text-mono">
             Partnerships
         </p>
@@ -250,14 +251,41 @@
         </button>
 
         <div class="container col-12 col-md-10 mx-auto align-items-center my-5 pb-1">
-            <div class="d-flex justify-content-center partners-banner">
-                <img src="../../assets/images/atom.png" alt="atom logo" placement="top" ngbTooltip="Atom">
-                <img src="../../assets/images/circleci.png" style="position: relative; top: 50%" alt="circleci logo" placement="top" ngbTooltip="Circle CI">
-                <img src="../../assets/images/codeclimate.png" alt="codeclimate logo" placement="top" ngbTooltip="Code Climate ">
-                <img src="../../assets/images/ac-dc.png" style="position: relative; top: 50%" alt="ac/dc logo" placement="top" ngbTooltip="AC/DC">
-                <img src="../../assets/images/travis-ci.png" alt="travis-ci logo" placement="top" ngbTooltip="Travis CI">
-                <img src="../../assets/images/zenhubio.png" style="position: relative; top: 50%" alt="zenhubio logo" placement="top" ngbTooltip="Zenhubio">
-                <img src="../../assets/images/google.png" alt="google logo" placement="top" ngbTooltip="Google">
+            <div class="d-none d-md-flex justify-content-center partners-banner">
+                <img src="../../assets/images/atom.png" alt="atom logo" placement="top" ngbTooltip="Atom" tooltipClass="custom-tooltip">
+                
+               
+                
+                <img src="../../assets/images/circleci.png" style="position: relative; top: 50%" alt="circleci logo" placement="top" ngbTooltip="Circle CI" tooltipClass="custom-tooltip">
+
+
+
+                <img src="../../assets/images/codeclimate.png" alt="codeclimate logo" placement="top" ngbTooltip="Code Climate" tooltipClass="custom-tooltip">
+
+                <div class="w-100 d-none d-sm-block "></div>
+
+                <img src="../../assets/images/ac-dc.png" style="position: relative; top: 50%" alt="ac/dc logo" placement="top" ngbTooltip="AC/DC" tooltipClass="custom-tooltip">
+                
+
+
+                <img src="../../assets/images/travis-ci.png" alt="travis-ci logo" placement="top" ngbTooltip="Travis CI" tooltipClass="custom-tooltip">
+                
+
+
+                <img src="../../assets/images/zenhubio.png" style="position: relative; top: 50%" alt="zenhubio logo" placement="top" ngbTooltip="Zenhubio" tooltipClass="custom-tooltip">
+
+                <div class="w-100 d-none d-sm-block d-lg-none"></div>
+                
+                <img src="../../assets/images/google.png" alt="google logo" placement="top" ngbTooltip="Google" tooltipClass="custom-tooltip">
+
+
+                <!-- wrap every 2 on md and lg-->
+                <!-- <div *ngIf="(i + 1) % 2 === 0" class="w-100 d-none d-md-block d-xl-none"></div> -->
+
+               
+                <!-- <div class="w-100 d-none d-sm-block d-lg-none"></div> -->
+
+
             </div>
         </div>
         <small class="text-gray partners-banner-text">*On {{ now | date: 'MMMM yyyy' }}</small>

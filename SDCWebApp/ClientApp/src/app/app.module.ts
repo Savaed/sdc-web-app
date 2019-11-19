@@ -30,6 +30,8 @@ import { ArticleDetailsComponent } from './article-details/article-details.compo
 import { Title } from '@angular/platform-browser';
 import { AuthInterceptorProvider } from './interceptors/AuthInterceptor';
 import { ExchangeTokenInterceptorProvider } from './interceptors/ExchangeTokenInterceptor';
+import { AdminAndModModule } from './admin-and-mod/admin-and-mod.module';
+import { ToastComponent } from './toast/toast.component';
 
 
 @NgModule({
@@ -53,12 +55,14 @@ import { ExchangeTokenInterceptorProvider } from './interceptors/ExchangeTokenIn
         OrderSummaryComponent,
         VisitSdcComponent,
         CookiesAlertComponent,
-        ArticleDetailsComponent
+        ArticleDetailsComponent,
+        ToastComponent
     ],
     imports: [
         HttpClientModule,
         BrowserModule,
         BrowserAnimationsModule,
+        AdminAndModModule,
         AppRoutingModule,
         FormsModule,
         ReactiveFormsModule,

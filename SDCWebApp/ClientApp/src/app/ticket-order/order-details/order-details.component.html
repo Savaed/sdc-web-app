@@ -1,45 +1,78 @@
-{{ ticketOrder | async | json }}
+<!-- {{ ticketOrder | async | json }} -->
+<div>
+    <div class="col-10 col-lg-5 text-center mx-auto pt-4 pb-1">
+        <p class="text-gray text-mono">
+            Ticket
+        </p>
+        <h1 class="header mb-2">
+            Your ticket
+        </h1>
+        <p class="text-gray col-11 mx-auto">
+            This is the ticket ordered
+        </p>
+    </div>
 
-<div id="orderedTickets">
-    <table class="table table-bordered m-5" *ngFor="let ticket of (ticketOrder | async).tickets">
-        <tbody>
-            <tr>
-                <td>
-                    <p class="cell-header text-gray">Ticket</p>
-                    <p class="cell-text">{{ (getTicketTariff(ticket) | async ).title }}</p>
-                </td>
-                <td>
-                    <p class="cell-header text-gray">Sightseeing date</p>
-                    <p class="cell-text"> {{ ticket.validFor | date: 'dd LLLL yyyy, H:mm' }} </p>
-                </td>
-                <td>
-                    <p class="cell-header text-gray"> Ticket price </p>
-                    <p class="cell-text"> {{ ticket.price }} PLN </p>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <p class="cell-header text-gray"> Ticket ID </p>
-                    <p class="cell-text"> {{ ticket.ticketUniqueId | slice:0:8 }} </p>
-                </td>
-                <td>
-                    <p class="cell-header text-gray"> Purchase date </p>
-                    <p class="cell-text"> {{ ticket.purchaseDate | date: 'dd LLLL yyyy, H:mm' }} </p>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <p class="cell-header text-gray"> Discount name </p>
-                    <p class="cell-text"> {{ (getDiscount(ticket) | async).type | discountType }} </p>
-                </td>
+    <div class="row">
+        <div id="orderedTickets" class="mx-auto">
+            <table class="table table-borderless border shadow-sm m-5" *ngFor="let ticket of (ticketOrder | async)?.tickets">
+                <tbody>
 
-                <td>
-                    <p class="cell-header text-gray"> Discount value </p>
-                    <p class="cell-text"> -{{ (getDiscount(ticket) | async).discountValueInPercentage }}% </p>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+                    <tr>
+                        <td>
+                            <small class="cell-header text-gray"> Name </small>
+                            <p class="cell-text m-0">Glass Heritage Centrum entrance ticket</p>
+                        </td>
+                        <td>
+                            <small class="cell-header text-gray"> Ticket ID </small>
+                            <p class="cell-text"> {{ ticket?.ticketUniqueId | slice:0:8 }} </p>
+                        </td>
+                        <td rowspan="4" style="vertical-align:middle; text-align:center">
+                            <div class="mx-3">
+                                <small class="cell-header text-gray"> Ticket price </small>
+                                <p class="cell-text-lg"> {{ ticket?.price | number:'1.2-2' }} PLN </p>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <small class="cell-header text-gray">Type</small>
+                            <p class="cell-text">{{ (getTicketTariff(ticket) | async )?.title }}</p>
+                        </td>
+                        <td>
+                            <small class="cell-header text-gray">Default price</small>
+                            <p class="cell-text">{{ (getTicketTariff(ticket) | async )?.defaultPrice | number:'1.2-2'}} PLN</p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <small class="cell-header text-gray"> Purchase date </small>
+                            <p class="cell-text"> {{ ticket?.purchaseDate | date: 'dd LLLL yyyy, H:mm' }} </p>
+                        </td>
+
+                        <td>
+                            <small class="cell-header text-gray">Sightseeing date</small>
+                            <p class="cell-text"> {{ ticket?.validFor | date: 'dd LLLL yyyy, H:mm' }} </p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <small class="cell-header text-gray"> Discount </small>
+                            <p class="cell-text"> {{ (getDiscount(ticket) | async).type | discountType }} </p>
+                        </td>
+
+                        <td>
+                            <small class="cell-header text-gray"> Discount value </small>
+                            <p class="cell-text"> -{{ (getDiscount(ticket) | async).discountValueInPercentage }}% </p>
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <button class="btn btn-accent-outline-tight d-flex mx-auto mb-5" (click)="saveOrderAsPdf()">Download ticket</button>
 </div>
-
-<button (click)="saveOrderAsPdf()">pdf</button>

@@ -20,7 +20,7 @@ namespace SDCWebApp.Controllers
     /// </summary>
     [Route("api")]
     //[AllowAnonymous]
-    [Authorize(ApiConstants.ApiUserPolicy)]
+   // [Authorize(ApiConstants.ApiUserPolicy)]
     [ApiController]
     public class TicketsController : CustomApiController, ITicketsController
     {

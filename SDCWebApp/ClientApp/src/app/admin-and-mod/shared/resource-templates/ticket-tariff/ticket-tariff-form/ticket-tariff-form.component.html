@@ -1,0 +1,108 @@
+<div class="resource-details">
+    <form [formGroup]="tariffForm">
+
+        <!-- VISIT TARIFF -->
+        <div *ngIf="isForAdd">
+            <label for="visitTariff">Visit tariff</label>
+            <select class="custom-select form-control" name="visitTariff" id="visitTariff" formControlName="visitTariffName" [class.is-invalid]="visitTariffName.invalid && visitTariffName.touched">
+                <option *ngFor="let tariff of visitTariffs;" [value]="tariff.visitTariffName">{{ tariff.visitTariffName }}</option>
+            </select>
+
+            <!-- VISIT TARIFF VALIDATION ERRORS -->
+            <div *ngIf="visitTariffName.invalid && visitTariffName.touched">
+                <small *ngIf="title.errors?.required" class="text-danger">Visit tariff is required</small>
+            </div>
+
+        </div>
+
+        <!-- TITLE -->
+        <div class="form-group">
+            <label for="tariffTitle">Title</label>
+            <input type="text" name="tariffTitle" id="tariffTitle" class="form-control" formControlName="title" [class.is-invalid]="title.invalid && title.touched">
+
+            <!-- TITLE VALIDATION ERRORS -->
+            <div *ngIf="title.invalid && title.touched">
+                <small *ngIf="title.errors?.required" class="text-danger">Title is required</small>
+                <small *ngIf="title.errors?.maxlength" class="text-danger">Title must be max 50 characters</small>
+            </div>
+        </div>
+
+        <!-- OVERVIEW -->
+        <div class="form-group">
+            <label for="tariffOverview">Overview</label>
+            <input type="text" name="tariffOverview" id="tariffOverview" class="form-control" formControlName="overview" [class.is-invalid]="overview.invalid && overview.touched">
+
+            <!-- OVERVIEW VALIDATION ERRORS -->
+            <div *ngIf="overview.invalid && overview.touched">
+                <small *ngIf="overview.errors?.required" class="text-danger">Overview is required</small>
+                <small *ngIf="overview.errors?.maxlength" class="text-danger">Overview must be max 50 characters</small>
+            </div>
+        </div>
+
+        <!-- DEFAULT PRICE -->
+        <div class="resource-details">
+            <label for="defaultPrice">Default price</label>
+            <input type="range" min=1 max="999" name="defaultPrice" id="defaultPrice" class="custom-range" formControlName="defaultPrice">
+            <p>Price: {{ defaultPrice.value }} PLN</p>
+        </div>
+
+        <!-- IS PER HOUR -->
+        <div class="custom-control custom-switch">
+            <input type="checkbox" class="custom-control-input" id="isPerHourSwitch" formControlName="isPerHour">
+            <label class="custom-control-label" for="isPerHourSwitch">Price per hour</label>
+        </div>
+
+        <!-- IS PER PERSON -->
+        <div class="custom-control custom-switch mb-3">
+            <input type="checkbox" class="custom-control-input" id="isPerPersonSwitch" formControlName="isPerPerson">
+            <label class="custom-control-label" for="isPerPersonSwitch">Price per person</label>
+        </div>
+
+        <!-- TICKET FEATURES -->
+        <div formArrayName="features">
+
+            <div *ngIf="features?.controls?.length > 0">
+                <label> Current ticket features</label>
+                <div *ngFor="let feature of features?.controls; let i=index">
+                    <div *ngIf="feature?.value?.feature !== ''" class="row">
+                        <p class="m-0"> {{ feature?.value?.feature }}</p>
+                        <i class="fas fa-trash" (click)="deleteFeature(i)"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div *ngFor="let feature of tariff?.features; let i=index" class="row">
+                <p class="m-0"> {{ feature }}</p>
+                <i class="fas fa-trash" (click)="deleteFeature(i, false)"></i>
+            </div>
+
+            <div class="resource-details-container shadow-sm m-3 p-3 mt-0">
+                <div *ngFor="let feature of features?.controls; let i=index; let last = last">
+
+                    <div *ngIf="last" class="form-group" [formGroupName]="i">
+
+                        <!-- TICKET FEATURE -->
+                        <div class="form-group">
+                            <label for="ticketFeature">Ticket feature</label>
+                            <input type="text" class="form-control" name="ticketFeature" id="ticketFeature" formControlName="feature" [class.is-invalid]="feature.invalid && feature.touched">
+
+                            <!-- FEATURE VALIDATION ERRORS -->
+                            <div *ngIf="feature.invalid && feature.touched">
+                                <small *ngIf="feature?.controls?.feature?.errors?.required" class="text-danger">Feature description is required</small>
+                                <small *ngIf="feature?.controls?.feature?.errors?.maxlength" class="text-danger">Feature description must be max 50 characters</small>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <button class="btn btn-accent-tight mr-3" (click)="addFeature()" [disabled]="features.invalid"> Add ticket feature </button>
+
+            </div>
+
+            <button class="btn btn-accent-tight" (click)="testCRUD()" [disabled]="tariffForm.invalid">OK</button>
+        </div>
+{{ tariffForm.value | json }}
+{{tariffForm.valid}}
+    </form>
+</div>

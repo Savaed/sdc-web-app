@@ -28,7 +28,7 @@ export class PricingComponent implements OnInit {
 
     ngOnInit() {
         this.discountService.getAllDiscounts().subscribe(discounts => this.discounts.next(discounts));
-        this.ticketTariffsService.getRecentTicketTariffs().subscribe(ticketTariffs => this.ticketTariffs.next(ticketTariffs));
+        this.ticketTariffsService.getRecentTicketTariffs().subscribe(ticketTariffs => this.ticketTariffs.next(ticketTariffs.tariffs));
         this.ticketTariffs.subscribe(t => console.log(t[0].defaultPrice));
         this.discounts.subscribe(x => console.log(x));
     }

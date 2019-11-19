@@ -1,0 +1,111 @@
+<div class="resource-details">
+    <form [formGroup]="infoForm">
+
+        <!-- DESCRIPTION -->
+        <div class="form-group">
+            <label for="discountDesc">Description</label>
+            <input type="text" name="discountDesc" id="discountDesc" class="form-control" formControlName="description" [class.is-invalid]="description.invalid && description.touched">
+
+            <!-- DESCRIPTION VALIDATION ERRORS -->
+            <div *ngIf="description.invalid && description.touched">
+                <small *ngIf="description.errors?.required" placement="right" ngbPopover="test" class="text-danger">Description is required</small>
+                <small *ngIf="description.errors?.maxlength" class="text-danger">Description must be max 256 characters</small>
+            </div>
+        </div>
+
+        <!-- MAX ALLOWED GROUP SIZE -->
+        <div class="resource-details">
+            <label for="maxAllowedGroupSize">Max allowed group size</label>
+            <input type="range" min=0 [max]="100" name="maxAllowedGroupSize" id="maxAllowedGroupSize" class="custom-range" formControlName="maxAllowedGroupSize">
+            <p>Group size: {{ maxAllowedGroupSize.value }}</p>
+        </div>
+
+        <!-- MAX CHILD AGE -->
+        <div class="resource-details">
+            <label for="maxChildAge">Max customer age for child discount (in years)</label>
+            <input type="range" min=0 [max]="18" name="maxChildAge" id="maxChildAge" class="custom-range" formControlName="maxChildAge">
+            <p>Customer age: {{ maxChildAge.value }}</p>
+        </div>
+
+        <!-- MAX TICKET INTERVAL -->
+        <div class="resource-details">
+            <label for="maxTicketOrderInterval">Max ticket order interval (in weeks)</label>
+            <input type="range" min=0 [max]="51" name="maxTicketOrderInterval" id="maxTicketOrderInterval" class="custom-range" formControlName="maxTicketOrderInterval">
+            <p>Ticket order interval: {{ maxTicketOrderInterval.value }}</p>
+        </div>
+
+        <!-- SIGHTSEEING DURATION -->
+        <div class="resource-details">
+            <label for="sightseeingDuration">Sightseeing duration (in hours)</label>
+            <input type="range" min=0 [max]="24" name="sightseeingDuration" id="sightseeingDuration" class="custom-range" formControlName="sightseeingDuration">
+            <p>Sightseeing duration: {{ sightseeingDuration.value }}</p>
+        </div>
+
+        <!-- OPENING HOUR -->
+        <div formArrayName="openingHours">
+
+            <div *ngIf="openingHours.controls.length > 0">
+                <label> Company opening hours </label>
+                <div *ngFor="let hour of openingHours.controls; let i=index">
+                    <div *ngIf="hour.value.dayOfWeek !== ''" class="row">
+                        <p class="m-0"> {{ hour.value.dayOfWeek }}: {{ hour.value.openingHour | slice:0:5 }} - {{ hour.value.closingHour | slice:0:5 }}</p>
+                        <i class="fas fa-trash" (click)="deleteHour(i)"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div *ngFor="let hour of visitInfo.openingHours; let i=index" class="row">
+                <p class="m-0"> {{ hour.dayOfWeek }}: {{ hour.openingHour | slice:0:5 }} - {{ hour.closingHour | slice:0:5 }}</p>
+                <i class="fas fa-trash" (click)="deleteHour(i, false)"></i>
+            </div>
+
+            <div class="resource-details-container shadow-sm m-3 p-3 mt-0">
+                <div *ngFor="let hour of openingHours?.controls; let i=index; let last = last">
+
+                    <div *ngIf="last" class="form-group" [formGroupName]="i">
+                        <div>
+                            <label for="dayOfWeekSelect">Day of week</label>
+                            <select class="custom-select" name="dayOfWeekSelect" id="dayOfWeekSelect" formControlName="dayOfWeek">
+                                <option value="Monday" selected>Monday</option>
+                                <option value="Tuesday">Tuesday</option>
+                                <option value="Wednesday">Wednesday</option>
+                                <option value="Thursday">Thursday</option>
+                                <option value="Friday">Friday</option>
+                                <option value="Saturday">Saturday</option>
+                                <option value="Sunday">Sunday</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="openingHourText">Opening hour</label>
+                            <input type="text" class="form-control" name="openingHourText" id="openingHourText" formControlName="openingHour" [class.is-invalid]="hour?.controls?.openingHour?.invalid && hour?.controls?.openingHour?.touched">
+
+                            <!-- OPENING HOUR VALIDATION ERRORS -->
+                            <div *ngIf="hour.invalid && hour.touched">
+                                <small *ngIf="hour?.controls?.openingHour?.errors?.required" placement="right" ngbPopover="test" class="text-danger">Opening hour is required</small>
+                                <small *ngIf="hour?.controls?.openingHour?.errors?.pattern" class="text-danger">Time format must be 'HH:mm' between 00:00 and 23:59</small>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="openingHourText">Closing hour</label>
+                            <input type="text" class="form-control" name="openingHourText" id="openingHourText" formControlName="closingHour" [class.is-invalid]="hour?.controls?.closingHour?.invalid && hour?.controls?.closingHour?.touched">
+
+                            <!-- CLOSING HOUR VALIDATION ERRORS -->
+                            <div *ngIf="hour.invalid && hour.touched">
+                                <small *ngIf="hour?.controls?.closingHour?.errors?.required" placement="right" ngbPopover="test" class="text-danger">Closing hour is required</small>
+                                <small *ngIf="hour?.controls?.closingHour?.errors?.pattern" class="text-danger">Time format must be 'HH:mm' between 00:00 and 23:59</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-accent-tight mr-3" (click)="addOpeningHour()" [disabled]="openingHours.invalid"> Add hour </button>
+
+            </div>
+
+            <button class="btn btn-accent-tight" (click)="testCRUD()" [disabled]="infoForm.invalid">OK</button>
+            
+        </div>
+    </form>
+</div>

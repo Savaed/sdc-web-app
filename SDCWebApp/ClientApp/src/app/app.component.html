@@ -1,4 +1,11 @@
 <app-cookies-alert></app-cookies-alert>
 <app-navbar></app-navbar>
 <router-outlet></router-outlet>
-<app-footer-logout></app-footer-logout>
+
+<ng-container *ngIf="authService.isLogged | async; else elseTemplate">
+    <app-footer-login></app-footer-login>
+</ng-container>
+
+<ng-template #elseTemplate>
+    <app-footer-logout></app-footer-logout>
+</ng-template>

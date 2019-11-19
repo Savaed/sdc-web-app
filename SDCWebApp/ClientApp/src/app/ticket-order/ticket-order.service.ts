@@ -15,6 +15,34 @@ import { OrderResponse, OrderRequest } from '../models/Order';
 import { map } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
+
+export class OrderedTicket {
+    private orderTicket: {
+        mostProfitableDiscount: Discount;
+        ticketTariff: TicketTariff;
+        visitDate: Date;
+    };
+    private amount: number;
+
+    public get ticketAmount(): number { return this.amount; }
+
+    public get ticket() { return this.orderTicket; }
+
+    public get ticketPrice() {
+        return this.ticket.ticketTariff.defaultPrice * (1 - (this.ticket.mostProfitableDiscount.discountValueInPercentage / 100));
+    }
+
+    constructor(ticketTariff: TicketTariff, discount: Discount, visitDate: Date, amount: number) {
+        this.orderTicket = {
+            ticketTariff,
+            mostProfitableDiscount: discount,
+            visitDate,
+        };
+        this.amount = amount;
+    }
+}
+
+
 @Injectable({
     providedIn: 'root'
 })
@@ -82,6 +110,9 @@ export class TicketOrderService {
             tickets: this.toShallowTickets()
         };
 
+        this.currentTicketTariff.next(undefined);
+        this.cart.next([]);
+
         return this.http.post<ApiResponse<OrderResponse>>(this.ticketOrderUrl, orderRequestBody).pipe(map(response => {
             this.commitedOrder.next(response.data);
             console.log(this.commitedOrder.getValue());
@@ -117,31 +148,5 @@ export class TicketOrderService {
         });
 
         return shallowTickets;
-    }
-}
-
-export class OrderedTicket {
-    private orderTicket: {
-        mostProfitableDiscount: Discount;
-        ticketTariff: TicketTariff;
-        visitDate: Date;
-    };
-    private amount: number;
-
-    public get ticketAmount(): number { return this.amount; }
-
-    public get ticket() { return this.orderTicket; }
-
-    public get ticketPrice() {
-        return this.ticket.ticketTariff.defaultPrice * (1 - (this.ticket.mostProfitableDiscount.discountValueInPercentage / 100));
-    }
-
-    constructor(ticketTariff: TicketTariff, discount: Discount, visitDate: Date, amount: number) {
-        this.orderTicket = {
-            ticketTariff,
-            mostProfitableDiscount: discount,
-            visitDate,
-        };
-        this.amount = amount;
     }
 }

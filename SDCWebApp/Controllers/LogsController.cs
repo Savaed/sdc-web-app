@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace SDCWebApp.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize(ApiConstants.ApiAdminPolicy)]
+    //[Authorize(ApiConstants.ApiAdminPolicy)]
     [ApiController]
     public class LogsController : CustomApiController, ILogsController
     {

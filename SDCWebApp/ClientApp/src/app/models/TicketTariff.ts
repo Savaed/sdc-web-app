@@ -4,6 +4,7 @@ export class TicketTariff implements BaseResponseDataType {
     id?: string;
     updatedAt?: Date;
     createdAt?: Date;
+    visitTariffId: string;
     title: string;
     overview: string;
     features: string[];
@@ -12,8 +13,10 @@ export class TicketTariff implements BaseResponseDataType {
     defaultPrice: number;
 
 
-    constructor(createdAt: Date, id: string, updatedAt: Date, isPerHour: boolean, isPerPerson: boolean, defaultPrice: number, title: string, overview: string, features: string[]) {
-        this.createdAt = createdAt;
+    constructor(visitTariffId: string, createdAt: Date, id: string, updatedAt: Date, isPerHour: boolean, isPerPerson: boolean, defaultPrice: number, title: string,
+        overview: string, features: string[]) {
+        this.visitTariffId = visitTariffId,
+            this.createdAt = createdAt;
         this.id = id;
         this.updatedAt = updatedAt;
         this.isPerPerson = isPerPerson;
@@ -45,7 +48,7 @@ export class TicketTariff implements BaseResponseDataType {
             }
         });
 
-        return new TicketTariff(ticketTariffJson.createdAt,
+        return new TicketTariff(ticketTariffJson.visitTariffId, ticketTariffJson.createdAt,
             ticketTariffJson.id,
             ticketTariffJson.updatedAt,
             ticketTariffJson.isPerHour,
@@ -72,6 +75,7 @@ export class TicketTariff implements BaseResponseDataType {
         }
 
         const ticketTariffJson: TicketTariffJson = {
+            visitTariffId: ticketTariff.visitTariffId,
             createdAt: ticketTariff.createdAt,
             id: ticketTariff.id,
             updatedAt: ticketTariff.updatedAt,
@@ -89,6 +93,7 @@ export interface TicketTariffJson {
     id?: string;
     updatedAt?: Date;
     createdAt?: Date;
+    visitTariffId: string,
     description: string;
     isPerHour: boolean;
     isPerPerson: boolean;

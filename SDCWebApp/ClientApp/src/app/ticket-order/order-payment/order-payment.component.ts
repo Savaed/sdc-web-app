@@ -1,6 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { OrderResponse } from '../../models/Order';
-import { TicketOrderService } from '../ticket-order.service';
 import { BehaviorSubject } from 'rxjs';
 
 @Component({

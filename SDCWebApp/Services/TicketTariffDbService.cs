@@ -171,7 +171,7 @@ namespace SDCWebApp.Services
             try
             {
                 _logger.LogDebug($"Starting retrieve all ticket tariffs from the database.");
-                var tariffs = await _context.TicketTariffs.ToArrayAsync();
+                var tariffs = await _context.TicketTariffs.Include(t => t.VisitTariff).ToArrayAsync();
                 _logger.LogDebug("Retrieve data succeeded.");
                 _logger.LogInformation($"Finished method '{nameof(GetAllAsync)}'. Returning {tariffs.Count()} elements.");
                 return tariffs.AsEnumerable();

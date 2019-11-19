@@ -1,0 +1,383 @@
+<div class="row border-bottom">
+    <!-- MENU START -->
+    <div class="col-2 pr-0 pl-0 dashboard-menu border-right">
+
+        <!-- <div class="resource-header">
+            <h3 class="text-center my-4">All resources</h3>
+
+            <div class="form-group mx-4">
+                <input type="text" class="form-control" name="search" id="search" aria-describedby="helpId" placeholder="Search">
+                <i class="fas fa-search"></i>
+            </div>
+             <button class="btn btn-accent" (click)="resourceService.search('test')">test search</button> 
+
+            <div class="tiny-divider bg-gray mx-0 my-3"></div>
+        </div> -->
+
+        <div class="list-group p-0 py-3">
+            <a (click)="resourceService.showArticles(); hideWelcomeBanner(); hideAddForm()" class="list-group-item list-group-item-action">
+                <div class="row align-items-center">
+                    <div class="circle text-center mr-4">
+                        <i class="fas fa-book resource-quantity"></i>
+                    </div>
+                    <div>
+                        <h6 class="m-0">Articles</h6>
+                        <small class="text-muted"></small>
+                    </div>
+                </div>
+            </a>
+
+            <a (click)="resourceService.showCustomers(); hideWelcomeBanner()" class="list-group-item list-group-item-action">
+                <div class="row align-items-center">
+                    <div class="circle text-center mr-4">
+                        <i class="fas fa-user-friends resource-quantity"></i>
+                    </div>
+                    <div>
+                        <h6 class="m-0">Customers</h6>
+                        <small class="text-muted"></small>
+                    </div>
+                </div>
+            </a>
+
+            <a (click)="resourceService.showDiscounts(); hideWelcomeBanner(); hideAddForm()" class="list-group-item list-group-item-action">
+                <div class="row align-items-center">
+                    <div class="circle text-center mr-4">
+                        <i class="fas fa-tags resource-quantity"></i>
+                    </div>
+                    <div>
+                        <h6 class="m-0">Discounts</h6>
+                        <small class="text-muted"></small>
+                    </div>
+                </div>
+            </a>
+
+            <a (click)="resourceService.showVisitGroups(); hideWelcomeBanner()" class="list-group-item list-group-item-action">
+                <div class="row align-items-center">
+                    <div class="circle text-center mr-4">
+                        <i class="fas fa-users resource-quantity"></i>
+                    </div>
+                    <div>
+                        <h6 class="m-0">Visit groups</h6>
+                        <small class="text-muted"></small>
+                    </div>
+                </div>
+            </a>
+
+            <a (click)="resourceService.showVisitInfo(); hideWelcomeBanner()" class="list-group-item list-group-item-action">
+                <div class="row align-items-center">
+                    <div class="circle text-center mr-4">
+                        <i class="fas fa-cogs resource-quantity"></i>
+                    </div>
+                    <div>
+                        <h6 class="m-0">Visit info</h6>
+                        <small class="text-muted"></small>
+                    </div>
+                </div>
+            </a>
+
+            <a (click)="resourceService.showTickets(); hideWelcomeBanner()" class="list-group-item list-group-item-action">
+                <div class="row align-items-center">
+                    <div class="circle text-center mr-4">
+                        <i class="fas fa-ticket-alt resource-quantity"></i>
+                    </div>
+                    <div>
+                        <h6 class="m-0">Tickets</h6>
+                        <small class="text-muted"></small>
+                    </div>
+                </div>
+            </a>
+
+            <a (click)="resourceService.showTicketTariffs(); hideWelcomeBanner()" class="list-group-item list-group-item-action">
+                <div class="row align-items-center">
+                    <div class="circle text-center mr-4">
+                        <i class="fas fa-list-alt resource-quantity"></i>
+                    </div>
+                    <div>
+                        <h6 class="m-0">Ticket price lists</h6>
+                        <small class="text-muted"></small>
+                    </div>
+                </div>
+            </a>
+
+            <a (click)="resourceService.showLogs(); hideWelcomeBanner()" *ngIf="authService.userRole === 'administrator'" class="list-group-item list-group-item-action">
+                <div class="row align-items-center">
+                    <div class="circle text-center mr-4">
+                        <i class="fas fa-user-tag resource-quantity"></i>
+                    </div>
+                    <div>
+                        <h6 class="m-0">User activity logs</h6>
+                        <small class="text-muted"></small>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <!-- MENU END -->
+
+    </div>
+
+
+    <!-- CONTENT CONTAINER START -->
+    <div class="col-8 px-0 m-0">
+        <div class="row mt-4 border-bottom">
+
+            <mat-checkbox class="ml-3 pl-2"></mat-checkbox>
+            <i *ngIf="(resourceService.isAddModeEnable | async) || (resourceService.isEditModeEnable | async)" (click)="backToOverview()" class="fas fa-arrow-left ml-3"></i>
+
+
+            <div class="dropdown ml-3">
+                <button class="btn btn-accent-tight shadow-sm" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Add new
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" data-toggle="modal" data-target="#exampleModal" (click)="showAddForm(resourceType.Article); hideWelcomeBanner()">Article</a>
+                    <a class="dropdown-item" data-toggle="modal" data-target="#exampleModal" (click)="showAddForm(resourceType.Discount); hideWelcomeBanner()">Discount</a>
+                    <a class="dropdown-item" data-toggle="modal" data-target="#exampleModal" (click)="showAddForm(resourceType.TicketTariff); hideWelcomeBanner()">Ticket price list</a>
+                    <a class="dropdown-item" data-toggle="modal" data-target="#exampleModal" (click)="showAddForm(resourceType.VisitInfo); hideWelcomeBanner()">Visit info</a>
+                </div>
+            </div>
+
+
+            <div class="dropdown">
+                <button class="btn dropdown-toggle btn-flat" type="button" id="dropdownMenuButton" ngbTooltip="Filters" placement="bottom" tooltipClass="custom-tooltip" data-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-sliders-h"></i>
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" href="#"><small>ID ascending</small></a>
+                    <a class="dropdown-item" href="#"><small>ID descending</small></a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#"><small>Updated ascending</small></a>
+                    <a class="dropdown-item" href="#"><small>Updated descending</small></a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#"><small>Created ascending</small></a>
+                    <a class="dropdown-item" href="#"><small>Created descending</small></a>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+
+        <!-- RESOURCE OVERVIEW -->
+        <div>
+
+            <!-- WELCOME BANNER -->
+            <div *ngIf="showWelcomeBanner | async" class="container-fluid text-center my-auto mx-auto mt-4 mb-5 bg-white">
+                <div class="col-10 my-5 pt-4 mx-auto">
+                    <p class="text-gray text-mono">
+                        Dashboard
+                    </p>
+                    <h1 class="header mb-4">
+                        This is the {{ authService.userRole }} panel
+                    </h1>
+                    <p class="text-gray col-11 mx-auto">
+                        Here you can manage all the resources available in the system. To choose a specific resource, use the menu on the left side. To add a new resource, select "Add new" on the top.
+                        Basic statistics
+                        will be displayed on the right (available soon)
+                    </p>
+                </div>
+                <div class="dashboard-img mx-auto"></div>
+            </div>
+
+            <!-- ADD NEW RESOURCE FORM -->
+            <div>
+                <div *ngIf="(resourceService.resourceType | async) == resourceType.Article && resourceService.isAddModeEnable | async" class="resource-details-container shadow-sm m-3 p-3">
+                    <app-article-form [isForAdd]="true"></app-article-form>
+                </div>
+                <div *ngIf="(resourceService.resourceType | async) == resourceType.Discount && resourceService.isAddModeEnable | async" class="resource-details-container shadow-sm m-3 p-3">
+                    <app-discount-form [isForAdd]="true"></app-discount-form>
+                </div>
+                <div *ngIf="(resourceService.resourceType | async) == resourceType.VisitInfo && resourceService.isAddModeEnable | async" class="resource-details-container shadow-sm m-3 p-3">
+                    <app-visit-info-form [isForAdd]="true"></app-visit-info-form>
+                </div>
+                <div *ngIf="(resourceService.resourceType | async) == resourceType.TicketTariff && resourceService.isAddModeEnable | async" class="resource-details-container shadow-sm m-3 p-3">
+                    <app-ticket-tariff-form [isForAdd]="true"></app-ticket-tariff-form>
+                </div>
+            </div>
+
+            <div *ngIf="!(resourceService.isAddModeEnable | async)" class="bg-gray">
+                <div *ngFor="let resource of resourceService.resourceList | async; let i = index">
+                    <a class="no-style-a" data-toggle="collapse" href="#item{{ i }}" role="button" aria-expanded="false">
+
+                        <!-- Check resource type -->
+                        <!-- Article -->
+                        <div *ngIf="(resourceService.resourceType | async) == resourceType.Article">
+                            <app-resource-overview [id]="resource.id" [mainInfo]="resource.title" [secondaryInfo]="resource.text" [modifyDate]="resource.createdAt" [editable]="true">
+                            </app-resource-overview>
+                        </div>
+
+                        <!-- Customer -->
+                        <div *ngIf="(resourceService.resourceType | async) == resourceType.Customer">
+                            <app-resource-overview [id]="resource.id" [mainInfo]="resource.emailAddress" [secondaryInfo]="resource.dateOfBirth" [modifyDate]="resource.createdAt">
+                            </app-resource-overview>
+                        </div>
+
+                        <!-- Discount -->
+                        <div *ngIf="(resourceService.resourceType | async) == resourceType.Discount">
+                            <app-resource-overview [id]="resource.id" [mainInfo]="resource.type" [secondaryInfo]="resource.description" [modifyDate]="resource.createdAt" [editable]="true">
+                            </app-resource-overview>
+                        </div>
+
+                        <!-- Log -->
+                        <div *ngIf="(resourceService.resourceType | async) == resourceType.Log">
+                            <app-resource-overview [id]="resource.id" [mainInfo]="resource.user" [secondaryInfo]="resource.description" [modifyDate]="resource.date"></app-resource-overview>
+                        </div>
+
+                        <!-- Ticket -->
+                        <div *ngIf="(resourceService.resourceType | async) == resourceType.Ticket">
+                            <app-resource-overview [id]="resource.id" [mainInfo]="resource.ticketUniqueId" [secondaryInfo]="resource.purchaseDate" [modifyDate]="resource.createdAt">
+                            </app-resource-overview>
+                        </div>
+
+                        <!-- TicketTariff -->
+                        <div *ngIf="(resourceService.resourceType | async) == resourceType.TicketTariff">
+                            <app-resource-overview [id]="resource.id" [mainInfo]="resource.title" [secondaryInfo]="resource.overview" [modifyDate]="resource.createdAt" [editable]="true">
+                            </app-resource-overview>
+                        </div>
+
+                        <!-- VisitInfo -->
+                        <div *ngIf="(resourceService.resourceType | async) == resourceType.VisitInfo">
+                            <app-resource-overview [id]="resource.id" [mainInfo]="resource.description" [modifyDate]="resource.createdAt" [editable]="true"></app-resource-overview>
+                        </div>                       
+
+                        <!-- VisitGroup -->
+                        <div *ngIf="(resourceService.resourceType | async) == resourceType.VisitGroup">
+                            <app-resource-overview [id]="resource.id" [mainInfo]="resource.sightseeingDate" [secondaryInfo]="resource.currentGroupSize" [modifyDate]="resource.createdAt">
+                            </app-resource-overview>
+                        </div>
+
+                    </a>
+
+                    <!-- Display details coresponding to resource type -->
+                    <div class="collapse border-bottom" id="item{{ i }}">
+                        <div class="resource-details-container shadow-sm m-3 p-3">
+                            <!-- Article -->
+                            <div *ngIf="(resourceService.resourceType | async) == resourceType.Article">
+                                <ng-container *ngIf="(resourceService.isEditModeEnable | async) && (resourceService.editIndex | async) === i; else elseTemplate">
+                                    <app-article-form [article]="resource"></app-article-form>
+                                </ng-container>
+                                <ng-template #elseTemplate>
+                                    <app-article [article]="resource"></app-article>
+                                    <div class="row">
+                                        <button class="btn btn-accent-tight mr-3" (click)="resourceService.setEditMode(i, true)">Update</button>
+                                        <button class="btn btn-accent-outline-tight" (click)="resourceService.delete(resource)">Delete</button>
+                                    </div>
+                                </ng-template>
+                            </div>
+
+                            <!-- Customer -->
+                            <div *ngIf="(resourceService.resourceType | async) == resourceType.Customer">
+                                <app-customer [customer]="resource"></app-customer>
+                            </div>
+
+                            <!-- Discount -->
+                            <div *ngIf="(resourceService.resourceType | async) == resourceType.Discount">
+                                <ng-container *ngIf="(resourceService.isEditModeEnable | async) && (resourceService.editIndex | async) === i; else elseTemplate">
+                                    <app-discount-form [discount]="resource"></app-discount-form>
+                                </ng-container>
+                                <ng-template #elseTemplate>
+                                    <app-discount [discount]="resource"></app-discount>
+                                    <div class="row">
+                                        <button class="btn btn-accent-tight mr-3" (click)="resourceService.setEditMode(i, true)">Update</button>
+                                        <button class="btn btn-accent-outline-tight" (click)="resourceService.delete(resource)">Delete</button>
+                                    </div>
+                                </ng-template>
+                            </div>
+
+                            <!-- Log -->
+                            <div *ngIf="(resourceService.resourceType | async) == resourceType.Log">
+                                <app-log [log]="resource"></app-log>
+                            </div>
+
+                            <!-- Ticket -->
+                            <div *ngIf="(resourceService.resourceType | async) == resourceType.Ticket">
+                                <app-ticket [ticket]="resource"></app-ticket>
+                            </div>
+
+                            <!-- TicketTariff -->
+                            <div *ngIf="(resourceService.resourceType | async) == resourceType.TicketTariff">
+                                <ng-container *ngIf="(resourceService.isEditModeEnable | async) && (resourceService.editIndex | async) === i; else elseTemplate">
+                                    <app-ticket-tariff-form [tariff]="resource"></app-ticket-tariff-form>
+                                </ng-container>
+                                <ng-template #elseTemplate>
+                                    <app-ticket-tariff [ticketTariff]="resource"></app-ticket-tariff>
+                                    <div class="row">
+                                        <button class="btn btn-accent-tight mr-3" (click)="resourceService.setEditMode(i, true)">Update</button>
+                                        <button class="btn btn-accent-outline-tight" (click)="resourceService.delete(resource)">Delete</button>
+                                    </div>
+                                </ng-template>
+                            </div>
+
+                            <!-- VisitInfo -->
+                            <div *ngIf="(resourceService.resourceType | async) == resourceType.VisitInfo">
+                                <ng-container *ngIf="(resourceService.isEditModeEnable | async) && (resourceService.editIndex | async) === i; else elseTemplate">
+                                    <app-visit-info-form [visitInfo]="resource"></app-visit-info-form>
+                                </ng-container>
+                                <ng-template #elseTemplate>
+                                    <app-visit-info [info]="resource"></app-visit-info>
+                                    <div class="row">
+                                        <button class="btn btn-accent-tight mr-3" (click)="resourceService.setEditMode(i, true)">Update</button>
+                                        <button class="btn btn-accent-outline-tight" (click)="resourceService.delete(resource)">Delete</button>
+                                    </div>
+                                </ng-template>
+                            </div>
+
+                            <!-- VisitGroup -->
+                            <div *ngIf="(resourceService.resourceType | async) == resourceType.VisitGroup">
+                                <app-visit-group [group]="resource"></app-visit-group>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+    </div>
+    <!-- CONTENT CONTAINER END -->
+
+    <div class="col-2 border-left m-0 p-0">
+        <div>
+            <!-- img, chart etc here -->
+        </div>
+
+
+        <div class="accent-color text-light">
+            <div class="row">
+                <div class="col-6">
+                    <i class="far fa-user"></i>
+                    <div class="row">
+                        <small>Visitors &bull; last week</small>
+                    </div>
+                    <h4>234</h4>
+                    <small class="text-warning" ngbTooltip="Change from last week" placement="bottom">+23%</small>
+                </div>
+                <div class="col-6">
+                    <i class="fas fa-ticket-alt"></i>
+                    stat 2
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <i class="fas fa-hand-holding-usd"></i>
+                    stat 3
+                </div>
+                <div class="col-6">
+                    stat 4
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+
+</div>

@@ -11,7 +11,7 @@ namespace SDCWebApp.Maps
         public SightseeingGroupProfile()
         {
             CreateMap<SightseeingGroup, SightseeingGroupDto>()
-                .ForMember(dest => dest.UpdatedAt, options => options.AddTransform(datetime => datetime != null ? datetime.Truncate(TimeSpan.FromSeconds(1)) : null))
+                .ForMember(dest => dest.UpdatedAt, options => options.AddTransform(datetime => datetime != null ? datetime : null))
                 .ForMember(dest => dest.UpdatedAt, options => options.AddTransform(datetime => datetime.Equals(DateTime.MinValue) ? null : datetime));
 
             CreateMap<SightseeingGroupDto, SightseeingGroup>()

@@ -48,8 +48,8 @@ export class ErrorHandler {
 
             // Forbidden http status code.
             case 403:
-                this.generalMessage.next('Hey, where are you going?. You cannot access this page because you do not have sufficient permissions.'
-                    + 'Only administrators or moderators can have access to these resources.');
+                this.generalMessage.next('Hey, where are you going? You cannot access this page because you do not have sufficient permissions.'
+                    + ' Only administrators or moderators can have access to these resources.');
                 this.router.navigate(['/error', error.status.toString()]);
                 break;
 

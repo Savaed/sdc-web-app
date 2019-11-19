@@ -20,7 +20,7 @@ export class ExchangeTokenInterceptor implements HttpInterceptor {
                 console.log('Debug only - ExchangeTokenInterceptor works');
                 console.log('The exchange of expired token was successful.');
 
-                return EMPTY;
+                return next.handle(request);
             })
         );
     }

@@ -1,0 +1,52 @@
+<div class="resource-details">
+    <form [formGroup]="discountForm">
+
+        <!-- DESCRIPTION -->
+        <div class="form-group">
+            <label for="discountDesc">Description</label>
+            <input type="text" name="discountDesc" id="discountDesc" class="form-control" formControlName="description" [class.is-invalid]="description.invalid && description.touched">
+
+            <!-- DESCRIPTION VALIDATION ERRORS -->
+            <div *ngIf="description.invalid && description.touched">
+                <small *ngIf="description.errors?.required" placement="right" ngbPopover="test" class="text-danger">Discount description is required</small>
+                <small *ngIf="description.errors?.maxlength" class="text-danger">Discount description must be max 256 characters</small>
+            </div>
+        </div>
+
+        <!-- TYPE -->
+        <div class="form-group" formGroupName="discountTypeGroup">
+            <label for="discountType">Type</label>
+            <select class="custom-select form-control" name="discountType" id="discountType" formControlName="type" [class.is-invalid]="type.invalid && type.touched">
+                <option value="ForChild">For child</option>
+                <option value="ForPensioner">For pensioner</option>
+                <option value="ForStudent">For student</option>
+                <option value="ForDisabled">For disabled</option>
+                <option value="ForGroup">For group</option>
+                <option value="ForFamily">For family</option>
+            </select>
+
+            <!-- TYPE VALIDATION ERRORS -->
+            <div *ngIf="type.invalid && type.touched">
+                <small *ngIf="type.errors?.required" placement="right" ngbPopover="test" class="text-danger">Discount type is required</small>
+            </div>
+
+            <!-- GROUP SIZE -->
+            <div class="resource-details">
+                <label for="maxGroupSizeForDiscount">Max group size for discount</label>
+                <input [disabled]="type.value !== discountType.ForGroup" type="range" min=0 max="30" name="maxGroupSizeForDiscount" id="maxGroupSizeForDiscount" class="custom-range"
+                    formControlName="groupSizeForDiscount">
+                <p>Group size: {{ groupSizeForDiscount?.value }}</p>
+            </div>
+        </div>
+
+        <!-- VALUE -->
+        <div class="form-group resource-details">
+            <label for="discountValue">Value (%)</label>
+            <input type="range" min=0 max="100" name="discountValue" id="discountValue" class="custom-range" formControlName="discountValueInPercentage">
+            <p>Value: {{ discountValueInPercentage?.value }}%</p>
+        </div>
+
+        <button class="btn btn-accent-tight mr-3" [disabled]="!discountForm.valid" (click)="testCRUD()"> OK </button>
+
+    </form>
+</div>

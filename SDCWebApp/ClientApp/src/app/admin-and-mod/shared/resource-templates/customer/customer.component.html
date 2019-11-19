@@ -1,0 +1,19 @@
+<div class="resource-details">
+    <small>Resource ID</small>
+    <p>{{ customer.id }}</p>
+    <small>Email address</small>
+    <p>{{ customer.emailAddress }}</p>
+    <small>Birthday date</small>
+    <p>{{ customer.dateOfBirth | date: 'dd.MM.yyyy' }}</p>
+    <small>Ordered tickets</small>
+    <p *ngFor="let id of orderedTicketsIds" class="m-0">
+        {{ id }}
+    </p>
+    <p></p>
+    <div *ngIf="customer.updatedAt !== null">
+        <small>Last modified</small>
+        <p>{{ customer.updatedAt | date: 'dd LLLL yyyy, HH:mm:ss' }} GMT</p>
+    </div>
+    <small>Created at</small>
+    <p>{{ customer.createdAt | date: 'dd LLLL yyyy, HH:mm:ss' }} GMT</p>
+</div>

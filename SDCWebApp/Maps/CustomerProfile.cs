@@ -11,8 +11,7 @@ namespace SDCWebApp.Maps
         public CustomerProfile()
         {
             CreateMap<Customer, CustomerDto>()
-               .ForMember(dest => dest.CreatedAt, options => options.AddTransform(datetime => datetime.Truncate(TimeSpan.FromSeconds(1))))
-               .ForMember(dest => dest.UpdatedAt, options => options.AddTransform(datetime => datetime != null ? datetime.Truncate(TimeSpan.FromSeconds(1)) : null))
+               .ForMember(dest => dest.UpdatedAt, options => options.AddTransform(datetime => datetime != null ? datetime : null))
                .ForMember(dest => dest.UpdatedAt, options => options.AddTransform(datetime => datetime.Equals(DateTime.MinValue) ? null : datetime));
 
             CreateMap<CustomerDto, Customer>()

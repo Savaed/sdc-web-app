@@ -1,0 +1,24 @@
+<div class="resource-details">
+    <small>Resource ID</small>
+    <p>{{ ticket.id }}</p>
+    <small>Ticket number</small>
+    <p>{{ ticket.ticketUniqueId }}</p>
+    <small>Purchase date</small>
+    <p>{{ ticket.purchaseDate | date: 'dd LLLL yyyy, HH:mm:ss' }}</p>
+    <small>Valid for</small>
+    <p>{{ ticket.validFor | date: 'dd LLLL yyyy, HH:mm' }}</p>
+    <small>Price</small>
+    <p>{{ ticket.price | number:'1.2-2' }} PLN</p>
+    <small>Customer email address</small>
+    <p>{{ customer?.emailAddress }}</p>
+    <small>Ticket price list</small>
+    <p>{{ ticketTariff?.title }}, {{ ticketTariff?.defaultPrice }} PLN</p>
+    <small>Discount</small>
+    <p>{{ discount?.type }} - {{ discount?.description }}, -{{ discount?.discountValueInPercentage }}%</p>
+    <div *ngIf="ticket.updatedAt !== null">
+        <small>Last modified</small>
+        <p>{{ ticket.updatedAt | date: 'dd LLLL yyyy, HH:mm:ss' }} GMT</p>
+    </div>
+    <small>Created at</small>
+    <p>{{ ticket.createdAt | date: 'dd LLLL yyyy, HH:mm:ss' }} GMT</p>
+</div>

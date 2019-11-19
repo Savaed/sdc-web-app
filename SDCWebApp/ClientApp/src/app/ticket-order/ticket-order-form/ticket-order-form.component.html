@@ -1,51 +1,59 @@
 <form [formGroup]="ticketOrderForm">
 
     <!-- VISIT DATE START -->
-    <div class="d-flex form-group">
-        <!-- VISIT DAY -->
-        <div>
-            <label>Visit day</label>
-            <div class="mr-auto">
-                <input matInput class="datepicker visit-day" readonly="true" [matDatepicker]="sightseeingDay" placeholder="Choose visit day" [matDatepickerFilter]="filterGroupDates"
-                    formControlName="visitDate">
-                <mat-datepicker-toggle matSuffix [for]="sightseeingDay"></mat-datepicker-toggle>
-                <mat-datepicker #sightseeingDay></mat-datepicker>
+    <div class="form-group">
+
+        <div class="ml-auto d-flex mb-2">
+            <div class="my-auto">
+                <small><strong>Your group: </strong></small>
+                <small *ngIf="visitDate.value !== '' && (visitHour | async) !== null; else elseBlock">
+                    {{ visitDate.value | date: 'dd LLLL yyyy'}}, {{ visitHour | async | date: 'H:mm' }}
+                </small>
+                <ng-template #elseBlock>
+                    <small>Please choose visit date and group</small>
+                </ng-template>
             </div>
         </div>
 
-        <!-- GROUPS DROPDOWN START -->
-        <div>
-            <label>Visit group</label>
-            <div class="dropdown open available-groups mx-auto">
-                <button class="btn btn-lg btn-secondary dropdown-toggle" [disabled]="isGroupButtonDisabled | async" type="button" id="groups" data-toggle="dropdown" aria-haspopup="true"
-                    aria-expanded="false">
-                    Choose visit group
-                </button>
-                <div class="dropdown-menu dropdown-menu" aria-labelledby="groups">
-                    <div class="dropdown-divider"></div>
-                    <div *ngFor="let group of groupInfo | async">
-                        <button class="dropdown-item" (click)="setVisitHour(group)">
-                            <!-- {{group | json}} -->
-                            <h6 class="mt-1">{{ group.sightseeingDate | date:'H:mm' }} </h6>
-                            <div class="d-inline-flex align-items-center">
-                                <small class="text-gray">Available seats in the group:</small>
-                                <p class="available-groups-badge"> {{ group.availablePlace }} </p>
-                            </div>
-                        </button>
-                        <div class="dropdown-divider"></div>
-                    </div>
+        <!-- VISIT DAY -->
+        <div class="row">
+            <div class="col-5 mr-2 p-0">
+                <label>Visit day</label>
+                <div class="mr-auto">
+                    <input matInput class="datepicker visit-day" readonly="true" [matDatepicker]="sightseeingDay" placeholder="Choose visit day" [matDatepickerFilter]="filterGroupDates"
+                        formControlName="visitDate">
+                    <mat-datepicker-toggle matSuffix [for]="sightseeingDay"></mat-datepicker-toggle>
+                    <mat-datepicker #sightseeingDay></mat-datepicker>
+                </div>
+            </div>
 
+            <!-- GROUPS DROPDOWN START -->
+            <div class="col-5 ml-2 p-0">
+                <label>Visit group</label>
+                <div class="dropdown open available-groups mx-auto">
+                    <button class="btn btn-lg btn-secondary dropdown-toggle" [disabled]="isGroupButtonDisabled | async" type="button" id="groups" data-toggle="dropdown" aria-haspopup="true"
+                        aria-expanded="false">
+                        Choose visit group
+                    </button>
+                    <div class="dropdown-menu dropdown-menu" aria-labelledby="groups">
+                        <div class="dropdown-divider"></div>
+                        <div *ngFor="let group of groupInfo | async">
+                            <button class="dropdown-item" (click)="setVisitHour(group)">
+                                <!-- {{group | json}} -->
+                                <h6 class="mt-1">{{ group.sightseeingDate | date:'H:mm' }} </h6>
+                                <div class="d-inline-flex align-items-center">
+                                    <small class="text-gray">Available seats in the group:</small>
+                                    <p class="available-groups-badge"> {{ group.availablePlace }} </p>
+                                </div>
+                            </button>
+                            <div class="dropdown-divider"></div>
+                        </div>
+
+                    </div>
                 </div>
             </div>
         </div>
         <!-- GROUPS DROPDOWN END -->
-
-        <div class="ml-auto d-flex">
-            <div class="my-auto">
-                <small><strong>Your group:</strong> {{ visitDate.value | date: 'dd LLLL yyyy'}}, {{ visitHour | async| date: 'H:mm' }}</small>
-            </div>
-        </div>
-
 
     </div>
     <!-- VISIT DATE END -->
@@ -66,8 +74,7 @@
         <!-- EMAIL -->
         <div>
             <label for="customer-email">Email</label>
-            <input type="text" [class.is-invalid]="email.invalid && email.touched" name="customer-email" id="customer-email" class="form-control" aria-describedby="email-help" 
-            formControlName="email">
+            <input type="text" [class.is-invalid]="email.invalid && email.touched" name="customer-email" id="customer-email" class="form-control" aria-describedby="email-help" formControlName="email">
         </div>
 
         <!-- EMAIL VALIDATION ERRORS -->
@@ -87,7 +94,7 @@
         <div class="form-group m-0">
             <div class="btn-group" role="group" aria-label="Basic example">
                 <button *ngFor="let discount of ticketOrderService.discounts | async" class="btn btn-discount-outline" type="button" (click)="addDiscount(discount)">
-                    {{ discount.type }}</button>
+                    {{ discount.type | discountType }}</button>
             </div>
         </div>
         <small id="discount-help" class="text-muted form-control-note">You can choose more than one information, but discounts do not accumulate.</small>

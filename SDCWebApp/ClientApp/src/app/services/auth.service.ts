@@ -6,15 +6,16 @@ import { LoginInfo } from '../models/LoginInfo';
 import { User } from '../models/User';
 import { ServerUrl } from '../helpers/Constants';
 import { map } from 'rxjs/operators';
-import * as moment from 'moment-mini-ts';
 import '../helpers/DateExtension';
 import { ExchangeToken } from '../models/ExchangeToken';
+import { JwtHelperService } from '@auth0/angular-jwt';
 
 @Injectable({
     providedIn: 'root'
 })
 export class AuthService {
     private readonly accountManageUrl = ServerUrl + '/users';
+    private jwtHelper: JwtHelperService;
 
     // User only is logged when he has an access token and unxpired refresh token.
     public get isLogged(): BehaviorSubject<boolean> {
@@ -24,22 +25,24 @@ export class AuthService {
             return new BehaviorSubject<boolean>(false);
         }
 
-
-        const isRefreshTokenExpired = new Date().toUtc(new Date(localStorage.getItem('refresh-token-expiry-date'))) < new Date();
-        console.log('refresh token expired in: ', new Date(localStorage.getItem('refresh-token-expiry-date') + 'Z'));
-        console.log('now', new Date());
-
-
-        console.log(isRefreshTokenExpired);
+        const now = new Date();
+        const isRefreshTokenExpired = new Date(localStorage.getItem('refresh-token-expiry-date')) < new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),
+            now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
 
         return new BehaviorSubject<boolean>(!isRefreshTokenExpired);
     }
+
+    public get userRole() { return localStorage.getItem('user-role'); }
+
+    public get username() { return localStorage.getItem('user-login'); }
 
     public get refreshToken() { return localStorage.getItem('refresh-token'); }
 
     public get accessToken() { return localStorage.getItem('access-token'); }
 
-    constructor(private http: HttpClient) { }
+    constructor(private http: HttpClient) {
+        this.jwtHelper = new JwtHelperService();
+    }
 
     public exchangeToken(accessToken: string, refreshToken: string) {
         const newTokens = this.http.post<ApiResponse<ExchangeToken>>(`${ServerUrl}/auth/refresh-token`, { accessToken, refreshToken }).pipe(map(response => response.data));
@@ -54,25 +57,25 @@ export class AuthService {
                 map(response => {
                     if (response.data != null && response.data !== undefined && JSON.stringify(response.error) === '{}') {
 
-                        this.isLogged.next(true);
-
-                        // Store user's login and toekns data.
+                        // Store user's login, role and tokens data.
                         localStorage.setItem('user-login', response.data.user.userName);
+                        localStorage.setItem('user-role', this.jwtHelper.decodeToken(response.data.accessToken.token).role);
                         this.saveTokensInLocalStorage(response.data);
-
-                        // TODO: Add user role to local storage.
                     }
-
+                    console.log(`User '${username}' has been logged in.`);
                     return response;
                 }));
     }
 
     public logout() {
+        const username = this.username;
+        localStorage.removeItem('user-login');
+        localStorage.removeItem('user-role');
         localStorage.removeItem('access-token');
         localStorage.removeItem('access-token-expiry-date');
-        localStorage.removeItem('user-login');
         localStorage.removeItem('refresh-token');
         localStorage.removeItem('refresh-token-expiry-date');
+        console.log(`User '${username}' has been logged out.`);
     }
 
     // Registers a new user and returns login details or an error if registration failed.

@@ -1,16 +1,31 @@
-<div class="m-5 col-10 mx-auto">
-    <!-- ORDER STEPS START -->
-    <ul class="list-group list-group-horizontal order-steps">
-        <li class="list-group-item" [class.active-steps]="orderService?.ticketOrderStep === 0"><small><strong>Step 1: </strong>Choose ticket</small> </li>
-        <li class="list-group-item" [class.active-steps]="orderService?.ticketOrderStep === 1"><small><strong>Step 2: </strong>Fill the form</small></li>
-        <li class="list-group-item" [class.active-steps]="orderService?.ticketOrderStep === 2"><small class="text-muted"><strong>Step 3: </strong>Order and pay</small></li>
-    </ul>
-    <!-- ORDER STEPS END -->
-
-    <div class="custom-shadow-lg mt-5 row order-container">
-        <app-ticket-order-form class="col-6"></app-ticket-order-form>
-        <app-order-summary class="col-6"></app-order-summary>
+<div class="bg-gray pb-4">
+    <div class="col-10 col-lg-5 text-center mx-auto pt-4 pb-1">
+        <p class="text-gray text-mono">
+            Ticket form
+        </p>
+        <h1 class="header mb-4">
+            Order your ticket
+        </h1>
+        <p class="text-gray col-11 mx-auto">
+            Please select the date of visit, group, discount and number of tickets, and then enter the email address to which the order confirmation will be sent
+        </p>
     </div>
 
+    <div class="my-3 col-10 mx-auto">
 
+        <!-- ORDER STEPS START -->
+        <div class="d-flex">
+            <ul class="list-group list-group-horizontal order-steps mx-auto">
+                <li class="list-group-item" [class.active-steps]="orderService?.ticketOrderStep === 0"><small><strong>Step 1: </strong>Choose ticket</small> </li>
+                <li class="list-group-item" [class.active-steps]="orderService?.ticketOrderStep === 1"><small><strong>Step 2: </strong>Fill the form</small></li>
+                <li class="list-group-item" [class.active-steps]="orderService?.ticketOrderStep === 2"><small class="text-muted"><strong>Step 3: </strong>Order and pay</small></li>
+            </ul>
+        </div>
+        <!-- ORDER STEPS END -->
+
+        <div class="custom-shadow-lg mt-3 row order-container bg-white">
+            <app-ticket-order-form class="col-6 border-right"></app-ticket-order-form>
+            <app-order-summary class="col-6"></app-order-summary>
+        </div>
+    </div>
 </div>

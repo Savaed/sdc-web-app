@@ -34,16 +34,20 @@ export class LoginFormComponent implements OnInit {
         });
     }
 
-    private login() {
+    private login(): void {
+        if (this.accountService.isLogged.getValue()) {
+            console.log('User already logged.');
+            return;
+        }
+
         this.accountService.login(this.username.value, this.password.value)
             .subscribe(response => {
-                if (response.error) {
+                if (JSON.stringify(response.error) !== '{}') {
                     this.serverErrorResponse.next(response.error.message);
-                    console.log(response.error);
+                    // console.log(response.error.message);
+                } else {
+                    this.router.navigate([`${this.accountService.userRole === 'administrator' ? 'admin' : 'mod'}/dashboard`]);
                 }
             });
-
-        this.serverErrorResponse.subscribe(error => console.log(error));
     }
 }
-

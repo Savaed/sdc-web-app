@@ -69,7 +69,7 @@ namespace SDCWebApp
                 options.SerializerSettings.Converters.Add(new StringEnumConverter());
 
                 // Set DateTime format in JSON, eg. "2019-12-12T23:12:56Z"
-                options.SerializerSettings.DateFormatString = "yyyy'-'MM'-'dd'T'HH':'mm':'ss";
+                options.SerializerSettings.DateFormatString = "yyyy'-'MM'-'dd'T'HH':'mm':'ssK";
             });
 
             // In production, the Angular files will be served from this directory.
