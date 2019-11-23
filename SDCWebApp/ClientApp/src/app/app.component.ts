@@ -13,7 +13,7 @@ export class AppComponent {
         'Additionally for API documentation see: https://google.pl\n\nIn the end, I have to add the page was created only for educational purposes and doesn\'t ' +
         'present any existent company. Any resemblance to real characters, places, and events is accidental ;)\n';
 
-    constructor(private authService: AuthService) {
+    constructor(public authService: AuthService) {
         this.displayWelcomeBanner(this.welcomeMessage);
     }
 

@@ -9,7 +9,7 @@ import { TicketService } from 'src/app/services/ticket.service';
 })
 export class CustomerComponent implements OnInit {
     @Input() public customer: Customer;
-    private orderedTicketsIds = new Array<string>();
+    public orderedTicketsIds = new Array<string>();
 
     constructor(private ticketService: TicketService) { }
 

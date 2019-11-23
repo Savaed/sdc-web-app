@@ -14,9 +14,10 @@ import { Title } from '@angular/platform-browser';
     styleUrls: ['./pricing.component.scss']
 })
 export class PricingComponent implements OnInit {
-    private ticketTariffs = new Subject<TicketTariff[]>();
-    private discounts = new Subject<Discount[]>();
     private readonly title = 'Pricing';
+
+    public ticketTariffs = new Subject<TicketTariff[]>();
+    public discounts = new Subject<Discount[]>();
 
     constructor(private ticketTariffsService: TicketTariffService,
         private discountService: DiscountService,
@@ -31,7 +32,7 @@ export class PricingComponent implements OnInit {
         this.ticketTariffsService.getRecentTicketTariffs().subscribe(ticketTariffs => this.ticketTariffs.next(ticketTariffs.tariffs));
     }
 
-    chooseTicketTariff(ticketTariff: TicketTariff) {
+    public chooseTicketTariff(ticketTariff: TicketTariff) {
         this.orderService.choosenTicketTariff = ticketTariff;
         this.orderService.ticketOrderStep = 1;
         this.router.navigate(['/order']);

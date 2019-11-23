@@ -5,7 +5,7 @@ import { Article } from '../models/Article';
 import { ArticleService } from 'src/app/services/article.service';
 import { VisitInfo } from '../models/VisitInfo';
 import { Title } from '@angular/platform-browser';
-import { ToastService } from '../services/toast.service';
+import { ToastrService } from 'ngx-toastr';
 
 
 @Component({
@@ -14,13 +14,13 @@ import { ToastService } from '../services/toast.service';
     styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit {
-    private topThreeArticles = new Subject<Article[]>();
-    private recentVisitInfo = new Subject<VisitInfo>();
-    private isOpenNow = new Subject<boolean>();
-    private now: Date;
     private readonly title = 'Glass Heritage Centrum';
+    public topThreeArticles = new Subject<Article[]>();
+    public recentVisitInfo = new Subject<VisitInfo>();
+    public isOpenNow = new Subject<boolean>();
+    public now: Date;
 
-    constructor(private infoService: VisitInfoService, private articleService: ArticleService, private titleService: Title, private toast: ToastService) {
+    constructor(private infoService: VisitInfoService, private articleService: ArticleService, private titleService: Title, private toastr: ToastrService) {
         this.titleService.setTitle(this.title);
     }
 

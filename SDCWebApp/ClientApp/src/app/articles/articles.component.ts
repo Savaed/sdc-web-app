@@ -11,10 +11,10 @@ import { Title } from '@angular/platform-browser';
     styleUrls: ['./articles.component.scss']
 })
 export class ArticlesComponent implements OnInit {
-    private articles = new Subject<Article[]>();
+    public articles = new Subject<Article[]>();
     private readonly title = 'News';
 
-    constructor(private articleService: ArticleService, private router: Router, private titleService: Title) {
+    constructor(private articleService: ArticleService, private titleService: Title) {
         this.titleService.setTitle(this.title);
     }
 

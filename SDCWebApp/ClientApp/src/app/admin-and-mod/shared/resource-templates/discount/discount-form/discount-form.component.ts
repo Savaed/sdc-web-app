@@ -4,6 +4,7 @@ import { ResourceService, ResourceType } from '../../../resource.service';
 import { Discount, DiscountType } from 'src/app/models/Discount';
 import { VisitInfo } from 'src/app/models/VisitInfo';
 import { VisitInfoService } from 'src/app/services/visit-info.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'app-discount-form',
@@ -11,20 +12,20 @@ import { VisitInfoService } from 'src/app/services/visit-info.service';
     styleUrls: ['./discount-form.component.scss']
 })
 export class DiscountFormComponent implements OnInit {
-    private discountForm: FormGroup;
-    private info: VisitInfo;
-    private discountType = DiscountType;
+    public discountForm: FormGroup;
+    public info: VisitInfo;
+    public discountType = DiscountType;
 
     @Input() public discount: Discount = { type: DiscountType.ForChild, description: '', discountValueInPercentage: 0, groupSizeForDiscount: 0 };
     @Input() public isForAdd = false;
 
-    private get discountTypeGroup() { return this.discountForm.get('discountTypeGroup') as FormGroup; }
-    private get type() { return this.discountForm.get('discountTypeGroup').get('type') as FormControl; }
-    private get description() { return this.discountForm.get('description') as FormControl; }
-    private get discountValueInPercentage() { return this.discountForm.get('discountValueInPercentage') as FormControl; }
-    private get groupSizeForDiscount() { return this.discountForm.get('discountTypeGroup').get('groupSizeForDiscount') as FormControl; }
+    public get discountTypeGroup() { return this.discountForm.get('discountTypeGroup') as FormGroup; }
+    public get type() { return this.discountForm.get('discountTypeGroup').get('type') as FormControl; }
+    public get description() { return this.discountForm.get('description') as FormControl; }
+    public get discountValueInPercentage() { return this.discountForm.get('discountValueInPercentage') as FormControl; }
+    public get groupSizeForDiscount() { return this.discountForm.get('discountTypeGroup').get('groupSizeForDiscount') as FormControl; }
 
-    constructor(private formBuilder: FormBuilder, private resourceService: ResourceService, private infoService: VisitInfoService) { }
+    constructor(private formBuilder: FormBuilder, private resourceService: ResourceService, private infoService: VisitInfoService, private toast: ToastrService) { }
 
     ngOnInit() {
         this.infoService.getRecentInfo().subscribe(i => this.info = i);
@@ -39,7 +40,7 @@ export class DiscountFormComponent implements OnInit {
         });
     }
 
-    private haveGroupSize: ValidatorFn = (control: FormGroup): ValidationErrors | null => {
+    public haveGroupSize: ValidatorFn = (control: FormGroup): ValidationErrors | null => {
         const discountType = control.get('type').value;
         const groupSize = control.get('groupSizeForDiscount').value;
 
@@ -50,9 +51,7 @@ export class DiscountFormComponent implements OnInit {
         return null;
     }
 
-    private edit() {
-        console.log('update discount');
-
+    public edit() {
         const updatedDiscount: Discount = {
             id: this.discount.id,
             createdAt: this.discount.createdAt,
@@ -65,6 +64,7 @@ export class DiscountFormComponent implements OnInit {
 
         if (this.isDifferent(this.discount, updatedDiscount)) {
             this.discount = this.resourceService.edit(updatedDiscount);
+            this.toast.info('Discount has been edited.');
         }
     }
 
@@ -84,9 +84,10 @@ export class DiscountFormComponent implements OnInit {
         };
 
         this.resourceService.add(newDiscount, ResourceType.Discount);
+        this.toast.info('New discount has been added.');
     }
 
-    private testCRUD() {
+    public testCRUD() {
         if (this.isForAdd) {
             this.add();
         } else {

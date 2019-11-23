@@ -14,9 +14,9 @@ import { TicketTariffService } from 'src/app/services/ticket-tariff.service';
 })
 export class TicketComponent implements OnInit {
     @Input() public ticket: Ticket;
-    private customer: Customer;
-    private discount: Discount;
-    private ticketTariff: TicketTariff;
+    public customer: Customer;
+    public discount: Discount;
+    public ticketTariff: TicketTariff;
 
     constructor(private customerService: CustomerService, private discountService: DiscountService, private ticketTariffService: TicketTariffService) { }
 

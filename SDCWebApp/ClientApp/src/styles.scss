@@ -6,6 +6,8 @@
 
 @import '@angular/material/prebuilt-themes/deeppurple-amber.css';
 
+@import '~ngx-toastr/toastr';
+
 // General
 *{
     margin: 0px;
@@ -499,4 +501,14 @@ form {
     p {
         font-size: 15px;
     }
+}
+
+// Toasts
+.custom-toast {
+    background-color: #252525;
+    padding: 10px 15px;
+    color: rgb(216, 216, 216);
+    font-size: medium;    
+    border-radius: 3px;
+    background-image: none;
 }

@@ -48,7 +48,7 @@ export class TicketOrderService {
     private currentTicketTariff = new BehaviorSubject<TicketTariff>(undefined);
     private recentInfo: VisitInfo;
     private orderStep = new BehaviorSubject<number>(0);
-    private discounts = new BehaviorSubject<Discount[]>(new Array<Discount>());
+    public discounts = new BehaviorSubject<Discount[]>(new Array<Discount>());
     private commitedOrder = new BehaviorSubject<OrderResponse>(undefined);
 
     public get order(): BehaviorSubject<OrderResponse> { return this.commitedOrder; }

@@ -6,6 +6,7 @@ import { Subject, BehaviorSubject } from 'rxjs';
 import { VisitGroupService } from 'src/app/services/visit-group.service';
 import { Customer } from '../../models/Customer';
 import { GroupInfo } from 'src/app/models/GroupInfo';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'app-ticket-order-form',
@@ -13,22 +14,29 @@ import { GroupInfo } from 'src/app/models/GroupInfo';
     styleUrls: ['./ticket-order-form.component.scss']
 })
 export class TicketOrderFormComponent implements OnInit {
-    private ticketOrderForm: FormGroup;
-    private availableGroupDates = new BehaviorSubject<GroupInfo[]>(undefined);
-    private firstAvailableGroupDate = new Subject<Date>();
-    private lastAvailableGroupDate = new Subject<Date>();
-    private firstDayInMonth = new Subject<number>();
-    private daysInMonth = new Subject<number>();
-    private customerDiscounts = new Array<Discount>();
-    private isGroupButtonDisabled = new BehaviorSubject<boolean>(true);
-    private groupInfo = new BehaviorSubject<GroupInfo[]>(new Array<GroupInfo>());
-    private visitHour = new BehaviorSubject<Date>(undefined);
-    private maxTicketsNumber = new BehaviorSubject<number>(0);
+    public ticketOrderForm: FormGroup;
+    public availableGroupDates = new BehaviorSubject<GroupInfo[]>(undefined);
+    public firstAvailableGroupDate = new Subject<Date>();
+    public lastAvailableGroupDate = new Subject<Date>();
+    public firstDayInMonth = new Subject<number>();
+    public daysInMonth = new Subject<number>();
+    public customerDiscounts = new Array<Discount>();
+    public isGroupButtonDisabled = new BehaviorSubject<boolean>(true);
+    public groupInfo = new BehaviorSubject<GroupInfo[]>(new Array<GroupInfo>());
+    public visitHour = new BehaviorSubject<Date>(undefined);
+    public maxTicketsNumber = new BehaviorSubject<number>(0);
 
     constructor(private formBuilder: FormBuilder,
-        private ticketOrderService: TicketOrderService,
-        private groupsSerivce: VisitGroupService) {
+        public ticketOrderService: TicketOrderService,
+        private groupsSerivce: VisitGroupService,
+        private toast: ToastrService) {
     }
+
+    public get email() { return this.customer.get('email') as FormControl; }
+    public get birthdayDate() { return this.customer.get('birthdayDate') as FormControl; }
+    public get visitDate() { return this.ticketOrderForm.get('visitDate') as FormControl; }
+    public get customer() { return this.ticketOrderForm.get('customer') as FormGroup; }
+    public get numberOfTickets() { return this.ticketOrderForm.get('numberOfTickets'); }
 
     private getGroupInfo(customerVisitDate: Date): GroupInfo[] {
         const groupInfo = new Array<GroupInfo>();
@@ -53,26 +61,10 @@ export class TicketOrderFormComponent implements OnInit {
         return groupInfo;
     }
 
-    private setVisitHour(group: GroupInfo) {
+    public setVisitHour(group: GroupInfo) {
         this.visitHour.next(group.sightseeingDate);
         this.maxTicketsNumber.next(group.availablePlace);
     }
-
-    private onChanges() {
-        this.visitDate.valueChanges.subscribe((value: Date) => {
-            this.groupInfo.next(this.getGroupInfo(value));
-            this.isGroupButtonDisabled.next(false);
-            this.visitHour.next(undefined);
-            this.maxTicketsNumber.next(0);
-            this.numberOfTickets.setValue(0);
-        });
-    }
-
-    private get email() { return this.customer.get('email') as FormControl; }
-    private get birthdayDate() { return this.customer.get('birthdayDate') as FormControl; }
-    private get visitDate() { return this.ticketOrderForm.get('visitDate') as FormControl; }
-    private get customer() { return this.ticketOrderForm.get('customer') as FormGroup; }
-    private get numberOfTickets() { return this.ticketOrderForm.get('numberOfTickets'); }
 
     ngOnInit() {
         this.ticketOrderForm = this.formBuilder.group({
@@ -105,22 +97,34 @@ export class TicketOrderFormComponent implements OnInit {
         });
     }
 
-    private addDiscount(discount: Discount) {
+    public addDiscount(discount: Discount) {
         if (!this.customerDiscounts.includes(discount)) {
             this.customerDiscounts.push(discount);
         }
     }
 
-    private addTickets() {
+    private onChanges() {
+        this.visitDate.valueChanges.subscribe((value: Date) => {
+            this.groupInfo.next(this.getGroupInfo(value));
+            this.isGroupButtonDisabled.next(false);
+            this.visitHour.next(undefined);
+            this.maxTicketsNumber.next(0);
+            this.numberOfTickets.setValue(0);
+        });
+    }
+
+    public addTickets() {
         const visitDate = new Date(this.visitDate.value);
         const visitTime = new Date(this.visitHour.getValue());
         const visitDateTime = new Date(visitDate.getFullYear(), visitDate.getMonth(), visitDate.getDate(), visitTime.getHours(), visitTime.getMinutes());
         this.ticketOrderService.addTicketToCart(this.customerDiscounts, visitDateTime, this.numberOfTickets.value);
         this.customerDiscounts = [];
         this.onChanges();
+
+        this.toast.info('New ticket has been added to the cart.');
     }
 
-    private orderTickets() {
+    public orderTickets() {
         this.ticketOrderService.ticketOrderStep = 2;
         const customer: Customer = {
             hasFamilyCard: false,
@@ -131,11 +135,13 @@ export class TicketOrderFormComponent implements OnInit {
         };
 
         this.ticketOrderService.orderTickets(customer).subscribe();
+
+        this.toast.info('The ticket order has been processed.');
     }
 
     private calculateDaysInMonth(iMonth, iYear): number { return 32 - new Date(iYear, iMonth, 32).getDate(); }
 
-    private filterGroupDates = (date: Date): boolean => {
+    public filterGroupDates = (date: Date): boolean => {
         const day = date.getDay();
         const month = date.getMonth();
         const year = date.getFullYear();
@@ -155,7 +161,7 @@ export class TicketOrderFormComponent implements OnInit {
         return isValidDate;
     }
 
-    private filterBirthdayDates = (date: Date): boolean => {
+    public filterBirthdayDates = (date: Date): boolean => {
         const now = new Date();
         const latestValidDate = new Date(now.getFullYear() - 126, now.getMonth(), now.getDay());
 

@@ -2,6 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { VisitInfo, OpeningHours } from 'src/app/models/VisitInfo';
 import { FormGroup, FormBuilder, Validators, FormControl, FormArray } from '@angular/forms';
 import { ResourceService, ResourceType } from '../../../resource.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'app-visit-info-form',
@@ -19,19 +20,16 @@ export class VisitInfoFormComponent implements OnInit {
         sightseeingDuration: 0,
     };
 
-    private infoForm: FormGroup;
+    public infoForm: FormGroup;
 
-    private get description() { return this.infoForm.get('description') as FormControl; }
-    private get maxAllowedGroupSize() { return this.infoForm.get('maxAllowedGroupSize') as FormControl; }
-    private get maxChildAge() { return this.infoForm.get('maxChildAge') as FormControl; }
-    private get maxTicketOrderInterval() { return this.infoForm.get('maxTicketOrderInterval') as FormControl; }
-    private get openingHours() { return this.infoForm.get('openingHours') as FormArray; }
-    private get sightseeingDuration() { return this.infoForm.get('sightseeingDuration') as FormControl; }
+    public get description() { return this.infoForm.get('description') as FormControl; }
+    public get maxAllowedGroupSize() { return this.infoForm.get('maxAllowedGroupSize') as FormControl; }
+    public get maxChildAge() { return this.infoForm.get('maxChildAge') as FormControl; }
+    public get maxTicketOrderInterval() { return this.infoForm.get('maxTicketOrderInterval') as FormControl; }
+    public get openingHours() { return this.infoForm.get('openingHours') as FormArray; }
+    public get sightseeingDuration() { return this.infoForm.get('sightseeingDuration') as FormControl; }
 
-    private getOpeningHour(i: number) { return this.openingHours.controls[i].get('openingHour') as FormControl; }
-    private getClosingHour(i: number) { return this.openingHours.controls[i].get('closingHour') as FormControl; }
-
-    constructor(private formBuilder: FormBuilder, private resourceService: ResourceService) { }
+    constructor(private formBuilder: FormBuilder, private resourceService: ResourceService, private toast: ToastrService) { }
 
     ngOnInit() {
         this.infoForm = this.formBuilder.group({
@@ -46,7 +44,7 @@ export class VisitInfoFormComponent implements OnInit {
         });
     }
 
-    addOpeningHourFormGroup(): FormGroup {
+    private addOpeningHourFormGroup(): FormGroup {
         return this.formBuilder.group({
             dayOfWeek: ['', Validators.required],
             openingHour: ['', [Validators.required, Validators.pattern(/^(?:\d|[01]\d|2[0-3]):[0-5]\d$/)]],
@@ -54,7 +52,7 @@ export class VisitInfoFormComponent implements OnInit {
         });
     }
 
-    private addOpeningHour() {
+    public addOpeningHour() {
         this.openingHours.push(this.addOpeningHourFormGroup());
     }
 
@@ -68,8 +66,8 @@ export class VisitInfoFormComponent implements OnInit {
             openingHours: this.getAllOpeningHours()
         };
 
-        console.log('add info');
         this.resourceService.add(newVisitInfo, ResourceType.VisitInfo);
+        this.toast.info('New visit info has been added.');
     }
 
     private isDifferent(oldInfo: VisitInfo, newInfo: VisitInfo): boolean {
@@ -93,6 +91,7 @@ export class VisitInfoFormComponent implements OnInit {
 
         if (this.isDifferent(updatedInfo, this.visitInfo)) {
             this.resourceService.edit(updatedInfo);
+            this.toast.info('Visit info has been edited.');
         }
     }
 
@@ -114,7 +113,7 @@ export class VisitInfoFormComponent implements OnInit {
         return tmpHours;
     }
 
-    private deleteHour(i: number, fromForm = true) {
+    public deleteHour(i: number, fromForm = true) {
         if (fromForm) {
             this.openingHours.controls.splice(i, 1);
         } else {
@@ -122,7 +121,7 @@ export class VisitInfoFormComponent implements OnInit {
         }
     }
 
-    private testCRUD() {
+    public testCRUD() {
         if (this.isForAdd) {
             this.addInfo();
         } else {

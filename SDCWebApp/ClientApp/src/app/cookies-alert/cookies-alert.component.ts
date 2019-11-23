@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'app-cookies-alert',
@@ -10,9 +11,12 @@ export class CookiesAlertComponent implements OnInit {
 
     public get isUserAcceptCookiPolicy(): boolean { return localStorage.getItem(this.acceptCookieItemName) !== null; }
 
-    constructor() { }
+    constructor(private toast: ToastrService) { }
 
     ngOnInit() { }
 
-    private acceptCookies() { localStorage.setItem(this.acceptCookieItemName, 'true'); }
+    public acceptCookies() {
+        localStorage.setItem(this.acceptCookieItemName, 'true');
+        this.toast.info('Cookies have been accepted.');
+    }
 }

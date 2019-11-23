@@ -4,7 +4,7 @@
         <div class="list-group p-0 py-3">
 
             <a (click)="resourceService.showArticles(); hideWelcomeBanner(); hideAddForm()" class="list-group-item list-group-item-action">
-                <div class="row align-items-center">
+                <div class="d-flex align-items-center">
                     <div class="circle text-center mr-4">
                         <i class="fas fa-book resource-quantity"></i>
                     </div>
@@ -16,7 +16,7 @@
             </a>
 
             <a (click)="resourceService.showCustomers(); hideWelcomeBanner()" class="list-group-item list-group-item-action">
-                <div class="row align-items-center">
+                <div class="d-flex align-items-center">
                     <div class="circle text-center mr-4">
                         <i class="fas fa-user-friends resource-quantity"></i>
                     </div>
@@ -28,7 +28,7 @@
             </a>
 
             <a (click)="resourceService.showDiscounts(); hideWelcomeBanner(); hideAddForm()" class="list-group-item list-group-item-action">
-                <div class="row align-items-center">
+                <div class="d-flex align-items-center">
                     <div class="circle text-center mr-4">
                         <i class="fas fa-tags resource-quantity"></i>
                     </div>
@@ -40,7 +40,7 @@
             </a>
 
             <a (click)="resourceService.showVisitGroups(); hideWelcomeBanner()" class="list-group-item list-group-item-action">
-                <div class="row align-items-center">
+                <div class="d-flex align-items-center">
                     <div class="circle text-center mr-4">
                         <i class="fas fa-users resource-quantity"></i>
                     </div>
@@ -52,7 +52,7 @@
             </a>
 
             <a (click)="resourceService.showVisitInfo(); hideWelcomeBanner()" class="list-group-item list-group-item-action">
-                <div class="row align-items-center">
+                <div class="d-flex align-items-center">
                     <div class="circle text-center mr-4">
                         <i class="fas fa-cogs resource-quantity"></i>
                     </div>
@@ -64,7 +64,7 @@
             </a>
 
             <a (click)="resourceService.showTickets(); hideWelcomeBanner()" class="list-group-item list-group-item-action">
-                <div class="row align-items-center">
+                <div class="d-flex align-items-center">
                     <div class="circle text-center mr-4">
                         <i class="fas fa-ticket-alt resource-quantity"></i>
                     </div>
@@ -76,7 +76,7 @@
             </a>
 
             <a (click)="resourceService.showTicketTariffs(); hideWelcomeBanner()" class="list-group-item list-group-item-action">
-                <div class="row align-items-center">
+                <div class="d-flex align-items-center">
                     <div class="circle text-center mr-4">
                         <i class="fas fa-list-alt resource-quantity"></i>
                     </div>
@@ -88,7 +88,7 @@
             </a>
 
             <a (click)="resourceService.showLogs(); hideWelcomeBanner()" *ngIf="authService.userRole === 'administrator'" class="list-group-item list-group-item-action">
-                <div class="row align-items-center">
+                <div class="d-flex align-items-center">
                     <div class="circle text-center mr-4">
                         <i class="fas fa-user-tag resource-quantity"></i>
                     </div>
@@ -105,7 +105,7 @@
 
     <!-- CONTENT CONTAINER START -->
     <div class="col-8 px-0 m-0">
-        <div class="row mt-4 border-bottom">
+        <div class="d-flex mt-4 border-bottom">
 
             <mat-checkbox class="ml-3 pl-2"></mat-checkbox>
             <i *ngIf="(resourceService.isAddModeEnable | async) || (resourceService.isEditModeEnable | async)" (click)="backToOverview()" class="fas fa-arrow-left ml-3"></i>

@@ -10,13 +10,13 @@ import { Router } from '@angular/router';
     styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent implements OnInit, DoCheck {
-    private openingHour = new BehaviorSubject<string>(undefined);
-    private closingHour = new BehaviorSubject<string>(undefined);
-    private isNavCollapse = new BehaviorSubject<boolean>(false);
+    public openingHour = new BehaviorSubject<string>(undefined);
+    public closingHour = new BehaviorSubject<string>(undefined);
+    public isNavCollapse = new BehaviorSubject<boolean>(false);
 
-    get isLogged(): BehaviorSubject<boolean> { return this.authService.isLogged; }
+    public get isLogged(): BehaviorSubject<boolean> { return this.authService.isLogged; }
 
-    constructor(private authService: AuthService, private infoService: VisitInfoService, private router: Router) { }
+    constructor(public authService: AuthService, private infoService: VisitInfoService) { }
 
     ngOnInit() {
         this.infoService.getRecentInfo().subscribe(info => {
@@ -33,7 +33,7 @@ export class NavbarComponent implements OnInit, DoCheck {
         this.authService.isLogged.subscribe(logged => this.isLogged.next(logged));
     }
 
-    private logout() {
+    public logout() {
         this.authService.logout();
     }
 }

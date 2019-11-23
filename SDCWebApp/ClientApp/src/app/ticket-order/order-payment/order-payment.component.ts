@@ -7,7 +7,7 @@ import { BehaviorSubject } from 'rxjs';
     styleUrls: ['./order-payment.component.scss']
 })
 export class OrderPaymentComponent implements OnInit {
-    private seconds = new BehaviorSubject<number>(15);
+    public seconds = new BehaviorSubject<number>(15);
 
     constructor() { }
 

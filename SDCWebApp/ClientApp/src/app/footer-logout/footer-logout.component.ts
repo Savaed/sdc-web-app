@@ -6,7 +6,7 @@ import { Component, OnInit } from '@angular/core';
     styleUrls: ['./footer-logout.component.scss']
 })
 export class FooterLogoutComponent implements OnInit {
-    private currentYear = new Date().getFullYear();
+    public currentYear = new Date().getFullYear();
 
     constructor() { }
 

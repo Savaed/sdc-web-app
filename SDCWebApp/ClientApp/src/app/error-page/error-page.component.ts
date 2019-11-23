@@ -10,9 +10,9 @@ import { Title } from '@angular/platform-browser';
     styleUrls: ['./error-page.component.scss']
 })
 export class ErrorPageComponent implements OnInit {
-    private errorCode: number;
-    private errorGeneralMessage: Observable<string>;
-    private errorSpecificMessage: Observable<string>;
+    public errorCode: number;
+    public errorGeneralMessage: Observable<string>;
+    public errorSpecificMessage: Observable<string>;
 
     constructor(private activatedRoute: ActivatedRoute, private errorHandler: ErrorHandler, private titleService: Title) {
         this.errorCode = this.activatedRoute.snapshot.params.errorStatusCode;

@@ -2,6 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { Article } from 'src/app/models/Article';
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { ResourceService, ResourceType } from '../../../resource.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'app-article-form',
@@ -9,16 +10,16 @@ import { ResourceService, ResourceType } from '../../../resource.service';
     styleUrls: ['./article-form.component.scss']
 })
 export class ArticleFormComponent implements OnInit {
-    private articleForm: FormGroup;
+    public articleForm: FormGroup;
 
     @Input() public article: Article = { author: '', text: '', title: '' };
     @Input() public isForAdd = false;
 
-    private get title() { return this.articleForm.get('title') as FormControl; }
-    private get text() { return this.articleForm.get('text') as FormControl; }
-    private get author() { return this.articleForm.get('author') as FormControl; }
+    public get title() { return this.articleForm.get('title') as FormControl; }
+    public get text() { return this.articleForm.get('text') as FormControl; }
+    public get author() { return this.articleForm.get('author') as FormControl; }
 
-    constructor(private formBuilder: FormBuilder, private resourceService: ResourceService) { }
+    constructor(private formBuilder: FormBuilder, private resourceService: ResourceService, private toast: ToastrService) { }
 
     ngOnInit() {
         this.articleForm = this.formBuilder.group({
@@ -28,7 +29,7 @@ export class ArticleFormComponent implements OnInit {
         });
     }
 
-    private edit() {
+    public edit() {
         const updatedArticle: Article = {
             id: this.article.id,
             createdAt: this.article.createdAt,
@@ -40,14 +41,16 @@ export class ArticleFormComponent implements OnInit {
 
         if (this.isDifferent(this.article, updatedArticle)) {
             this.article = this.resourceService.edit(updatedArticle);
+            this.toast.info('Article has been edited.');
         }
+
     }
 
-    private isDifferent(oldArticle: Article, newArticle: Article): boolean {
+    public isDifferent(oldArticle: Article, newArticle: Article): boolean {
         return oldArticle.title !== newArticle.title || oldArticle.text !== newArticle.text || oldArticle.author !== newArticle.author;
     }
 
-    private add() {
+    public add() {
         const newArticle: Article = {
             text: this.text.value,
             author: this.author.value,
@@ -55,9 +58,10 @@ export class ArticleFormComponent implements OnInit {
         };
 
         this.resourceService.add(newArticle, ResourceType.Article);
+        this.toast.info('New article has been added.');
     }
 
-    private testCRUD() {
+    public testCRUD() {
         if (this.isForAdd) {
             this.add();
         } else {

@@ -10,16 +10,16 @@ import { Title } from '@angular/platform-browser';
     styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit {
-    private resourceType = ResourceType;
-    private showWelcomeBanner = new BehaviorSubject<boolean>(true);
+    public resourceType = ResourceType;
+    public showWelcomeBanner = new BehaviorSubject<boolean>(true);
 
-    constructor(private resourceService: ResourceService, private authService: AuthService, private title: Title) { }
+    constructor(public resourceService: ResourceService, public authService: AuthService, public title: Title) { }
 
     ngOnInit() {
         this.title.setTitle('Dashboard');
     }
 
-    private showAddForm(resourceType: ResourceType) {
+    public showAddForm(resourceType: ResourceType) {
         switch (resourceType) {
             case ResourceType.Article:
                 this.resourceService.showAddArticleForm();
@@ -41,15 +41,15 @@ export class DashboardComponent implements OnInit {
         this.resourceService.setAddMode(true);
     }
 
-    private hideWelcomeBanner() { this.showWelcomeBanner.next(false); }
+    public hideWelcomeBanner() { this.showWelcomeBanner.next(false); }
 
-    private hideAddForm() {
+    public hideAddForm() {
         if (this.resourceService.isAddModeEnable.getValue() === true) {
             this.resourceService.setAddMode(false);
         }
     }
 
-    private backToOverview() {
+    public backToOverview() {
         if (this.resourceService.isEditModeEnable.getValue()) {
             this.resourceService.setEditMode(-1, false);
         } else {

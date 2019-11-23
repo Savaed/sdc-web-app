@@ -60,7 +60,7 @@
                     <tr>
                         <td>
                             <small class="cell-header text-gray"> Discount </small>
-                            <p class="cell-text"> {{ (getDiscount(ticket) | async).type | discountType }} </p>
+                            <p class="cell-text"> {{ (getDiscount(ticket) | async).type.toString() | discountType }} </p>
                         </td>
 
                         <td>

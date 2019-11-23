@@ -8,7 +8,7 @@ import { Title } from '@angular/platform-browser';
 })
 export class PartnersComponent implements OnInit {
     private readonly title = 'Partnership';
-    private now: Date;
+    public now: Date;
 
     constructor(private titleService: Title) {
         this.titleService.setTitle(this.title);

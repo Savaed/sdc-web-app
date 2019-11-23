@@ -8,9 +8,9 @@ import { BehaviorSubject } from 'rxjs';
     styleUrls: ['./order-summary.component.scss']
 })
 export class OrderSummaryComponent implements OnInit, DoCheck {
-    private overallCartPrice = new BehaviorSubject<number>(0);
-    private ticketCart = new BehaviorSubject<OrderedTicket[]>([]);
-    private isCartEmpty = new BehaviorSubject<boolean>(true);
+    public overallCartPrice = new BehaviorSubject<number>(0);
+    public ticketCart = new BehaviorSubject<OrderedTicket[]>([]);
+    public isCartEmpty = new BehaviorSubject<boolean>(true);
 
     constructor(private orderService: TicketOrderService) { }
 
@@ -29,7 +29,7 @@ export class OrderSummaryComponent implements OnInit, DoCheck {
         });
     }
 
-    private removeTicket(ticket: OrderedTicket) {
+    public removeTicket(ticket: OrderedTicket) {
         this.orderService.removeTicketFromCart(ticket);
     }
 

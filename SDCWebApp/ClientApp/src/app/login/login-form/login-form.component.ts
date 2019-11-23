@@ -12,18 +12,14 @@ import { Router } from '@angular/router';
     styleUrls: ['./login-form.component.scss']
 })
 export class LoginFormComponent implements OnInit {
-    public loginForm: FormGroup;
     private passwordValidPattern = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!#$%&\'()*+,\-.\/:;<=>?@[\\\]^_`{|}~]).{0,}$/;
     private usernameValidaPattern = /^[a-z]+$/;
-    private serverErrorResponse = new BehaviorSubject<string>(null);
 
-    public get username() {
-        return this.loginForm.get('username');
-    }
+    public loginForm: FormGroup;
+    public serverErrorResponse = new BehaviorSubject<string>(null);
 
-    public get password() {
-        return this.loginForm.get('password');
-    }
+    public get username() { return this.loginForm.get('username'); }
+    public get password() { return this.loginForm.get('password'); }
 
     constructor(private formBuilder: FormBuilder, private accountService: AuthService, private router: Router) { }
 
@@ -34,7 +30,7 @@ export class LoginFormComponent implements OnInit {
         });
     }
 
-    private login(): void {
+    public login(): void {
         if (this.accountService.isLogged.getValue()) {
             console.log('User already logged.');
             return;

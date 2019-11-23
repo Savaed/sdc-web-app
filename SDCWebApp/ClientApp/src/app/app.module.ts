@@ -31,7 +31,8 @@ import { Title } from '@angular/platform-browser';
 import { AuthInterceptorProvider } from './interceptors/AuthInterceptor';
 import { ExchangeTokenInterceptorProvider } from './interceptors/ExchangeTokenInterceptor';
 import { AdminAndModModule } from './admin-and-mod/admin-and-mod.module';
-import { ToastComponent } from './toast/toast.component';
+import { ToastrModule } from 'ngx-toastr';
+import { CustomToastComponent } from './custom-toast/custom-toast.component';
 
 
 @NgModule({
@@ -56,8 +57,9 @@ import { ToastComponent } from './toast/toast.component';
         VisitSdcComponent,
         CookiesAlertComponent,
         ArticleDetailsComponent,
-        ToastComponent
+        CustomToastComponent
     ],
+    entryComponents: [CustomToastComponent],
     imports: [
         HttpClientModule,
         BrowserModule,
@@ -68,7 +70,13 @@ import { ToastComponent } from './toast/toast.component';
         ReactiveFormsModule,
         MatDatepickerModule,
         MatNativeDateModule,
-        NgbModule
+        NgbModule,
+        ToastrModule.forRoot({
+            positionClass: 'toast-bottom-left',
+            timeOut: 5000,
+            toastClass: 'custom-toast',
+            preventDuplicates: true
+        })
     ],
     providers: [
         HttpErrorInterceptorProvider,

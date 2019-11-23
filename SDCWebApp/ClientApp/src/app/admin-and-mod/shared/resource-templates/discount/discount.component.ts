@@ -7,7 +7,7 @@ import { Discount } from 'src/app/models/Discount';
     styleUrls: ['./discount.component.scss']
 })
 export class DiscountComponent implements OnInit {
-    @Input() discount: Discount;
+    @Input() public discount: Discount;
 
     constructor() { }
 

@@ -14,6 +14,7 @@ import { Discount } from 'src/app/models/Discount';
 import { VisitInfo } from 'src/app/models/VisitInfo';
 import { TicketTariff } from 'src/app/models/TicketTariff';
 import { VisitTariff } from 'src/app/models/VisitTariff';
+import { ToastrService } from 'ngx-toastr';
 
 export enum ResourceType {
     None,
@@ -62,7 +63,8 @@ export class ResourceService {
         private ticketTariffService: TicketTariffService,
         private customerService: CustomerService,
         private visitGroupService: VisitGroupService,
-        private infoService: VisitInfoService
+        private infoService: VisitInfoService,
+        private toast: ToastrService
     ) { }
 
     public setEditMode(index: number, value: boolean) {
@@ -231,6 +233,7 @@ export class ResourceService {
                 tmpList.splice(tmpList.indexOf(resource as Article), 1);
                 this.currentResourceList.next(tmpList);
                 this.isEditMode.next(false);
+                this.toast.info('Article has been deleted.');
                 break;
 
             case ResourceType.Discount:
@@ -239,6 +242,7 @@ export class ResourceService {
                 tmpList.splice(tmpList.indexOf(resource as Discount), 1);
                 this.currentResourceList.next(tmpList);
                 this.isEditMode.next(false);
+                this.toast.info('Discount has been deleted.');
                 break;
 
             case ResourceType.VisitInfo:
@@ -247,6 +251,7 @@ export class ResourceService {
                 tmpList.splice(tmpList.indexOf(resource as VisitInfo), 1);
                 this.currentResourceList.next(tmpList);
                 this.isEditMode.next(false);
+                this.toast.info('Visit info has been deleted.');
                 break;
 
             case ResourceType.TicketTariff:
@@ -255,6 +260,7 @@ export class ResourceService {
                 tmpList.splice(tmpList.indexOf(resource as TicketTariff), 1);
                 this.currentResourceList.next(tmpList);
                 this.isEditMode.next(false);
+                this.toast.info('Ticket price list has been deleted.');
                 break;
         }
     }

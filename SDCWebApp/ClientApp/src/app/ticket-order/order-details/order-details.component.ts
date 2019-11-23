@@ -17,7 +17,7 @@ import { Title } from '@angular/platform-browser';
     styleUrls: ['./order-details.component.scss']
 })
 export class OrderDetailsComponent implements OnInit {
-    private ticketOrder = new BehaviorSubject<OrderResponse>(undefined);
+    public ticketOrder = new BehaviorSubject<OrderResponse>(undefined);
     private ticketTariffs = new BehaviorSubject<TicketTariff[]>(undefined);
     private discounts = new BehaviorSubject<Discount[]>(undefined);
 
@@ -44,19 +44,19 @@ export class OrderDetailsComponent implements OnInit {
         this.ticketTariffSrevice.getRecentTicketTariffs().subscribe(tariffs => this.ticketTariffs.next(tariffs.tariffs));
     }
 
-    private getDiscount(ticket: Ticket): Observable<Discount> {
+    public getDiscount(ticket: Ticket): Observable<Discount> {
         const discountId = ticket._links.find(x => x.rel === 'Discount').href.split('/')[1];
         const discount = this.discounts.getValue().find(x => x.id === discountId);
         return new BehaviorSubject(discount).asObservable();
     }
 
-    private getTicketTariff(ticket: Ticket): Observable<TicketTariff> {
+    public getTicketTariff(ticket: Ticket): Observable<TicketTariff> {
         const ticketTariffId = ticket._links.find(x => x.rel === 'TicketTariff').href.split('/')[1];
         const ticketTariff = this.ticketTariffs.getValue().find(x => x.id === ticketTariffId);
         return new BehaviorSubject(ticketTariff).asObservable();
     }
 
-    private saveOrderAsPdf() {
+    public saveOrderAsPdf() {
         const options = {
             filename: 'SDC-ticket',
             image: { type: 'jpg' },

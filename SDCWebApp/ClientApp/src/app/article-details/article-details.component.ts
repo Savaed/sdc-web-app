@@ -12,9 +12,10 @@ import { Title } from '@angular/platform-browser';
 })
 export class ArticleDetailsComponent implements OnInit {
     private allArticles = new BehaviorSubject<Article[]>(undefined);
-    private readArticle = new BehaviorSubject<Article>(undefined);
-    private otherArticles = new BehaviorSubject<Article[]>(undefined);
-    private nextArticle = new BehaviorSubject<Article>(undefined);
+    
+    public readArticle = new BehaviorSubject<Article>(undefined);
+    public otherArticles = new BehaviorSubject<Article[]>(undefined);
+    public nextArticle = new BehaviorSubject<Article>(undefined);
 
     constructor(private articleService: ArticleService, private activatedRoute: ActivatedRoute, private router: Router, private titleService: Title) {
         const articleName = this.activatedRoute.snapshot.params.articleName as string;
@@ -52,7 +53,7 @@ export class ArticleDetailsComponent implements OnInit {
         }
     }
 
-    private navigateToArticle(articleTitle: string) {
+    public navigateToArticle(articleTitle: string) {
         this.router.navigate(['news', articleTitle]);
         const allArticles = this.allArticles.getValue();
         this.readArticle.next(allArticles.find(x => x.title.toLowerCase() === articleTitle.toLowerCase()));

@@ -4,6 +4,7 @@ import { FormControl, FormArray, FormGroup, Validators, FormBuilder } from '@ang
 import { VisitInfo, OpeningHours } from 'src/app/models/VisitInfo';
 import { ResourceType, ResourceService } from '../../../resource.service';
 import { TicketTariffService } from 'src/app/services/ticket-tariff.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'app-ticket-tariff-form',
@@ -11,13 +12,13 @@ import { TicketTariffService } from 'src/app/services/ticket-tariff.service';
     styleUrls: ['./ticket-tariff-form.component.scss']
 })
 export class TicketTariffFormComponent implements OnInit {
-    private tariffForm: FormGroup;
-    private visitTariffs = new Array<{ visitTariffName: string, visitTariffId: string }>();
+    public tariffForm: FormGroup;
+    public visitTariffs = new Array<{ visitTariffName: string, visitTariffId: string }>();
 
     @Input() public tariff: TicketTariff = { visitTariffId: '', defaultPrice: 1, features: [], isPerHour: false, isPerPerson: false, overview: '', title: '' };
     @Input() public isForAdd = false;
 
-    constructor(private formBuilder: FormBuilder, private resourceService: ResourceService, private ticketTariffService: TicketTariffService) { }
+    constructor(private formBuilder: FormBuilder, private resourceService: ResourceService, private ticketTariffService: TicketTariffService, private toast: ToastrService) { }
 
     get visitTariffName() { return this.tariffForm.get('visitTariffName') as FormControl; }
     get title() { return this.tariffForm.get('title') as FormControl; }
@@ -56,13 +57,13 @@ export class TicketTariffFormComponent implements OnInit {
         return '';
     }
 
-    addFeatureFormGroup(): FormGroup {
+    public addFeatureFormGroup(): FormGroup {
         return this.formBuilder.group({
             feature: ['', [Validators.required, Validators.maxLength(40)]]
         });
     }
 
-    private addFeature() {
+    public addFeature() {
         this.features.push(this.addFeatureFormGroup());
     }
 
@@ -77,8 +78,8 @@ export class TicketTariffFormComponent implements OnInit {
             features: this.getFeatures()
         };
 
-        console.log('add ticket tariff');
         this.resourceService.add(newTariff, ResourceType.TicketTariff);
+        this.toast.info('New ticket price list has been added.');
     }
 
     private isDifferent(oldTariff: TicketTariff, newTariff: TicketTariff): boolean {
@@ -103,6 +104,7 @@ export class TicketTariffFormComponent implements OnInit {
 
         if (this.isDifferent(updatedTariff, this.tariff)) {
             this.resourceService.edit(updatedTariff);
+            this.toast.info('Ticket price list has been edited.');
         }
     }
 
@@ -118,7 +120,7 @@ export class TicketTariffFormComponent implements OnInit {
         return tmpFeatures;
     }
 
-    private deleteFeature(i: number, fromForm = true) {
+    public deleteFeature(i: number, fromForm = true) {
         if (fromForm) {
             this.features.controls.splice(i, 1);
         } else {
@@ -126,7 +128,7 @@ export class TicketTariffFormComponent implements OnInit {
         }
     }
 
-    private testCRUD() {
+    public testCRUD() {
         if (this.isForAdd) {
             this.add();
         } else {
