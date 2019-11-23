@@ -18,8 +18,6 @@ import { CustomerComponent } from './shared/resource-templates/customer/customer
 import { DiscountFormComponent } from './shared/resource-templates/discount/discount-form/discount-form.component';
 import { TicketTariffFormComponent } from './shared/resource-templates/ticket-tariff/ticket-tariff-form/ticket-tariff-form.component';
 import { VisitInfoFormComponent } from './shared/resource-templates/visit-info/visit-info-form/visit-info-form.component';
-import { VisitTariffComponent } from './shared/resource-templates/visit-tariff/visit-tariff.component';
-import { VisitTariffFormComponent } from './shared/resource-templates/visit-tariff/visit-tariff-form/visit-tariff-form.component';
 
 
 @NgModule({
@@ -37,9 +35,7 @@ import { VisitTariffFormComponent } from './shared/resource-templates/visit-tari
         CustomerComponent,
         DiscountFormComponent,
         TicketTariffFormComponent,
-        VisitInfoFormComponent,
-        VisitTariffComponent,
-        VisitTariffFormComponent
+        VisitInfoFormComponent
     ],
     imports: [
         CommonModule,

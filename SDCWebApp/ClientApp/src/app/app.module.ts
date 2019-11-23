@@ -71,9 +71,9 @@ import { ToastComponent } from './toast/toast.component';
         NgbModule
     ],
     providers: [
-        AuthInterceptorProvider,
-        ExchangeTokenInterceptorProvider,
         HttpErrorInterceptorProvider,
+        ExchangeTokenInterceptorProvider,
+        AuthInterceptorProvider,
         Title
     ],
     bootstrap: [AppComponent]

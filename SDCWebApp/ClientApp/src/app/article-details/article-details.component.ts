@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Article } from '../models/Article';
 import { ArticleService } from '../services/article.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { Title } from '@angular/platform-browser';
 
 @Component({
@@ -25,11 +25,9 @@ export class ArticleDetailsComponent implements OnInit {
         this.articleService.getAllArticles().subscribe(articles => {
             this.allArticles.next(articles);
             const articleName = this.activatedRoute.snapshot.params.articleName as string;
-            console.log(articleName);
             this.readArticle.next(articles.find(x => x.title.toLowerCase() === articleName.toLowerCase()));
             this.otherArticles.next(articles.filter(x => x.title.toLowerCase() !== articleName.toLowerCase()).sort((a, b) => this.sortChronological(a, b)).slice(0, 8));
             this.nextArticle.next(this.otherArticles.getValue()[0]);
-            console.log(this.otherArticles.getValue());
         });
     }
 
@@ -60,7 +58,6 @@ export class ArticleDetailsComponent implements OnInit {
         this.readArticle.next(allArticles.find(x => x.title.toLowerCase() === articleTitle.toLowerCase()));
         this.otherArticles.next(allArticles.filter(x => x.title.toLowerCase() !== articleTitle.toLowerCase()).sort((a, b) => this.sortChronological(a, b)).slice(0, 8));
         this.nextArticle.next(this.otherArticles.getValue()[0]);
-
         this.titleService.setTitle('News - ' + articleTitle);
     }
 }

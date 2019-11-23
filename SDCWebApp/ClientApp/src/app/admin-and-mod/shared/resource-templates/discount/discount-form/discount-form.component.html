@@ -16,7 +16,7 @@
         <!-- TYPE -->
         <div class="form-group" formGroupName="discountTypeGroup">
             <label for="discountType">Type</label>
-            <select class="custom-select form-control" name="discountType" id="discountType" formControlName="type" [class.is-invalid]="type.invalid && type.touched">
+            <select class="custom-select form-control" name="discountType" id="discountType" formControlName="type" [class.is-invalid]="discountTypeGroup.invalid && discountTypeGroup.touched">
                 <option value="ForChild">For child</option>
                 <option value="ForPensioner">For pensioner</option>
                 <option value="ForStudent">For student</option>
@@ -26,22 +26,30 @@
             </select>
 
             <!-- TYPE VALIDATION ERRORS -->
-            <div *ngIf="type.invalid && type.touched">
-                <small *ngIf="type.errors?.required" placement="right" ngbPopover="test" class="text-danger">Discount type is required</small>
+            <div *ngIf="discountTypeGroup.invalid && discountTypeGroup.touched">
+                <small *ngIf="discountTypeGroup.errors?.required" placement="right" ngbPopover="test" class="text-danger">Discount type is required</small>
+                <small *ngIf="discountTypeGroup.errors?.invalidType" placement="right" ngbPopover="test" class="text-danger">Only 'For group' type is allowed if group size is greater than 0</small>
             </div>
 
             <!-- GROUP SIZE -->
-            <div class="resource-details">
+            <div class="resource-details mt-3">
                 <label for="maxGroupSizeForDiscount">Max group size for discount</label>
-                <input [disabled]="type.value !== discountType.ForGroup" type="range" min=0 max="30" name="maxGroupSizeForDiscount" id="maxGroupSizeForDiscount" class="custom-range"
-                    formControlName="groupSizeForDiscount">
+                <input type="range" min=0 [max]="info?.maxAllowedGroupSize" name="maxGroupSizeForDiscount" id="maxGroupSizeForDiscount" class="custom-range" formControlName="groupSizeForDiscount" 
+                [class.is-invalid]="discountTypeGroup.invalid && discountTypeGroup.touched">
+                
+                <!-- GROUP SIZE VALIDATION ERRORS -->
+                <div *ngIf="discountTypeGroup.invalid && discountTypeGroup.touched">
+                    <small *ngIf="discountTypeGroup.errors?.required" placement="right" ngbPopover="test" class="text-danger">Discount group size is required</small>
+                    <small *ngIf="discountTypeGroup.errors?.invalidType" placement="right" ngbPopover="test" class="text-danger">Discount group size may be greater than 0 only if type is 'For group'</small>
+                </div>
+
                 <p>Group size: {{ groupSizeForDiscount?.value }}</p>
             </div>
         </div>
 
         <!-- VALUE -->
         <div class="form-group resource-details">
-            <label for="discountValue">Value (%)</label>
+            <label for="discountValue">Value</label>
             <input type="range" min=0 max="100" name="discountValue" id="discountValue" class="custom-range" formControlName="discountValueInPercentage">
             <p>Value: {{ discountValueInPercentage?.value }}%</p>
         </div>

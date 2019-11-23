@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { ServerUrl } from '../helpers/Constants';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Ticket } from '../models/Ticket';
 import { ApiResponse } from '../models/ApiResponse';
 import { map } from 'rxjs/operators';
 import { SightseeingGroup } from '../models/SightseeingGroup';

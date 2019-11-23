@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Route } from '@angular/router';
 import { DashboardComponent } from './shared/dashboard/dashboard.component';
-
 import { ResourceOverviewComponent } from './shared/resource-overview/resource-overview.component';
 import { AuthGuard } from '../guards/auth.guard';
 
@@ -11,19 +10,14 @@ const userRoutes: Route[] = [
     {
         path: 'admin',
         canActivate: [AuthGuard],
-        children:
-            [
-                {
-                    path: 'dashboard',
-                    component: DashboardComponent
-                }
-            ]
+        canLoad: [AuthGuard],
+        children: [{ path: 'dashboard', component: DashboardComponent }]
     },
     {
         path: 'mod',
-        children: [
-            { path: 'dashboard', component: DashboardComponent }
-        ]
+        canActivate: [AuthGuard],
+        canLoad: [AuthGuard],
+        children: [{ path: 'dashboard', component: DashboardComponent }]
     }
 ];
 

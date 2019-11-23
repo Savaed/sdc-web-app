@@ -11,7 +11,5 @@ export class VisitInfoComponent implements OnInit {
 
     constructor() { }
 
-    ngOnInit() {
-    }
-
+    ngOnInit() { }
 }

@@ -8,9 +8,5 @@
     <ng-template #elseTemplate>
         <p class="overview-info text-muted"> {{ secondaryInfo }}</p>
     </ng-template>
-    <p [class.resource-date]="editable" class="overview-info ml-auto mr-2 text-muted">{{ modifyDate | date: 'dd LLL yyyy'}}</p>
-    <!-- <div class="row" [class.d-none]="!editable">
-        <i role="button" class="fas fa-trash action-icon" placement="bottom" ngbTooltip="Delete" tooltipClass="custom-tooltip" (click)="delete()"></i>
-        <i class="fas fa-pen action-icon" placement="bottom" ngbTooltip="Edit" tooltipClass="custom-tooltip"></i>
-    </div> -->
+    <p [class.resource-date]="editable" class="overview-info ml-auto mr-2 text-muted">{{ modifyDate | date: 'dd LLL yyyy'}}</p>   
 </div>

@@ -1,6 +1,6 @@
 <div class="container-fluid pt-4 pb-5 align-items-center">
 
-    <div class="col-10 col-lg-5 text-center mx-auto mt-4 mb-5">
+    <div class="col-12 col-lg-5 text-center mx-auto mt-4 mb-5">
         <p class="text-gray text-mono">
             Our articles
         </p>
@@ -16,33 +16,27 @@
 
     <!-- ARTICLE CARDS START -->
     <div class="card-deck col-12 col-lg-8 mx-auto mb-md-3">
-        <div class="m-0 p-0" *ngFor="let article of articles | async; let i = index" >
-            {{ i }}
-            <div class="card custom-card">
-                <img src="../../assets/images/glass-rod.jpg" class="card-img-top" alt="glass rod">
-                <div class="card-body">
-                    <div>
-                        <h5 class="card-title">{{ article.title }}</h5>
-                        <p class="card-text text">{{ article.text | slice:0:280 }}.</p>
-                    </div>
-                    <div class="row mt-4">
-                      <a [routerLink]="[ '/news', article.title ]"><small>Read more</small></a>
-                        <small class="text-muted ml-auto">{{ article.createdAt | date: 'dd LLLL yyyy, H:mm' }}</small>
-                    </div>
+
+        <div class="card custom-card" *ngFor="let article of articles | async; let i = index">
+            <img src="../../assets/images/glass-rod.jpg" class="card-img-top" alt="glass rod">
+            <div class="card-body">
+                <div>
+                    <h5 class="card-title">{{ article.title }}</h5>
+                    <p class="card-text text">{{ article.text | slice:0:280 }}.</p>
+                </div>
+                <div class="row mt-4">
+                    <a [routerLink]="[ '/news', article.title ]"><small>Read more</small></a>
+                    <small class="text-muted ml-auto">{{ article.createdAt | date: 'dd LLLL yyyy, H:mm' }}</small>
                 </div>
             </div>
 
             <!-- wrap every 1 on sm -->
             <div class="w-100 d-none d-sm-block d-md-none"></div>
-
+    
             <!-- wrap every 2 on md and lg-->
-            <div *ngIf="(i + 1) % 2 === 0" class="w-100 d-none d-md-block d-xl-none"></div>
-
-            <!-- wrap every 3 on xl -->
-            <div *ngIf="(i + 1) % 3 == 0" class="w-100 d-none d-xl-block"></div>
+            <div *ngIf="(i + 1) % 2 === 0" class="w-100 d-none d-md-block"></div>
 
         </div>
-
 
     </div>
     <!-- </div> -->

@@ -1,20 +1,8 @@
 <div class="row border-bottom">
     <!-- MENU START -->
     <div class="col-2 pr-0 pl-0 dashboard-menu border-right">
-
-        <!-- <div class="resource-header">
-            <h3 class="text-center my-4">All resources</h3>
-
-            <div class="form-group mx-4">
-                <input type="text" class="form-control" name="search" id="search" aria-describedby="helpId" placeholder="Search">
-                <i class="fas fa-search"></i>
-            </div>
-             <button class="btn btn-accent" (click)="resourceService.search('test')">test search</button> 
-
-            <div class="tiny-divider bg-gray mx-0 my-3"></div>
-        </div> -->
-
         <div class="list-group p-0 py-3">
+
             <a (click)="resourceService.showArticles(); hideWelcomeBanner(); hideAddForm()" class="list-group-item list-group-item-action">
                 <div class="row align-items-center">
                     <div class="circle text-center mr-4">
@@ -115,14 +103,12 @@
 
     </div>
 
-
     <!-- CONTENT CONTAINER START -->
     <div class="col-8 px-0 m-0">
         <div class="row mt-4 border-bottom">
 
             <mat-checkbox class="ml-3 pl-2"></mat-checkbox>
             <i *ngIf="(resourceService.isAddModeEnable | async) || (resourceService.isEditModeEnable | async)" (click)="backToOverview()" class="fas fa-arrow-left ml-3"></i>
-
 
             <div class="dropdown ml-3">
                 <button class="btn btn-accent-tight shadow-sm" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -136,9 +122,8 @@
                 </div>
             </div>
 
-
             <div class="dropdown">
-                <button class="btn dropdown-toggle btn-flat" type="button" id="dropdownMenuButton" ngbTooltip="Filters" placement="bottom" tooltipClass="custom-tooltip" data-toggle="dropdown"
+                <button class="btn dropdown-toggle btn-flat" type="button" id="dropdownMenuButton" ngbTooltip="Filters (just placeholder)" placement="bottom" tooltipClass="custom-tooltip" data-toggle="dropdown"
                     aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-sliders-h"></i>
                 </button>
@@ -155,11 +140,6 @@
             </div>
         </div>
 
-
-
-
-
-
         <!-- RESOURCE OVERVIEW -->
         <div>
 
@@ -173,9 +153,9 @@
                         This is the {{ authService.userRole }} panel
                     </h1>
                     <p class="text-gray col-11 mx-auto">
-                        Here you can manage all the resources available in the system. To choose a specific resource, use the menu on the left side. To add a new resource, select "Add new" on the top.
-                        Basic statistics
-                        will be displayed on the right (available soon)
+                        Here you can manage all the resources available in the system. To choose a specific resource, use the menu on the left side. 
+                        To add a new resource, select "Add new" on the top. Basic statistics will be displayed on the right (available soon). 
+                        This subpage is not responsive by design.
                     </p>
                 </div>
                 <div class="dashboard-img mx-auto"></div>
@@ -184,15 +164,19 @@
             <!-- ADD NEW RESOURCE FORM -->
             <div>
                 <div *ngIf="(resourceService.resourceType | async) == resourceType.Article && resourceService.isAddModeEnable | async" class="resource-details-container shadow-sm m-3 p-3">
+                    <p>New article</p>
                     <app-article-form [isForAdd]="true"></app-article-form>
                 </div>
                 <div *ngIf="(resourceService.resourceType | async) == resourceType.Discount && resourceService.isAddModeEnable | async" class="resource-details-container shadow-sm m-3 p-3">
+                    <p>New discount</p>
                     <app-discount-form [isForAdd]="true"></app-discount-form>
                 </div>
                 <div *ngIf="(resourceService.resourceType | async) == resourceType.VisitInfo && resourceService.isAddModeEnable | async" class="resource-details-container shadow-sm m-3 p-3">
+                    <p>New visit info</p>
                     <app-visit-info-form [isForAdd]="true"></app-visit-info-form>
                 </div>
                 <div *ngIf="(resourceService.resourceType | async) == resourceType.TicketTariff && resourceService.isAddModeEnable | async" class="resource-details-container shadow-sm m-3 p-3">
+                    <p>New ticket price list</p>
                     <app-ticket-tariff-form [isForAdd]="true"></app-ticket-tariff-form>
                 </div>
             </div>
@@ -204,47 +188,47 @@
                         <!-- Check resource type -->
                         <!-- Article -->
                         <div *ngIf="(resourceService.resourceType | async) == resourceType.Article">
-                            <app-resource-overview [id]="resource.id" [mainInfo]="resource.title" [secondaryInfo]="resource.text" [modifyDate]="resource.createdAt" [editable]="true">
+                            <app-resource-overview [id]="resource.id" [mainInfo]="resource.title" [secondaryInfo]="resource.text" [modifyDate]="resource.updatedAt !== null ? resource.updatedAt : resource.createdAt" [editable]="true">
                             </app-resource-overview>
                         </div>
 
                         <!-- Customer -->
                         <div *ngIf="(resourceService.resourceType | async) == resourceType.Customer">
-                            <app-resource-overview [id]="resource.id" [mainInfo]="resource.emailAddress" [secondaryInfo]="resource.dateOfBirth" [modifyDate]="resource.createdAt">
+                            <app-resource-overview [id]="resource.id" [mainInfo]="resource.emailAddress" [secondaryInfo]="'Birthday date: ' + (resource.dateOfBirth | date: 'yyyy.LL.dd')" [modifyDate]="resource.updatedAt !== null ? resource.updatedAt : resource.createdAt">
                             </app-resource-overview>
                         </div>
 
                         <!-- Discount -->
                         <div *ngIf="(resourceService.resourceType | async) == resourceType.Discount">
-                            <app-resource-overview [id]="resource.id" [mainInfo]="resource.type" [secondaryInfo]="resource.description" [modifyDate]="resource.createdAt" [editable]="true">
+                            <app-resource-overview [id]="resource.id" [mainInfo]="resource.type" [secondaryInfo]="resource.description" [modifyDate]="resource.updatedAt !== null ? resource.updatedAt : resource.createdAt" [editable]="true">
                             </app-resource-overview>
                         </div>
 
                         <!-- Log -->
                         <div *ngIf="(resourceService.resourceType | async) == resourceType.Log">
-                            <app-resource-overview [id]="resource.id" [mainInfo]="resource.user" [secondaryInfo]="resource.description" [modifyDate]="resource.date"></app-resource-overview>
+                            <app-resource-overview [id]="resource.id" [mainInfo]="resource.user" [secondaryInfo]="resource.description" [modifyDate]="resource.updatedAt !== null ? resource.updatedAt : resource.createdAt"></app-resource-overview>
                         </div>
 
                         <!-- Ticket -->
                         <div *ngIf="(resourceService.resourceType | async) == resourceType.Ticket">
-                            <app-resource-overview [id]="resource.id" [mainInfo]="resource.ticketUniqueId" [secondaryInfo]="resource.purchaseDate" [modifyDate]="resource.createdAt">
+                            <app-resource-overview [id]="resource.id" [mainInfo]="resource.ticketUniqueId" [secondaryInfo]="'Purchase date: ' + (resource.purchaseDate | date: 'yyyy.LL.dd, HH:mm')" [modifyDate]="resource.updatedAt !== null ? resource.updatedAt : resource.createdAt">
                             </app-resource-overview>
                         </div>
 
                         <!-- TicketTariff -->
                         <div *ngIf="(resourceService.resourceType | async) == resourceType.TicketTariff">
-                            <app-resource-overview [id]="resource.id" [mainInfo]="resource.title" [secondaryInfo]="resource.overview" [modifyDate]="resource.createdAt" [editable]="true">
+                            <app-resource-overview [id]="resource.id" [mainInfo]="resource.title" [secondaryInfo]="resource.overview" [modifyDate]="resource.updatedAt !== null ? resource.updatedAt : resource.createdAt" [editable]="true">
                             </app-resource-overview>
                         </div>
 
                         <!-- VisitInfo -->
                         <div *ngIf="(resourceService.resourceType | async) == resourceType.VisitInfo">
-                            <app-resource-overview [id]="resource.id" [mainInfo]="resource.description" [modifyDate]="resource.createdAt" [editable]="true"></app-resource-overview>
+                            <app-resource-overview [id]="resource.id" [mainInfo]="resource.description" [modifyDate]="resource.updatedAt !== null ? resource.updatedAt : resource.createdAt" [editable]="true"></app-resource-overview>
                         </div>                       
 
                         <!-- VisitGroup -->
                         <div *ngIf="(resourceService.resourceType | async) == resourceType.VisitGroup">
-                            <app-resource-overview [id]="resource.id" [mainInfo]="resource.sightseeingDate" [secondaryInfo]="resource.currentGroupSize" [modifyDate]="resource.createdAt">
+                            <app-resource-overview [id]="resource.id" [mainInfo]="'Sightseeing date: ' + (resource.sightseeingDate | date: 'yyyy.LL.dd')" [secondaryInfo]="'Current group size: ' + resource.currentGroupSize" [modifyDate]="resource.updatedAt !== null ? resource.updatedAt : resource.createdAt">
                             </app-resource-overview>
                         </div>
 
@@ -253,6 +237,7 @@
                     <!-- Display details coresponding to resource type -->
                     <div class="collapse border-bottom" id="item{{ i }}">
                         <div class="resource-details-container shadow-sm m-3 p-3">
+
                             <!-- Article -->
                             <div *ngIf="(resourceService.resourceType | async) == resourceType.Article">
                                 <ng-container *ngIf="(resourceService.isEditModeEnable | async) && (resourceService.editIndex | async) === i; else elseTemplate">
@@ -337,10 +322,6 @@
             </div>
         </div>
 
-
-
-
-
     </div>
     <!-- CONTENT CONTAINER END -->
 
@@ -348,7 +329,6 @@
         <div>
             <!-- img, chart etc here -->
         </div>
-
 
         <div class="accent-color text-light">
             <div class="row">
@@ -375,9 +355,5 @@
                 </div>
             </div>
         </div>
-
-
-
     </div>
-
 </div>

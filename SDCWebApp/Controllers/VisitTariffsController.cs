@@ -20,7 +20,7 @@ namespace SDCWebApp.Controllers
     /// Provides methods to Http verbs proccessing on <see cref="VisitTariff"/> entities.
     /// </summary>
     [Route("api/visit-tariffs")]
-    //[Authorize(ApiConstants.ApiUserPolicy)]
+    [Authorize(ApiConstants.ApiUserPolicy)]
     [ApiController]
     public class VisitTariffsController : CustomApiController, IVisitTariffsController
     {

@@ -228,7 +228,6 @@ button.btn-accent-outline{
 .custom-bordered-card {
     border-radius: 8px;
     transition: all 0.2s ease-out;
-    //margin: 5px;
     border: 1px solid transparent;
 
     &>a{
@@ -242,9 +241,7 @@ button.btn-accent-outline{
          box-shadow: 0 2px 8px 6px rgba(0,0,0,.1);
          border: 1px solid rgba(128, 128, 128, 0.3);
     }
-}
-    
-
+}  
 
 div.custom-card{
     text-align: left;

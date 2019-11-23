@@ -33,11 +33,8 @@ export class TicketTariffFormComponent implements OnInit {
                 this.visitTariffs.push({ visitTariffName: visitTariff.name, visitTariffId: visitTariff.id });
             }));
 
-        console.log(this.visitTariffs);
-
-
         this.tariffForm = this.formBuilder.group({
-            visitTariffName: [this.getVisitTariffName(this.tariff.visitTariffId), this.isForAdd ? Validators.required : null ],
+            visitTariffName: [this.getVisitTariffName(this.tariff.visitTariffId), this.isForAdd ? Validators.required : null],
             title: [this.tariff.title, [Validators.required, Validators.maxLength(50)]],
             overview: [this.tariff.overview, [Validators.required, Validators.maxLength(50)]],
             isPerHour: [this.tariff.isPerHour, [Validators.required]],
@@ -67,8 +64,6 @@ export class TicketTariffFormComponent implements OnInit {
 
     private addFeature() {
         this.features.push(this.addFeatureFormGroup());
-        console.log(this.features.controls);
-        
     }
 
     private add() {
@@ -139,4 +134,3 @@ export class TicketTariffFormComponent implements OnInit {
         }
     }
 }
-

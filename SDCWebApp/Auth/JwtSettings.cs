@@ -31,7 +31,7 @@ namespace SDCWebApp.Auth
                 ValidAudience = Audience,
                 ValidateAudience = true,
 
-                // Ensure the token was issued by trusted authorization server (in this case by this server),
+                // Ensure the token was issued by trusted authorization server (in this case by this server).
                 ValidIssuer = Issuer,
                 ValidateIssuer = true,
 

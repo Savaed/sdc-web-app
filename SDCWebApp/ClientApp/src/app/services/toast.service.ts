@@ -46,7 +46,7 @@ export class ToastService {
         this.alert(new Alert({ message, type: AlertType.Warning, alertId }));
     }
 
-    // main alert method   
+    // main alert method
     alert(alert: Alert) {
         this.keepAfterRouteChange = alert.keepAfterRouteChange;
         this.subject.next(alert);

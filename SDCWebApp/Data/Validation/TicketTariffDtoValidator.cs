@@ -16,7 +16,7 @@ namespace SDCWebApp.Data.Validation
             RuleFor(x => x.Description)
                     .Cascade(CascadeMode.StopOnFirstFailure)
                     .NotEmpty().WithMessage("{PropertyName} is required.")
-                    .MaximumLength(256);
+                    .MaximumLength(300);
         }
     }
 }

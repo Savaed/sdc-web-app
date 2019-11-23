@@ -1,7 +1,6 @@
 import { Component, OnInit, DoCheck } from '@angular/core';
 import { TicketOrderService, OrderedTicket } from '../ticket-order.service';
 import { BehaviorSubject } from 'rxjs';
-import { Ticket } from 'src/app/models/Ticket';
 
 @Component({
     selector: 'app-order-summary',
@@ -19,7 +18,6 @@ export class OrderSummaryComponent implements OnInit, DoCheck {
         this.orderService.ticketCart.subscribe(cart => {
             this.overallCartPrice.next(this.calculateOveralPrice(cart));
             this.ticketCart.next(cart);
-            console.log(this.isCartEmpty.getValue());
         });
     }
 
@@ -43,7 +41,6 @@ export class OrderSummaryComponent implements OnInit, DoCheck {
         }
 
         tickets.forEach(ticket => sum += (ticket.ticketPrice * ticket.ticketAmount));
-        console.log(sum);
         return sum;
     }
 }

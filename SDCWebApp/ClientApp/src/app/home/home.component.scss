@@ -13,7 +13,7 @@
     }
 
     &-header{
-        font-size: 60px;
+        font-size: 3em;
         font-weight: 600;
     }
 
@@ -104,4 +104,9 @@
     background-repeat: no-repeat;
     background-size: contain;
     border-radius: 8px;
+}
+
+.far {
+    position: relative;
+    top: 4px;
 }

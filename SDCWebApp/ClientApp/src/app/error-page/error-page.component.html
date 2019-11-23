@@ -1,21 +1,23 @@
 <div class="error-page">
-    <div class="col-4 my-auto">
-        <p class="error-header">
-            Oops!
-        </p>
-        <p class="error-code-highlight"> Erorr code <strong>{{ errorCode }}</strong> </p>
-        <div class="col-8 p-0">
-            <p class="error-message text-gray">{{ errorGeneralMessage | async }}</p>
-            <p class="error-message text-gray">{{ errorSpecificMessage | async }}</p>
-            <button class="btn btn-lg btn-accent px-5 mt-2" [routerLink]="[ '/home' ]">Go Home</button>
+    <div class="d-flex my-auto">
+        <div class="col-4">
+            <p class="error-header">
+                Oops!
+            </p>
+            <p class="error-code-highlight"> Erorr code <strong>{{ errorCode }}</strong> </p>
+            <div class="col-8 p-0">
+                <p class="error-message text-gray">{{ errorGeneralMessage | async }}</p>
+                <p class="error-message text-gray">{{ errorSpecificMessage | async }}</p>
+                <button class="btn btn-lg btn-accent px-5 mt-2" [routerLink]="[ '/home' ]">Go Home</button>
+            </div>
         </div>
-    </div>
-    <div class="col-4 p-5 my-auto">         
-        <ng-container *ngIf="errorCode == 401 || errorCode == 403; else otherCode">
-            <div class="error-img-401-403"></div>
-        </ng-container>
-        <ng-template #otherCode>
+        <div class="col-4 p-5">
+            <ng-container *ngIf="errorCode == 401 || errorCode == 403; else otherCode">
+                <div class="error-img-401-403"></div>
+            </ng-container>
+            <ng-template #otherCode>
                 <div class="error-img-other"></div>
-        </ng-template>
+            </ng-template>
+        </div>
     </div>
 </div>

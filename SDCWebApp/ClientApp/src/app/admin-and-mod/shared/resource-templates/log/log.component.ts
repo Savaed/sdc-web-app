@@ -8,7 +8,7 @@ import { ActivityLog } from 'src/app/models/ActivityLog';
 })
 export class LogComponent implements OnInit {
     @Input() public log: ActivityLog;
-    
+
     constructor() { }
 
     ngOnInit() { }

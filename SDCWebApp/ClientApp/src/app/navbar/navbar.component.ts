@@ -12,6 +12,7 @@ import { Router } from '@angular/router';
 export class NavbarComponent implements OnInit, DoCheck {
     private openingHour = new BehaviorSubject<string>(undefined);
     private closingHour = new BehaviorSubject<string>(undefined);
+    private isNavCollapse = new BehaviorSubject<boolean>(false);
 
     get isLogged(): BehaviorSubject<boolean> { return this.authService.isLogged; }
 
@@ -21,8 +22,10 @@ export class NavbarComponent implements OnInit, DoCheck {
         this.infoService.getRecentInfo().subscribe(info => {
             const now = new Date();
 
-            this.openingHour.next(info.openingHours.find(hour => hour.dayOfWeek.toString() === now.dayToString()).openingHour.toString());
-            this.closingHour.next(info.openingHours.find(hour => hour.dayOfWeek.toString() === now.dayToString()).closingHour.toString());
+            if (info !== undefined) {
+                this.openingHour.next(info.openingHours.find(hour => hour.dayOfWeek.toString() === now.dayToString()).openingHour.toString());
+                this.closingHour.next(info.openingHours.find(hour => hour.dayOfWeek.toString() === now.dayToString()).closingHour.toString());
+            }
         });
     }
 

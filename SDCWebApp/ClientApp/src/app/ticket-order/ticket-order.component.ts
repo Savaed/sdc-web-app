@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { TicketOrderService } from './ticket-order.service';
 import { Title } from '@angular/platform-browser';
 
 @Component({
@@ -10,10 +9,9 @@ import { Title } from '@angular/platform-browser';
 export class TicketOrderComponent implements OnInit {
     private readonly title = 'Ticket order';
 
-    constructor(private titleService: Title, private orderService: TicketOrderService) {
+    constructor(private titleService: Title) {
         this.titleService.setTitle(this.title);
     }
 
-    ngOnInit() {
-    }
+    ngOnInit() { }
 }

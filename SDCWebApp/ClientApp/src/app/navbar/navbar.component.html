@@ -1,11 +1,11 @@
-<nav class="px-lg-5 navbar navbar-expand-lg navbar-light bg-light shadow-sm">
-    <button class="navbar-toggler ml-auto" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+<nav class="p-0 px-lg-5 shadow-sm navbar navbar-expand-lg navbar-light shadow-sm bg-light">
+    <button class="navbar-toggler ml-auto m-2" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
-    </button>
+    </button>   
 
     <!-- NAV MENU START -->
-    <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav text-center mr-auto">
+    <div class="collapse navbar-collapse border-top" id="navbarNav">
+        <ul class="navbar-nav text-center bg-light mr-auto">
             <li class="nav-item mx-0 mr-lg-3 mr-xl-5 pl-lg-3">
                 <a class="nav-link" [routerLink]="[ '/' ]">HOME</a>
             </li>
@@ -32,22 +32,26 @@
 
             </li>
         </ul>
-        <div class="pr-4 d-none d-lg-flex align-items-center">
+
+        <div class="pr-0 pr-lg-4 d-lg-flex align-items-center text-center">
 
             <!-- OPENING HOUR INFO -->
-            <p *ngIf="(closingHour | async ) !== undefined && (openingHour | async ) !== undefined; else closeInfo" class="m-0 text-open-hours mr-lg-4 mr-xl-5">OPEN TODAY
-                {{ openingHour | async  | slice:0:5 }}-{{ closingHour | async | slice:0:5 }}</p>
-            <ng-template #closeInfo>
-                <p class="m-0 text-open-hours mr-lg-4 mr-xl-5" href="#">CLOSE TODAY</p>
-            </ng-template>
+            <div class="d-none d-lg-block">
+
+                <p *ngIf="(closingHour | async ) !== undefined && (openingHour | async ) !== undefined; else closeInfo" class="m-0 text-open-hours mr-lg-4 mr-xl-5">OPEN TODAY
+                    {{ openingHour | async  | slice:0:5 }}-{{ closingHour | async | slice:0:5 }}</p>
+                <ng-template #closeInfo>
+                    <p class="m-0 text-open-hours mr-lg-4 mr-xl-5" href="#">CLOSE TODAY</p>
+                </ng-template>
+            </div>
 
             <!-- LOGIN/LOGOUT BUTTON -->
-            <ng-container *ngIf="!(isLogged | async); else logoutTemplate">
-                <button type="button" class="my-3 btn btn-accent-outline btn-login" [routerLink]="[ '/login' ]">Login</button>
+            <ng-container *ngIf="!(isLogged | async); else logoutTemplate" class="d-flex">
+                <button type="button" class="my-3 btn btn-accent-outline-tight mx-auto" [routerLink]="[ '/login' ]">Login</button>
             </ng-container>
 
             <ng-template #logoutTemplate>
-                <button type="button" class="my-3 btn btn-accent-outline btn-login" [routerLink]="[ '/' ]" (click)="logout()">Logout</button>
+                <button type="button" class="my-3 btn btn-accent-outline-tight mx-auto" [routerLink]="[ '/' ]" (click)="logout()">Logout</button>
             </ng-template>
         </div>
     </div>

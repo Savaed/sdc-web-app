@@ -10,7 +10,5 @@ export class FooterLoginComponent implements OnInit {
 
     constructor() { }
 
-    ngOnInit() {
-    }
-
+    ngOnInit() { }
 }

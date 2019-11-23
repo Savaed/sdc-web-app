@@ -11,6 +11,5 @@ export class TicketTariffComponent implements OnInit {
 
     constructor() { }
 
-    ngOnInit() {
-    }
+    ngOnInit() { }
 }

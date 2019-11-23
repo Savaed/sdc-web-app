@@ -9,14 +9,11 @@ import { TicketTariffService } from 'src/app/services/ticket-tariff.service';
 import { CustomerService } from 'src/app/services/customer.service';
 import { VisitGroupService } from 'src/app/services/visit-group.service';
 import { VisitInfoService } from 'src/app/services/visit-info.service';
-import { BaseResponseDataType } from 'src/app/models/BaseResponseDataType';
 import { Article } from 'src/app/models/Article';
 import { Discount } from 'src/app/models/Discount';
 import { VisitInfo } from 'src/app/models/VisitInfo';
 import { TicketTariff } from 'src/app/models/TicketTariff';
 import { VisitTariff } from 'src/app/models/VisitTariff';
-import { ReturnStatement } from '@angular/compiler';
-import { ResourceSearchService } from './resource-search.service';
 
 export enum ResourceType {
     None,
@@ -58,7 +55,6 @@ export class ResourceService {
     public get isAddModeEnable(): BehaviorSubject<boolean> { return this.addMode; }
     public get editIndex(): BehaviorSubject<number> { return this.index; }
 
-
     constructor(private articleService: ArticleService,
         private ticketService: TicketService,
         private discountService: DiscountService,
@@ -66,18 +62,8 @@ export class ResourceService {
         private ticketTariffService: TicketTariffService,
         private customerService: CustomerService,
         private visitGroupService: VisitGroupService,
-        private infoService: VisitInfoService,
-        // private searchService: ResourceSearchService
-
+        private infoService: VisitInfoService
     ) { }
-
-    // public search(question: string) {
-    //     console.log('search in resource service');
-
-    //     question = '';
-    //     const filteredResourceList = this.searchService.filterResource(this.resourceType.getValue(), this.resourceList.getValue(), question);
-    //     this.resourceList.next(filteredResourceList);
-    // }
 
     public setEditMode(index: number, value: boolean) {
         this.isEditMode.next(value);

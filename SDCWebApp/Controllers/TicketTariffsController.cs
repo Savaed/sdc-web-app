@@ -19,7 +19,7 @@ namespace SDCWebApp.Controllers
     /// Provides methods to Http verbs proccessing on <see cref="TicketTariff"/> entities.
     /// </summary>
     [ApiController]
-    //[Authorize(ApiConstants.ApiAdminPolicy)]
+    [Authorize(ApiConstants.ApiUserPolicy)]
     public class TicketTariffsController : CustomApiController, ITicketTariffsController
     {
         private const string ControllerPrefix = "ticket-tariffs";

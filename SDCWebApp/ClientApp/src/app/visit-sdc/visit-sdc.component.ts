@@ -13,6 +13,5 @@ export class VisitSdcComponent implements OnInit {
         this.titleService.setTitle(this.title);
     }
 
-    ngOnInit() {
-    }
+    ngOnInit() { }
 }

@@ -18,14 +18,11 @@ export class TicketComponent implements OnInit {
     private discount: Discount;
     private ticketTariff: TicketTariff;
 
-    constructor(private customerService: CustomerService, private discountService: DiscountService, private ticketTariffService: TicketTariffService) {
-
-    }
+    constructor(private customerService: CustomerService, private discountService: DiscountService, private ticketTariffService: TicketTariffService) { }
 
     ngOnInit() {
         this.ticketTariffService.getAllTicketTariffs().subscribe(tt => this.ticketTariff = tt.find(x => x.id === this.ticket._links.find(l => l.rel === 'TicketTariff').href.split('/')[1]));
         this.discountService.getDiscount(this.ticket._links.find(x => x.rel === 'Discount').href.split('/')[1]).subscribe(d => this.discount = d);
         this.customerService.getCustomer(this.ticket._links.find(x => x.rel === 'Customer').href.split('/')[1]).subscribe(c => this.customer = c);
-        console.log(this.discount, this.customer, this.ticketTariff);
     }
 }

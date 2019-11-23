@@ -2,6 +2,8 @@ import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup, FormControl, FormBuilder, Validators, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
 import { ResourceService, ResourceType } from '../../../resource.service';
 import { Discount, DiscountType } from 'src/app/models/Discount';
+import { VisitInfo } from 'src/app/models/VisitInfo';
+import { VisitInfoService } from 'src/app/services/visit-info.service';
 
 @Component({
     selector: 'app-discount-form',
@@ -9,28 +11,29 @@ import { Discount, DiscountType } from 'src/app/models/Discount';
     styleUrls: ['./discount-form.component.scss']
 })
 export class DiscountFormComponent implements OnInit {
+    private discountForm: FormGroup;
+    private info: VisitInfo;
+    private discountType = DiscountType;
+
     @Input() public discount: Discount = { type: DiscountType.ForChild, description: '', discountValueInPercentage: 0, groupSizeForDiscount: 0 };
     @Input() public isForAdd = false;
 
-    private discountForm: FormGroup;
-    private discountType = DiscountType;
-
+    private get discountTypeGroup() { return this.discountForm.get('discountTypeGroup') as FormGroup; }
     private get type() { return this.discountForm.get('discountTypeGroup').get('type') as FormControl; }
     private get description() { return this.discountForm.get('description') as FormControl; }
     private get discountValueInPercentage() { return this.discountForm.get('discountValueInPercentage') as FormControl; }
     private get groupSizeForDiscount() { return this.discountForm.get('discountTypeGroup').get('groupSizeForDiscount') as FormControl; }
 
-    constructor(private formBuilder: FormBuilder, private resourceService: ResourceService) { }
+    constructor(private formBuilder: FormBuilder, private resourceService: ResourceService, private infoService: VisitInfoService) { }
 
     ngOnInit() {
-
-        // TODO: Add validation for type and group size
+        this.infoService.getRecentInfo().subscribe(i => this.info = i);
 
         this.discountForm = this.formBuilder.group({
             discountTypeGroup: this.formBuilder.group({
-                groupSizeForDiscount: [{ value: this.discount.groupSizeForDiscount, disabled: false}, Validators.max(30)],
+                groupSizeForDiscount: [this.discount.groupSizeForDiscount],
                 type: [this.discount.type, Validators.required]
-            }),
+            }, { validators: [this.haveGroupSize, Validators.required] }),
             description: [this.discount.description, [Validators.maxLength(256), Validators.required]],
             discountValueInPercentage: [this.discount.discountValueInPercentage, [Validators.min(0), Validators.max(100), Validators.required]],
         });
@@ -40,9 +43,8 @@ export class DiscountFormComponent implements OnInit {
         const discountType = control.get('type').value;
         const groupSize = control.get('groupSizeForDiscount').value;
 
-        if (discountType !== DiscountType.ForGroup && groupSize >= 0) {
-            console.log('group size invalid');
-            return { invalidType: 'test' };
+        if (discountType !== DiscountType[DiscountType.ForGroup] && groupSize > 0) {
+            return { invalidType: 'group size > 0 allowed only ForGroup type' };
         }
 
         return null;
@@ -57,7 +59,7 @@ export class DiscountFormComponent implements OnInit {
             updatedAt: this.discount.updatedAt,
             description: this.description.value,
             type: this.type.value,
-            groupSizeForDiscount: this.groupSizeForDiscount.value,
+            groupSizeForDiscount: this.groupSizeForDiscount.value > 0 ? this.groupSizeForDiscount.value : null,
             discountValueInPercentage: this.discountValueInPercentage.value
         };
 
@@ -91,5 +93,4 @@ export class DiscountFormComponent implements OnInit {
             this.edit();
         }
     }
-
 }

@@ -16,7 +16,7 @@ namespace SDCWebApp.Data.Validation
             RuleFor(x => x.Description)
                 .Cascade(CascadeMode.StopOnFirstFailure)
                 .NotEmpty()
-                .MaximumLength(256);
+                .MaximumLength(300);
         }
     }
 }

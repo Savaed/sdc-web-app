@@ -21,7 +21,7 @@ namespace SDCWebApp.Controllers
     /// </summary>
     [Route("api/[controller]")]
     [AllowAnonymous]
-    //[Authorize(ApiConstants.ApiUserPolicy)]
+    [Authorize(ApiConstants.ApiUserPolicy)]
     [ApiController]
     public class GroupsController : CustomApiController, IGroupsController
     {

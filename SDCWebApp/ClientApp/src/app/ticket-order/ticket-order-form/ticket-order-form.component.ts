@@ -1,15 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
-import { TicketOrderService, OrderedTicket } from '../ticket-order.service';
-import { Discount, DiscountType } from '../../models/Discount';
-import { VisitInfoService } from 'src/app/services/visit-info.service';
-import { DiscountService } from 'src/app/services/discount.service';
-import { Subject, BehaviorSubject, Observable } from 'rxjs';
-import { Ticket } from '../../models/Ticket';
-import { ShallowTicket } from '../../models/ShallowTicket';
-import { GroupInfo } from '../../models/GroupInfo';
+import { TicketOrderService } from '../ticket-order.service';
+import { Discount } from '../../models/Discount';
+import { Subject, BehaviorSubject } from 'rxjs';
 import { VisitGroupService } from 'src/app/services/visit-group.service';
 import { Customer } from '../../models/Customer';
+import { GroupInfo } from 'src/app/models/GroupInfo';
 
 @Component({
     selector: 'app-ticket-order-form',
@@ -32,10 +28,9 @@ export class TicketOrderFormComponent implements OnInit {
     constructor(private formBuilder: FormBuilder,
         private ticketOrderService: TicketOrderService,
         private groupsSerivce: VisitGroupService) {
-        console.log('ticket form ctor');
     }
 
-    getGroupInfo(customerVisitDate: Date): GroupInfo[] {
+    private getGroupInfo(customerVisitDate: Date): GroupInfo[] {
         const groupInfo = new Array<GroupInfo>();
 
         if (this.availableGroupDates === undefined || this.availableGroupDates === null) {
@@ -58,7 +53,7 @@ export class TicketOrderFormComponent implements OnInit {
         return groupInfo;
     }
 
-    setVisitHour(group: GroupInfo) {
+    private setVisitHour(group: GroupInfo) {
         this.visitHour.next(group.sightseeingDate);
         this.maxTicketsNumber.next(group.availablePlace);
     }
@@ -73,21 +68,13 @@ export class TicketOrderFormComponent implements OnInit {
         });
     }
 
-    get email() { return this.customer.get('email') as FormControl; }
-
-    get birthdayDate() { return this.customer.get('birthdayDate') as FormControl; }
-
-    get visitDate() { return this.ticketOrderForm.get('visitDate') as FormControl; }
-
-    get customer() { return this.ticketOrderForm.get('customer') as FormGroup; }
-
-    get discount() { return this.ticketOrderForm.get('discount'); }
-
-    get numberOfTickets() { return this.ticketOrderForm.get('numberOfTickets'); }
+    private get email() { return this.customer.get('email') as FormControl; }
+    private get birthdayDate() { return this.customer.get('birthdayDate') as FormControl; }
+    private get visitDate() { return this.ticketOrderForm.get('visitDate') as FormControl; }
+    private get customer() { return this.ticketOrderForm.get('customer') as FormGroup; }
+    private get numberOfTickets() { return this.ticketOrderForm.get('numberOfTickets'); }
 
     ngOnInit() {
-        console.log('ticket form ng on init');
-
         this.ticketOrderForm = this.formBuilder.group({
             customer: this.formBuilder.group({
                 email: ['', [Validators.email, Validators.required]],
@@ -118,29 +105,22 @@ export class TicketOrderFormComponent implements OnInit {
         });
     }
 
-    addDiscount(discount: Discount) {
+    private addDiscount(discount: Discount) {
         if (!this.customerDiscounts.includes(discount)) {
             this.customerDiscounts.push(discount);
         }
-        console.log(this.customerDiscounts);
-
     }
 
-    addTickets() {
+    private addTickets() {
         const visitDate = new Date(this.visitDate.value);
         const visitTime = new Date(this.visitHour.getValue());
         const visitDateTime = new Date(visitDate.getFullYear(), visitDate.getMonth(), visitDate.getDate(), visitTime.getHours(), visitTime.getMinutes());
-
-        console.log('xxxxxxxxxxxxxxxxxxxxxx', this.customerDiscounts, visitDateTime, this.numberOfTickets.value);
-
         this.ticketOrderService.addTicketToCart(this.customerDiscounts, visitDateTime, this.numberOfTickets.value);
-
         this.customerDiscounts = [];
-
         this.onChanges();
     }
 
-    orderTickets() {
+    private orderTickets() {
         this.ticketOrderService.ticketOrderStep = 2;
         const customer: Customer = {
             hasFamilyCard: false,
@@ -153,9 +133,9 @@ export class TicketOrderFormComponent implements OnInit {
         this.ticketOrderService.orderTickets(customer).subscribe();
     }
 
-    calculateDaysInMonth(iMonth, iYear): number { return 32 - new Date(iYear, iMonth, 32).getDate(); }
+    private calculateDaysInMonth(iMonth, iYear): number { return 32 - new Date(iYear, iMonth, 32).getDate(); }
 
-    filterGroupDates = (date: Date): boolean => {
+    private filterGroupDates = (date: Date): boolean => {
         const day = date.getDay();
         const month = date.getMonth();
         const year = date.getFullYear();
@@ -175,7 +155,7 @@ export class TicketOrderFormComponent implements OnInit {
         return isValidDate;
     }
 
-    filterBirthdayDates = (date: Date): boolean => {
+    private filterBirthdayDates = (date: Date): boolean => {
         const now = new Date();
         const latestValidDate = new Date(now.getFullYear() - 126, now.getMonth(), now.getDay());
 

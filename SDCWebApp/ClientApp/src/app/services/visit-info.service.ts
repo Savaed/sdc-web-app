@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { ServerUrl } from '../helpers/Constants';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Discount } from '../models/Discount';
 import { ApiResponse } from '../models/ApiResponse';
 import { map } from 'rxjs/operators';
 import { VisitInfo, OpeningHours } from '../models/VisitInfo';
@@ -11,7 +10,6 @@ import { VisitInfo, OpeningHours } from '../models/VisitInfo';
     providedIn: 'root'
 })
 export class VisitInfoService {
-
     private readonly visitInfoUrl = ServerUrl + '/info';
 
     constructor(private http: HttpClient) { }
@@ -56,7 +54,6 @@ export class VisitInfoService {
     public deleteInfo(id: string): Observable<ApiResponse<{}>> {
         return this.http.delete<ApiResponse<VisitInfo>>(`${this.visitInfoUrl}/${id}`);
     }
-
 
     private sortDay(openingHours: OpeningHours[]) {
         const sorter = {

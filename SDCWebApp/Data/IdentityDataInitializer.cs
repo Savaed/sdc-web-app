@@ -27,7 +27,7 @@ namespace SDCWebApp.Data
                 };
 
                 userManager.CreateAsync(admin, adminPassword).Wait();
-                userManager.AddToRoleAsync(admin, "administrator").Wait();
+                userManager.AddToRoleAsync(admin, ApiConstants.AdministratorRole).Wait();
             }
 
             if (userManager.FindByNameAsync(modUsername).Result is null)
@@ -40,24 +40,21 @@ namespace SDCWebApp.Data
                 };
 
                 userManager.CreateAsync(mod, modPassword).Wait();
-                userManager.AddToRoleAsync(mod, "moderator").Wait();
+                userManager.AddToRoleAsync(mod, ApiConstants.ModeratorRole).Wait();
             }
         }
 
         public static void SeedRoles(RoleManager<IdentityRole> roleManager)
         {
-            const string AdministratorRole = "administrator";
-            const string ModeratorRole = "moderator";
-
-            if (!roleManager.RoleExistsAsync(AdministratorRole).Result)
+            if (!roleManager.RoleExistsAsync(ApiConstants.AdministratorRole).Result)
             {
-                var adminRole = new IdentityRole(AdministratorRole);
+                var adminRole = new IdentityRole(ApiConstants.AdministratorRole);
                 roleManager.CreateAsync(adminRole).Wait();
             }
 
-            if (!roleManager.RoleExistsAsync(ModeratorRole).Result)
+            if (!roleManager.RoleExistsAsync(ApiConstants.ModeratorRole).Result)
             {
-                var modRole = new IdentityRole(ModeratorRole);
+                var modRole = new IdentityRole(ApiConstants.ModeratorRole);
                 roleManager.CreateAsync(modRole).Wait();
             }
         }

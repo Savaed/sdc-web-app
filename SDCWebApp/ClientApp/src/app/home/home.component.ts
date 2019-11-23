@@ -1,11 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { VisitInfoService } from 'src/app/services/visit-info.service';
-import { Subject, BehaviorSubject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { Article } from '../models/Article';
 import { ArticleService } from 'src/app/services/article.service';
 import { VisitInfo } from '../models/VisitInfo';
-import { TicketTariffService } from 'src/app/services/ticket-tariff.service';
-import { TicketTariffJson, TicketTariff } from '../models/TicketTariff';
 import { Title } from '@angular/platform-browser';
 import { ToastService } from '../services/toast.service';
 
@@ -23,7 +21,7 @@ export class HomeComponent implements OnInit {
     private readonly title = 'Glass Heritage Centrum';
 
     constructor(private infoService: VisitInfoService, private articleService: ArticleService, private titleService: Title, private toast: ToastService) {
-        this.titleService.setTitle(this.title);        
+        this.titleService.setTitle(this.title);
     }
 
     ngOnInit() {
@@ -34,6 +32,6 @@ export class HomeComponent implements OnInit {
             const openingHours = info.openingHours.find(hour => hour.dayOfWeek.toString() === this.now.dayToString());
             this.isOpenNow.next(this.now.getHours() >= parseInt(openingHours.openingHour.toString()) && this.now.getHours() <= parseInt(openingHours.closingHour.toString()));
         });
-        this.articleService.getAllArticles().subscribe(articles => this.topThreeArticles.next(articles.slice(0, 3)));      
+        this.articleService.getAllArticles().subscribe(articles => this.topThreeArticles.next(articles.slice(0, 3)));
     }
 }

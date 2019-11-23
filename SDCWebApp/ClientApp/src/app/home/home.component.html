@@ -1,9 +1,9 @@
 <div>
     <!-- HEADER START -->
     <div class="row home-foto text-center align-items-center home-filter">
-        <div class="col-6 col-md-4 text-md-left ml-5 mr-auto text-primary-color home-container">
-            <div class="ml-lg-4 mt-lg-5 px-0 pt-lg-5">
-                <div class="mb-3">
+        <div class="col-11 col-md-8 col-xl-4 text-lg-left mx-auto ml-lg-5 mr-lg-auto text-primary-color home-container">
+            <div class="ml-lg-4 mt-xl-5 px-0 pt-3 pt-xl-5">
+                <div class="mb-3 d-none d-lg-block">
                     <ng-container *ngIf="isOpenNow | async; else elseTemplate">
                         <p class="mt-0 mb-1">OPEN NOW</p>
                     </ng-container>
@@ -20,7 +20,7 @@
                     only
                     tells the story of for decades in Poland and the world of Fakecity glass but also creates it.
                 </p>
-                <button type="button" [routerLink]="[ '/pricing' ]" class="btn btn-lg btn-primary btn-accent">
+                <button type="button" [routerLink]="[ '/pricing' ]" class="btn btn-lg btn-primary btn-accent d-none d-md-flex mx-auto m-lg-0 mr-lg-auto mt-3 mt-lg-1">
                     <i class="far fa-money-bill-alt mr-2"></i>
                     Order tickets
                 </button>
@@ -32,7 +32,7 @@
     <!-- MAIN INFO SECTION START -->
     <div class="row pt-4 mb-3">
         <div class="container-fluid align-items-center">
-            <div class="col-12 col-lg-5 text-center mx-auto mt-4 mb-5">
+            <div class="col-12 col-lg-5 text-center mx-auto mt-4 mb-md-5">
                 <p class="text-gray text-mono">
                     Explore the SDC
                 </p>
@@ -47,8 +47,8 @@
 
             <!-- INFO CARD SECTION START -->
             <div class="row mb-5">
-                <div class="col-12 col-md-10 mx-auto mt-5 align-items-center">
-                    <div class="p-4 col-12 col-md-6 custom-bordered-card" id="visit-card">
+                <div class="col-12 col-md-10 col-xl-8 mx-auto mt-5 align-items-center text-center text-md-left">
+                    <div class="p-4 col-12 col-lg-6 custom-bordered-card" id="visit-card">
                         <a [routerLink]="[ '/visit-sdc' ]">
                             <div class="d-flex">
                                 <div>
@@ -59,12 +59,12 @@
                                         visit SDC.
                                     </small>
                                 </div>
-                                <i class="my-auto ml-auto fas fa-caret-right"></i>
+                                <i class="my-auto ml-auto fas fa-caret-right d-none d-md-block"></i>
                             </div>
                         </a>
                     </div>
 
-                    <div class="p-4 col-12 col-md-6 custom-bordered-card" id="opening-hours-card">
+                    <div class="p-4 col-12 col-lg-6 custom-bordered-card" id="opening-hours-card">
                         <a href="/">
                             <div class="d-flex">
                                 <div>
@@ -74,12 +74,12 @@
                                         That is why we have selected opening hours so that they can serve everyone.
                                     </small>
                                 </div>
-                                <i class=" my-auto ml-5 fas fa-caret-right"></i>
+                                <i class=" my-auto ml-5 fas fa-caret-right d-none d-md-block"></i>
                             </div>
                         </a>
                     </div>
 
-                    <div class="p-4 col-12 col-md-6 custom-bordered-card" id="join-card">
+                    <div class="p-4 col-12 col-lg-6 custom-bordered-card" id="join-card">
                         <a [routerLink]="[ '/partners' ]">
                             <div class="d-flex">
                                 <div>
@@ -90,7 +90,7 @@
                                         dreams come true by joining the SDC.
                                     </small>
                                 </div>
-                                <i class=" my-auto ml-5 fas fa-caret-right"></i>
+                                <i class=" my-auto ml-5 fas fa-caret-right d-none d-md-block"></i>
                             </div>
                         </a>
                     </div>
@@ -130,12 +130,34 @@
                 </div>
             </div>
 
-
         </div>
         <!-- INFO CARD SECTION END -->
     </div>
     <!-- MAIN INFO SECTION END -->
 
+    <div class="card-deck col-12 col-lg-9 mx-auto">
+        <div class="col-12 col-sm-6 col-lg-4 text-wrap mx-auto mb-5" *ngFor="let article of topThreeArticles | async; let i=index">
+            <div class="card custom-card visit-card-img">
+                <div class="card-body p-0">
+                    <img src="../../assets/images/glass-rod.jpg" class="card-img-top" alt="artistic broken glass">
+                    <div class="m-3">
+                        <div>
+                            <h5 class="card-title">{{ article.title }}</h5>
+                            <p class="card-text text">{{ article.text | slice:0:270 }}...</p>
+                        </div>
+                        <div class="row mt-3">
+                            <a [routerLink]="[ '/news', article.title ]"><small>Read more</small></a>
+                            <small class="text-muted my-0 ml-auto">{{ article.createdAt | date: 'dd LLLL yyyy, H:mm' }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-100 d-xs-block d-sm-none"></div>
+            <div *ngIf="(i + 1) % 2 === 0" class="w-100 d-none d-sm-block d-md-none"></div>
+
+        </div>
+    </div>
 
     <!-- ARTICLES SECTION START -->
     <div class="container-fluid pt-4 pb-5 bg-gray align-items-center">
@@ -153,8 +175,8 @@
         </div>
 
         <!-- ARTICLE CARDS START -->
-        <div class="card-deck col-12 col-md-10 mx-auto mb-md-3">
-            <div class="card custom-card" *ngFor="let article of topThreeArticles | async">             
+        <div class="card-deck col-12 col-xl-10 mx-auto mb-md-3">
+            <div class="card custom-card mr-0" *ngFor="let article of topThreeArticles | async">
                 <img src="../../assets/images/glass-rod.jpg" class="card-img-top" alt="glass rod">
                 <div class="card-body">
                     <div>
@@ -176,13 +198,13 @@
 
     <!-- DISCOUNTS INFO SECTION START -->
     <div class="container-fluid py-4">
-        <div class="container col-12 col-md-10 mx-auto mb-md-5">
+        <div class="container col-11 col-lg-10 mx-auto mb-md-5 text-center text-md-left">
             <div class="ml-md-4 my-4">
-                <h1 class="header my-5 pl-3 pl-md-0 text-center text-md-left">
+                <h1 class="header my-5">
                     Everybody <i class="fas fa-heart"></i> discounts
                 </h1>
                 <div class="row discounts-info">
-                    <div class="col-12 col-lg-4 pl-3 pl-lg-0 pr-lg-3">
+                    <div class="col-lg-4 pl-3 pl-md-0 pr-lg-3 mb-3 mb-lg-0">
                         <img src="../../assets/images/old-man.png">
                         <h3>
                             For seniors
@@ -193,7 +215,7 @@
                             cellars and the Centrum Dziedzictwa Szkla.
                         </p>
                     </div>
-                    <div class="col-12 col-lg-4 px-lg-3 ">
+                    <div class="col-lg-4 px-lg-3 px-0">
                         <img src="../../assets/images/student.png">
                         <h3>
                             For children
@@ -205,7 +227,7 @@
                             the future. Therefore, one of the major discounts at SDC applies to children
                         </p>
                     </div>
-                    <div class="col-12 col-lg-4 pl-lg-3 pr-0">
+                    <div class="col-lg-4 pl-0 pl-lg-3 pr-3 pr-lg-0">
                         <img src="../../assets/images/group.png">
                         <h3>
                             For groups
@@ -219,10 +241,10 @@
             </div>
         </div>
 
-        <div class="col-12 col-md-6 mx-auto pb-5">
+        <div class="col-12 col-lg-6 mx-auto pb-5">
             <div class="tiny-divider bg-gray mx-auto"></div>
 
-            <div class="col-11 col-md-7 mx-auto text-center">
+            <div class="col-11 col-md-9 col-lg-7 mx-auto text-center">
                 <h4>Something for everyone</h4>
                 <small class="text-muted">
                     Discounts available in SDC are tailored to our customers. No matter how old you are, whether you
@@ -253,38 +275,16 @@
         <div class="container col-12 col-md-10 mx-auto align-items-center my-5 pb-1">
             <div class="d-none d-md-flex justify-content-center partners-banner">
                 <img src="../../assets/images/atom.png" alt="atom logo" placement="top" ngbTooltip="Atom" tooltipClass="custom-tooltip">
-                
-               
-                
                 <img src="../../assets/images/circleci.png" style="position: relative; top: 50%" alt="circleci logo" placement="top" ngbTooltip="Circle CI" tooltipClass="custom-tooltip">
-
-
-
                 <img src="../../assets/images/codeclimate.png" alt="codeclimate logo" placement="top" ngbTooltip="Code Climate" tooltipClass="custom-tooltip">
-
-                <div class="w-100 d-none d-sm-block "></div>
-
                 <img src="../../assets/images/ac-dc.png" style="position: relative; top: 50%" alt="ac/dc logo" placement="top" ngbTooltip="AC/DC" tooltipClass="custom-tooltip">
-                
-
-
                 <img src="../../assets/images/travis-ci.png" alt="travis-ci logo" placement="top" ngbTooltip="Travis CI" tooltipClass="custom-tooltip">
-                
-
-
                 <img src="../../assets/images/zenhubio.png" style="position: relative; top: 50%" alt="zenhubio logo" placement="top" ngbTooltip="Zenhubio" tooltipClass="custom-tooltip">
-
-                <div class="w-100 d-none d-sm-block d-lg-none"></div>
-                
                 <img src="../../assets/images/google.png" alt="google logo" placement="top" ngbTooltip="Google" tooltipClass="custom-tooltip">
-
 
                 <!-- wrap every 2 on md and lg-->
                 <!-- <div *ngIf="(i + 1) % 2 === 0" class="w-100 d-none d-md-block d-xl-none"></div> -->
-
-               
                 <!-- <div class="w-100 d-none d-sm-block d-lg-none"></div> -->
-
 
             </div>
         </div>

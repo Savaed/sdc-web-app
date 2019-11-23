@@ -14,8 +14,8 @@
 
         #region Api roles
 
-        public const string AdministratorRole = "admin";
-        public const string ModeratorRole = "mod";
+        public const string AdministratorRole = "administrator";
+        public const string ModeratorRole = "moderator";
 
         #endregion
 

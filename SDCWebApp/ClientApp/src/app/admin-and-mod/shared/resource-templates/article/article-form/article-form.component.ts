@@ -9,10 +9,10 @@ import { ResourceService, ResourceType } from '../../../resource.service';
     styleUrls: ['./article-form.component.scss']
 })
 export class ArticleFormComponent implements OnInit {
+    private articleForm: FormGroup;
+
     @Input() public article: Article = { author: '', text: '', title: '' };
     @Input() public isForAdd = false;
-
-    private articleForm: FormGroup;
 
     private get title() { return this.articleForm.get('title') as FormControl; }
     private get text() { return this.articleForm.get('text') as FormControl; }

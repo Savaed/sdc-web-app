@@ -17,6 +17,11 @@ export class AuthService {
     private readonly accountManageUrl = ServerUrl + '/users';
     private jwtHelper: JwtHelperService;
 
+    public get userRole() { return localStorage.getItem('user-role'); }
+    public get username() { return localStorage.getItem('user-login'); }
+    public get refreshToken() { return localStorage.getItem('refresh-token'); }
+    public get accessToken() { return localStorage.getItem('access-token'); }
+
     // User only is logged when he has an access token and unxpired refresh token.
     public get isLogged(): BehaviorSubject<boolean> {
         const refreshToken = localStorage.getItem('refresh-token');
@@ -31,14 +36,6 @@ export class AuthService {
 
         return new BehaviorSubject<boolean>(!isRefreshTokenExpired);
     }
-
-    public get userRole() { return localStorage.getItem('user-role'); }
-
-    public get username() { return localStorage.getItem('user-login'); }
-
-    public get refreshToken() { return localStorage.getItem('refresh-token'); }
-
-    public get accessToken() { return localStorage.getItem('access-token'); }
 
     constructor(private http: HttpClient) {
         this.jwtHelper = new JwtHelperService();

@@ -6,15 +6,12 @@ import { ServerUrl } from '../helpers/Constants';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { VisitTariff } from '../models/VisitTariff';
-import { ReturnStatement } from '@angular/compiler';
 
 @Injectable({
     providedIn: 'root'
 })
 export class TicketTariffService {
-
     constructor(private http: HttpClient) { }
-
 
     public getAllVisitTariffs(): Observable<VisitTariff[]> {
         return this.http.get<ApiResponse<VisitTariff[]>>(`${ServerUrl}/visit-tariffs`)

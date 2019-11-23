@@ -19,18 +19,16 @@ export class PricingComponent implements OnInit {
     private readonly title = 'Pricing';
 
     constructor(private ticketTariffsService: TicketTariffService,
-                private discountService: DiscountService,
-                private orderService: TicketOrderService,
-                private router: Router,
-                private titleService: Title) {
+        private discountService: DiscountService,
+        private orderService: TicketOrderService,
+        private router: Router,
+        private titleService: Title) {
         this.titleService.setTitle(this.title);
     }
 
     ngOnInit() {
         this.discountService.getAllDiscounts().subscribe(discounts => this.discounts.next(discounts));
         this.ticketTariffsService.getRecentTicketTariffs().subscribe(ticketTariffs => this.ticketTariffs.next(ticketTariffs.tariffs));
-        this.ticketTariffs.subscribe(t => console.log(t[0].defaultPrice));
-        this.discounts.subscribe(x => console.log(x));
     }
 
     chooseTicketTariff(ticketTariff: TicketTariff) {

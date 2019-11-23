@@ -1,13 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { OrderResponse } from 'src/app/models/Order';
 import { TicketOrderService } from '../ticket-order.service';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { TicketTariff } from 'src/app/models/TicketTariff';
 import { Discount } from 'src/app/models/Discount';
 import { TicketTariffService } from 'src/app/services/ticket-tariff.service';
 import { DiscountService } from 'src/app/services/discount.service';
 import { Ticket } from 'src/app/models/Ticket';
-import { map } from 'rxjs/operators';
 import * as html2pdf from 'html2pdf.js';
 import { ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
@@ -30,7 +29,7 @@ export class OrderDetailsComponent implements OnInit {
 
     ngOnInit() {
         this.titleService.setTitle('Order');
-        
+
         // Check if navigate directly from order form (newOrder = true) or user typed URL based on given order id eg. from ticket order email confirmation.
         if (this.actiatedRoute.snapshot.queryParams.newOrder === true) {
             this.ticketOrder = this.ticketOrderService.order;
@@ -57,8 +56,7 @@ export class OrderDetailsComponent implements OnInit {
         return new BehaviorSubject(ticketTariff).asObservable();
     }
 
-    saveOrderAsPdf() {
-
+    private saveOrderAsPdf() {
         const options = {
             filename: 'SDC-ticket',
             image: { type: 'jpg' },

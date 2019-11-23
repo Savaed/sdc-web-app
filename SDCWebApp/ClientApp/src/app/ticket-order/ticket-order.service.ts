@@ -1,12 +1,10 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { ShallowTicket } from '../models/ShallowTicket';
-import { Ticket } from '../models/Ticket';
 import { VisitInfo } from '../models/VisitInfo';
 import { TicketTariff } from '../models/TicketTariff';
 import { Customer } from '../models/Customer';
-import { Discount, DiscountType } from '../models/Discount';
-import { TicketService } from 'src/app/services/ticket.service';
+import { Discount } from '../models/Discount';
 import { DiscountService } from 'src/app/services/discount.service';
 import { HttpClient } from '@angular/common/http';
 import { ServerUrl } from 'src/app/helpers/Constants';
@@ -25,9 +23,7 @@ export class OrderedTicket {
     private amount: number;
 
     public get ticketAmount(): number { return this.amount; }
-
     public get ticket() { return this.orderTicket; }
-
     public get ticketPrice() {
         return this.ticket.ticketTariff.defaultPrice * (1 - (this.ticket.mostProfitableDiscount.discountValueInPercentage / 100));
     }
@@ -42,7 +38,6 @@ export class OrderedTicket {
     }
 }
 
-
 @Injectable({
     providedIn: 'root'
 })
@@ -56,26 +51,17 @@ export class TicketOrderService {
     private discounts = new BehaviorSubject<Discount[]>(new Array<Discount>());
     private commitedOrder = new BehaviorSubject<OrderResponse>(undefined);
 
-
     public get order(): BehaviorSubject<OrderResponse> { return this.commitedOrder; }
-
+    public get ticketCart(): BehaviorSubject<OrderedTicket[]> { return this.cart; }
+    public set ticketOrderStep(value: number) { this.orderStep.next(value); }
+    public get ticketOrderStep(): number { return this.orderStep.getValue(); }
     public set choosenTicketTariff(value: TicketTariff) {
         this.currentTicketTariff.next(value);
-        this.currentTicketTariff.subscribe(t => console.log(t));
     }
-
-    public get ticketCart(): BehaviorSubject<OrderedTicket[]> { return this.cart; }
-
     public get choosenTicketTariff(): TicketTariff { return this.currentTicketTariff.getValue(); }
-
-    public set ticketOrderStep(value: number) { this.orderStep.next(value); }
-
-    public get ticketOrderStep(): number { return this.orderStep.getValue(); }
 
     constructor(private http: HttpClient, private discountService: DiscountService, private router: Router) {
         this.discountService.getAllDiscounts().subscribe(discounts => this.discounts.next(discounts));
-        console.log('ticket order service ctor');
-
     }
 
     public addTicketToCart(customerChoosenDiscounts: Discount[], visitDate: Date, ticketsAmount: number) {
@@ -92,7 +78,6 @@ export class TicketOrderService {
         const tmpCart = this.cart.getValue();
         tmpCart.push(newTicket);
         this.cart.next(tmpCart);
-        console.log(this.cart.getValue());
     }
 
     // Remove ticket from cart.
@@ -115,7 +100,6 @@ export class TicketOrderService {
 
         return this.http.post<ApiResponse<OrderResponse>>(this.ticketOrderUrl, orderRequestBody).pipe(map(response => {
             this.commitedOrder.next(response.data);
-            console.log(this.commitedOrder.getValue());
 
             this.router.navigate(['payment']);
             setTimeout(() => {
@@ -131,8 +115,6 @@ export class TicketOrderService {
 
     private toShallowTickets(): ShallowTicket[] {
         const cartTickets = this.ticketCart.getValue();
-        console.log('toShallowTickets():', cartTickets);
-
         const shallowTickets: ShallowTicket[] = [];
 
         cartTickets.forEach(ticket => {

@@ -1,7 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { VisitInfo, OpeningHours } from 'src/app/models/VisitInfo';
-import { FormGroup, FormBuilder, Validators, FormControl, FormArray, ControlContainer } from '@angular/forms';
-import { TouchSequence } from 'selenium-webdriver';
+import { FormGroup, FormBuilder, Validators, FormControl, FormArray } from '@angular/forms';
 import { ResourceService, ResourceType } from '../../../resource.service';
 
 @Component({
@@ -20,19 +19,17 @@ export class VisitInfoFormComponent implements OnInit {
         sightseeingDuration: 0,
     };
 
-
-    get description() { return this.infoForm.get('description') as FormControl; }
-    get maxAllowedGroupSize() { return this.infoForm.get('maxAllowedGroupSize') as FormControl; }
-    get maxChildAge() { return this.infoForm.get('maxChildAge') as FormControl; }
-    get maxTicketOrderInterval() { return this.infoForm.get('maxTicketOrderInterval') as FormControl; }
-    get openingHours() { return this.infoForm.get('openingHours') as FormArray; }
-    get sightseeingDuration() { return this.infoForm.get('sightseeingDuration') as FormControl; }
-
-
-    getOpeningHour(i: number) { return this.openingHours.controls[i].get('openingHour') as FormControl; }
-    getClosingHour(i: number) { return this.openingHours.controls[i].get('closingHour') as FormControl; }
-
     private infoForm: FormGroup;
+
+    private get description() { return this.infoForm.get('description') as FormControl; }
+    private get maxAllowedGroupSize() { return this.infoForm.get('maxAllowedGroupSize') as FormControl; }
+    private get maxChildAge() { return this.infoForm.get('maxChildAge') as FormControl; }
+    private get maxTicketOrderInterval() { return this.infoForm.get('maxTicketOrderInterval') as FormControl; }
+    private get openingHours() { return this.infoForm.get('openingHours') as FormArray; }
+    private get sightseeingDuration() { return this.infoForm.get('sightseeingDuration') as FormControl; }
+
+    private getOpeningHour(i: number) { return this.openingHours.controls[i].get('openingHour') as FormControl; }
+    private getClosingHour(i: number) { return this.openingHours.controls[i].get('closingHour') as FormControl; }
 
     constructor(private formBuilder: FormBuilder, private resourceService: ResourceService) { }
 
@@ -59,8 +56,6 @@ export class VisitInfoFormComponent implements OnInit {
 
     private addOpeningHour() {
         this.openingHours.push(this.addOpeningHourFormGroup());
-        console.log(this.openingHours);
-
     }
 
     private addInfo() {
