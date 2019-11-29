@@ -1,13 +1,21 @@
 .error-page{
-    width: 100% !important;
-    height: 100vh !important;
     display: flex;
     justify-content: center;
 
-    .error-header{
-        font-size: 140px;
-        color: #212121;
-        font-weight: 600;
+    @media screen and (min-width: 992px) {
+        .error-header{
+            font-size: 140px;
+            color: #212121;
+            font-weight: 600;
+        }
+    }
+
+    @media screen and (max-width: 992px) {
+        .error-header{
+            font-size: 80px;
+            color: #212121;
+            font-weight: 600;
+        }
     }
 
     .error-code-highlight{
@@ -22,21 +30,10 @@
         padding: 0 20px 0 0;
     }
 
-    .error-img {   
-        &-401-403 { 
-            background-image: url(../../assets/images/safe.jpg);
-            width: 500px;
-            height: 500px;
-            background-size: contain;
-            background-repeat: no-repeat;
-        }
-
-        &-other {
-            background-image: url(../../assets/images/broken-glass-jar.jpg);
-            width: 500px;
-            height: 500px;
-            background-size: contain;
-            background-repeat: no-repeat;
-        }
+    .responsive-img {
+        max-width: 500px;
+        max-height: 1000px;
+        width: 100%;
+        height: auto;
     }
 }

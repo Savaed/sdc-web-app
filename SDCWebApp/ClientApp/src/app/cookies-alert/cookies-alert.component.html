@@ -1,14 +1,16 @@
 <div *ngIf="!isUserAcceptCookiPolicy" class="cookie-alert">
-    <div class="mx-auto p-2 d-flex col-sm-9 col-4">
-        <div class="cookie-img mr-4"></div>
-        <p class="cookie-info my-auto">
-            On this website, the SDC and its partners use technologies such as cookies and local storage to customize content and analyze user activity.
-            You can learn more by reading our privacy policy. By using this site and all its subpages, you agree to the use of these technologies.
-            We are forced to disclose some of the collected data to law enforcement authorities, but we will never pass it on to third parties without a
-            clear need or your consent. By clicking "Accept" you agree to the above actions.
-        </p>
-        <div class="d-flex ml-4">
-            <button class="btn btn-accent-tight my-auto" (click)="acceptCookies()">Accept</button>
+    <div class="mx-auto p-3 d-lg-flex col-12 col-xl-8">
+        <div class="d-flex text-center text-lg-left">
+            <div class="cookie-img mr-4 d-none d-lg-flex my-auto"></div>
+            <p class="cookie-info my-auto">
+                On this website, the SDC and its partners use technologies such as cookies and local storage to customize content and analyze user activity.
+                You can learn more by reading our privacy policy. By using this site and all its subpages, you agree to the use of these technologies.
+                We are forced to disclose some of the collected data to law enforcement authorities, but we will never pass it on to third parties without a
+                clear need or your consent. By clicking "Accept" you agree to the above actions.
+            </p>
+        </div>
+        <div class="d-flex ml-lg-4 mt-3 mt-lg-0">
+            <button class="btn btn-accent-tight mx-auto my-lg-auto" (click)="acceptCookies()">Accept</button>
         </div>
     </div>
 

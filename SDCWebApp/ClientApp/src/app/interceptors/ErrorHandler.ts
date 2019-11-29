@@ -36,9 +36,7 @@ export class ErrorHandler {
     // Redirect to specific error page.
     public redirectToErrorPage(error: HttpErrorResponse) {
         switch (error.status) {
-            case 400:
-                break;
-
+            
             // Unauthorized http status code.
             case 401:
                 this.generalMessage.next('Hey, where are you going? You cannot access this page because you are not logged in.');

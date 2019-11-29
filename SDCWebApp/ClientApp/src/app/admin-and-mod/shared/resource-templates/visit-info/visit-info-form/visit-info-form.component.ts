@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { VisitInfo, OpeningHours } from 'src/app/models/VisitInfo';
-import { FormGroup, FormBuilder, Validators, FormControl, FormArray } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, FormControl, FormArray, ValidatorFn, ValidationErrors } from '@angular/forms';
 import { ResourceService, ResourceType } from '../../../resource.service';
 import { ToastrService } from 'ngx-toastr';
 
@@ -49,7 +49,24 @@ export class VisitInfoFormComponent implements OnInit {
             dayOfWeek: ['', Validators.required],
             openingHour: ['', [Validators.required, Validators.pattern(/^(?:\d|[01]\d|2[0-3]):[0-5]\d$/)]],
             closingHour: ['', [Validators.required, Validators.pattern(/^(?:\d|[01]\d|2[0-3]):[0-5]\d$/)]]
-        });
+        }, { validators: this.validHours });
+    }
+
+
+    public validHours: ValidatorFn = (control: FormGroup): ValidationErrors | null => {
+        const openingHourString = control.get('openingHour').value as string;
+        const closingHourString = control.get('closingHour').value as string;
+
+        const openingHour = { h: +openingHourString.split(':')[0], m: +openingHourString.split(':')[1] };
+        const closingHour = { h: +closingHourString.split(':')[0], m: +closingHourString.split(':')[1] };
+
+        if (openingHour.h > closingHour.h) {
+            return { invalidHour: 'opening hour must be before closing hour' };
+        } else if (openingHour.h === closingHour.h && openingHour.m > closingHour.m) {
+            return { invalidHour: 'opening hour must be before closing hour' };
+        }
+
+        return null;
     }
 
     public addOpeningHour() {

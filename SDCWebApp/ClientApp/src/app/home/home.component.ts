@@ -14,7 +14,7 @@ import { ToastrService } from 'ngx-toastr';
     styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit {
-    private readonly title = 'Glass Heritage Centrum';
+    private readonly title = 'SDC';
     public topThreeArticles = new Subject<Article[]>();
     public recentVisitInfo = new Subject<VisitInfo>();
     public isOpenNow = new Subject<boolean>();

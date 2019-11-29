@@ -26,6 +26,8 @@ export class TicketOrderFormComponent implements OnInit {
     public visitHour = new BehaviorSubject<Date>(undefined);
     public maxTicketsNumber = new BehaviorSubject<number>(0);
 
+    public clickedDiscountIndexes = new Array<number>();
+
     constructor(private formBuilder: FormBuilder,
         public ticketOrderService: TicketOrderService,
         private groupsSerivce: VisitGroupService,
@@ -97,10 +99,19 @@ export class TicketOrderFormComponent implements OnInit {
         });
     }
 
-    public addDiscount(discount: Discount) {
+    public addDiscount(discount: Discount, index: number) {
         if (!this.customerDiscounts.includes(discount)) {
             this.customerDiscounts.push(discount);
+            this.clickedDiscountIndexes.push(index);
+        } else if (this.customerDiscounts.includes(discount)) {
+            this.customerDiscounts.splice(this.customerDiscounts.indexOf(discount), 1);
+            this.clickedDiscountIndexes.splice(this.clickedDiscountIndexes.indexOf(index), 1);
         }
+
+        console.log(this.clickedDiscountIndexes);
+        console.log(this.customerDiscounts);
+        
+        
     }
 
     private onChanges() {
@@ -119,6 +130,7 @@ export class TicketOrderFormComponent implements OnInit {
         const visitDateTime = new Date(visitDate.getFullYear(), visitDate.getMonth(), visitDate.getDate(), visitTime.getHours(), visitTime.getMinutes());
         this.ticketOrderService.addTicketToCart(this.customerDiscounts, visitDateTime, this.numberOfTickets.value);
         this.customerDiscounts = [];
+        this.clickedDiscountIndexes = [];
         this.onChanges();
 
         this.toast.info('New ticket has been added to the cart.');

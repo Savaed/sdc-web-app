@@ -119,9 +119,10 @@ export class TicketOrderService {
 
         cartTickets.forEach(ticket => {
             for (let i = 0; i < ticket.ticketAmount; i++) {
+                const utcVisitDate = ticket.ticket.visitDate.setUTCHours(ticket.ticket.visitDate.getHours());
                 const tmpShallowTicket: ShallowTicket = {
                     discountId: ticket.ticket.mostProfitableDiscount.id,
-                    sightseeingDate: ticket.ticket.visitDate,
+                    sightseeingDate: new Date(utcVisitDate),
                     ticketTariffId: ticket.ticket.ticketTariff.id
                 };
 

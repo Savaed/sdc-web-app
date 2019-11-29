@@ -2,17 +2,86 @@ p.badge-text {
     font-size: medium !important;
 }
 
-#benefits-card:hover ~ #badge #benefits-badge {
+#benefits-card:hover {
+    ~ #badge #benefits-badge {
     transform:scale(1.05);
-    transition: all .2s ease-in;    
+    transition: all .2s ease-in;   
+    }
+    
+    ~ .container-fluid > div#benefits-badge {
+        transform:scale(1.05);
+        transition: all .2s ease-in;    
+    }
 }
 
-#ventures-card:hover ~ #badge #ventures-badge {
-    transform:scale(1.05);
-    transition: all .2s ease-in;    
+@media screen and (min-width: 1200px) {
+    #benefits-badge {
+        position: relative;
+        top: 70px; 
+        left: 30px;
+    }
 }
 
-#join-card:hover ~ #badge #join-badge {
-    transform:scale(1.05);
-    transition: all .2s ease-in;    
+#ventures-card:hover {
+    ~ #badge #ventures-badge {
+        transform:scale(1.05);
+        transition: all .2s ease-in;    
+    }
+
+    ~ .container-fluid > div#ventures-badge {
+        transform:scale(1.05);
+        transition: all .2s ease-in;    
+    }
+}
+
+@media screen and (min-width: 1200px) {
+    #ventures-badge {
+        position: relative; 
+        top: -150px; 
+        left: 300px;
+    }
+}
+
+@media screen and (min-width: 1929px) {
+    #ventures-badge {
+        position: relative; 
+        top: 95px; 
+        left: 50px;
+    }
+}
+
+#join-card:hover {
+    ~ #badge #join-badge {
+        transform:scale(1.05);
+        transition: all .2s ease-in;    
+    }
+
+    ~ .container-fluid > div#join-badge {
+        transform:scale(1.05);
+        transition: all .2s ease-in;    
+    }
+}
+
+@media screen and (max-width: 1645px) and (min-width: 1200px) {
+    #join-badge {
+        position: relative; 
+        top: -140px; 
+        left: 200px;
+    }
+}
+
+@media screen and (min-width: 1646px) {
+    #join-badge {
+        position: relative; 
+        top: 50px; 
+        left: 0;
+    }
+}
+
+@media screen and (min-width: 1929px) {
+    #join-badge {
+        position: relative; 
+        top: 60px; 
+        left: 200px;
+    }
 }

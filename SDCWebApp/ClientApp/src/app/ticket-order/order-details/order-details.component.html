@@ -1,6 +1,5 @@
-<!-- {{ ticketOrder | async | json }} -->
 <div>
-    <div class="col-12 col-lg-5 text-center mx-auto pt-4 pb-1">
+    <div class="col-12 col-lg-9 col-xl-5 text-center mx-auto pt-4 mb-5">
         <p class="text-gray text-mono">
             Ticket
         </p>
@@ -8,19 +7,19 @@
             Your ticket
         </h1>
         <p class="text-gray col-11 mx-auto">
-            This is the ticket ordered
+            This is your SDC ticket. Have a nice sightseeing.
         </p>
     </div>
 
-    <div class="row">
+    <div class="d-flex p-2">
         <div id="orderedTickets" class="mx-auto">
-            <table class="table table-borderless border shadow-sm m-5" *ngFor="let ticket of (ticketOrder | async)?.tickets">
+            <table class="table table-borderless border shadow-sm" *ngFor="let ticket of (ticketOrder | async)?.tickets">
                 <tbody>
 
                     <tr>
                         <td>
                             <small class="cell-header text-gray"> Name </small>
-                            <p class="cell-text m-0">Glass Heritage Centrum entrance ticket</p>
+                            <p class="cell-text m-0">SDC entrance ticket</p>
                         </td>
                         <td>
                             <small class="cell-header text-gray"> Ticket ID </small>
@@ -48,12 +47,12 @@
                     <tr>
                         <td>
                             <small class="cell-header text-gray"> Purchase date </small>
-                            <p class="cell-text"> {{ ticket?.purchaseDate | date: 'dd LLLL yyyy, H:mm' }} </p>
+                            <p class="cell-text"> {{ ticket?.purchaseDate | date: 'dd.LL.yyyy, H:mm' }} </p>
                         </td>
 
                         <td>
                             <small class="cell-header text-gray">Sightseeing date</small>
-                            <p class="cell-text"> {{ ticket?.validFor | date: 'dd LLLL yyyy, H:mm' }} </p>
+                            <p class="cell-text"> {{ ticket?.validFor | date: 'dd.LL.yyyy, H:mm' }} </p>
                         </td>
                     </tr>
 
@@ -74,5 +73,6 @@
         </div>
     </div>
 
-    <button class="btn btn-accent-outline-tight d-flex mx-auto mb-5" (click)="saveOrderAsPdf()">Download ticket</button>
+    <button class="btn btn-accent-outline-tight d-flex mx-auto my-5" (click)="saveOrderAsPdf()">Download ticket</button>
+
 </div>

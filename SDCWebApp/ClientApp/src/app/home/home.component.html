@@ -1,10 +1,7 @@
 <div class="container-fluid">
 
-
-   
-      
     <!-- HEADER START -->
-    <div class="row home-foto text-center align-items-center home-filter">
+    <div class="d-flex home-foto text-center align-items-center home-filter">
         <div class="col-11 col-md-8 col-xl-4 text-lg-left mx-auto ml-lg-5 mr-lg-auto text-primary-color home-container">
             <div class="ml-lg-4 mt-xl-5 px-0 pt-3 pt-xl-5">
                 <div class="mb-3 d-none d-lg-block">
@@ -20,7 +17,7 @@
                     The glass heritage of Fakecity
                 </h1>
                 <p class="text-light my-3">
-                    Thanks to the achievements of modern museology and modern techniques, the Glass Heritage Center not
+                    Thanks to the achievements of modern museology and modern techniques, the SDC not
                     only
                     tells the story of for decades in Poland and the world of Fakecity glass but also creates it.
                 </p>
@@ -34,9 +31,9 @@
     <!-- HEADER END -->
 
     <!-- MAIN INFO SECTION START -->
-    <div class="row pt-4 mb-3">
+    <div class="d-flex pt-4 mb-lg-3">
         <div class="container-fluid align-items-center">
-            <div class="col-12 col-lg-5 text-center mx-auto mt-4 mb-md-5">
+            <div class="col-12 col-lg-9 col-xl-5 text-center mx-auto mt-4 mb-md-5">
                 <p class="text-gray text-mono">
                     Explore the SDC
                 </p>
@@ -50,7 +47,7 @@
             </div>
 
             <!-- INFO CARD SECTION START -->
-            <div class="row mb-5">
+            <div class="d-flex mb-5">
                 <div class="col-12 col-md-10 col-xl-8 mx-auto mt-5 align-items-center text-center text-md-left">
                     <div class="p-4 col-12 col-lg-6 custom-bordered-card" id="visit-card">
                         <a [routerLink]="[ '/visit-sdc' ]">
@@ -63,7 +60,7 @@
                                         visit SDC.
                                     </small>
                                 </div>
-                                <i class="my-auto ml-auto fas fa-caret-right d-none d-md-block"></i>
+                                <i class="my-auto ml-5 fas fa-caret-right d-none d-md-block"></i>
                             </div>
                         </a>
                     </div>
@@ -99,14 +96,14 @@
                         </a>
                     </div>
 
-                    <div id="info" style="position: absolute; right: 0; top: 50px;">
+                    <div id="info" class="col-lg-6 d-none d-lg-block my-auto responsive-container">
                         <div class="d-table">
 
-                            <div id="visit-info">
-                                <div class="visit-img shadow-lg"></div>
+                            <div id="visit-info" class="pl-5">
+                                <img src="../../assets/images/snake-figure.jpg" class="responsive-img rounded" alt="visit">
                             </div>
 
-                            <div id="opening-hours-info" style="position: relative; right: 80px;">
+                            <div id="opening-hours-info" style="position: relative; left: 40px;">
                                 <table class="table table-bordered text-center">
                                     <thead>
                                         <tr>
@@ -125,8 +122,8 @@
                                 </table>
                             </div>
 
-                            <div id="join-info">
-                                <div class="join-img shadow-lg"></div>
+                            <div id="join-info" class="pl-5">
+                                <img src="../../assets/images/glass-rod.jpg" class="responsive-img rounded" alt="join">
                             </div>
 
                         </div>
@@ -139,7 +136,7 @@
     </div>
     <!-- MAIN INFO SECTION END -->
 
-    <div class="card-deck col-12 col-lg-9 mx-auto">
+    <!-- <div class="card-deck col-12 col-lg-9 mx-auto">
         <div class="col-12 col-sm-6 col-lg-4 text-wrap mx-auto mb-5" *ngFor="let article of topThreeArticles | async; let i=index">
             <div class="card custom-card visit-card-img">
                 <div class="card-body p-0">
@@ -149,7 +146,7 @@
                             <h5 class="card-title">{{ article.title }}</h5>
                             <p class="card-text text">{{ article.text | slice:0:270 }}...</p>
                         </div>
-                        <div class="row mt-3">
+                        <div class="d-flex mt-3">
                             <a [routerLink]="[ '/news', article.title ]"><small>Read more</small></a>
                             <small class="text-muted my-0 ml-auto">{{ article.createdAt | date: 'dd LLLL yyyy, H:mm' }}</small>
                         </div>
@@ -161,11 +158,11 @@
             <div *ngIf="(i + 1) % 2 === 0" class="w-100 d-none d-sm-block d-md-none"></div>
 
         </div>
-    </div>
+    </div> -->
 
     <!-- ARTICLES SECTION START -->
     <div class="container-fluid pt-4 pb-5 bg-gray align-items-center">
-        <div class="col-12 col-lg-5 text-center mx-auto mt-4 mb-5">
+        <div class="col-12 col-lg-9 col-xl-5 text-center mx-auto mt-4 mb-5">
             <p class="text-gray text-mono">
                 The glass news
             </p>
@@ -179,22 +176,59 @@
         </div>
 
         <!-- ARTICLE CARDS START -->
-        <div class="card-deck col-12 col-xl-10 mx-auto mb-md-3">
-            <div class="card custom-card mr-0" *ngFor="let article of topThreeArticles | async">
-                <img src="../../assets/images/glass-rod.jpg" class="card-img-top" alt="glass rod">
-                <div class="card-body">
-                    <div>
-                        <h5 class="card-title">{{ article.title }}</h5>
-                        <p class="card-text text">{{ article.text | slice:0:270 }}...</p>
-                    </div>
-                    <div class="row mt-3">
-                        <a [routerLink]="[ '/news', article.title ]"><small>Read more</small></a>
-                        <small class="text-muted my-0 ml-auto">{{ article.createdAt | date: 'dd LLLL yyyy, H:mm' }}</small>
-                    </div>
-                </div>
+        <div class="d-flex col-12 col-lg-9 flex-wrap justify-content-center mx-auto">
+            <div class="col-12 col-md-6 col-xl-4 mb-4" *ngFor="let article of topThreeArticles | async">
+                <div class="custom-card m-0 h-100">
+                    <div class="card-body h-100 p-0">
+                        <img src="../../assets/images/glass-rod.jpg" class="card-img-top" alt="glass rod">
+                        <div class="m-3">
 
+                            <div>
+                                <h5 class="card-title">{{ article.title }}</h5>
+                                <p class="card-text text">{{ article.text | slice:0:270 }}...</p>
+                            </div>
+                            <div class="d-flex mt-3">
+                                <a [routerLink]="[ '/news', article.title ]"><small>Read more</small></a>
+                                <small class="text-muted my-0 ml-auto">{{ article.createdAt | date: 'dd LLLL yyyy, H:mm' }}</small>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
             </div>
         </div>
+
+
+        <!-- <div class="col-12 col-sm-6 col-lg-4 p-3" *ngFor="let ticketTariff of ticketTariffs | async">
+            <div class="custom-card m-0 h-100">
+                <div class="card-body h-100">
+                    <div>
+                        <h5 class="card-subtitle text-center my-2 my-xl-4">{{ ticketTariff.title }}</h5>
+                        <h1 class="card-title text-center">{{ ticketTariff.defaultPrice }} PLN</h1>
+                        <ng-container *ngIf="ticketTariff.isPerPerson;">
+                            <h6 class="text-center">Per person</h6>
+                        </ng-container>
+                        <ng-container *ngIf="ticketTariff.isPerHour;">
+                            <h6 class="text-center">Per hour</h6>
+                        </ng-container>
+                        <p class="col-12 col-xl-8 text-center visit-overview mx-auto text-gray"> {{ ticketTariff.overview }} </p>
+                        <div>
+                            <ul class="ticket-details">
+                                <li *ngFor="let ticketFeature of ticketTariff.features">
+                                    <div class="d-lg-flex">
+                                        <i class="fas fa-check"></i>
+                                        <small>{{ ticketFeature }}</small>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="mt-auto d-flex">
+                        <button class="btn btn-accent btn-block btn-lg" type="button" (click)="chooseTicketTariff(ticketTariff)">Choose {{ ticketTariff.title}}</button>
+                    </div>
+                </div>
+            </div>
+        </div> -->
         <!-- ARTICLE CARD END -->
 
     </div>
@@ -207,39 +241,41 @@
                 <h1 class="header my-5">
                     Everybody <i class="fas fa-heart"></i> discounts
                 </h1>
-                <div class="row discounts-info">
-                    <div class="col-lg-4 pl-3 pl-md-0 pr-lg-3 mb-3 mb-lg-0">
-                        <img src="../../assets/images/old-man.png">
-                        <h3>
-                            For seniors
-                        </h3>
-                        <p class="text-gray">
-                            Seniors often do not sit at home at all, instead, they travel, sightseeing, get konw new
-                            places and people ao for such people the SDC team has prepared discounts for sightseeing the
-                            cellars and the Centrum Dziedzictwa Szkla.
-                        </p>
-                    </div>
-                    <div class="col-lg-4 px-lg-3 px-0">
-                        <img src="../../assets/images/student.png">
-                        <h3>
-                            For children
-                        </h3>
-                        <p class="text-gray">
-                            Every child who visits the SDC gets a lot of knowledge about the glass heritage from these
-                            visits. These children may be the next artists who will present their exhibitions in the SDC
-                            in
-                            the future. Therefore, one of the major discounts at SDC applies to children
-                        </p>
-                    </div>
-                    <div class="col-lg-4 pl-0 pl-lg-3 pr-3 pr-lg-0">
-                        <img src="../../assets/images/group.png">
-                        <h3>
-                            For groups
-                        </h3>
-                        <p class="text-gray">
-                            Why not go sightseeing with friends, family or partner? Or maybe organize a school trip? No
-                            matter who you go with, there are always discounts on tickets for organized groups.
-                        </p>
+                <div class="container-fluid m-0 p-0">
+                    <div class="row discounts-info">
+                        <div class="col-lg-4 pl-3 pl-md-0 pr-lg-3 mb-3 mb-lg-0">
+                            <img src="../../assets/images/old-man.png">
+                            <h3>
+                                For seniors
+                            </h3>
+                            <p class="text-gray">
+                                Seniors often do not sit at home at all, instead, they travel, sightseeing, get konw new
+                                places and people ao for such people the SDC team has prepared discounts for sightseeing the
+                                cellars and the SDC.
+                            </p>
+                        </div>
+                        <div class="col-lg-4 px-lg-3 px-0">
+                            <img src="../../assets/images/student.png">
+                            <h3>
+                                For children
+                            </h3>
+                            <p class="text-gray">
+                                Every child who visits the SDC gets a lot of knowledge about the glass heritage from these
+                                visits. These children may be the next artists who will present their exhibitions in the SDC
+                                in
+                                the future. Therefore, one of the major discounts at SDC applies to children
+                            </p>
+                        </div>
+                        <div class="col-lg-4 pl-0 pl-lg-3 pr-3 pr-lg-0">
+                            <img src="../../assets/images/group.png">
+                            <h3>
+                                For groups
+                            </h3>
+                            <p class="text-gray">
+                                Why not go sightseeing with friends, family or partner? Or maybe organize a school trip? No
+                                matter who you go with, there are always discounts on tickets for organized groups.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -248,7 +284,7 @@
         <div class="col-12 col-lg-6 mx-auto pb-5">
             <div class="tiny-divider bg-gray mx-auto"></div>
 
-            <div class="col-11 col-md-9 col-lg-7 mx-auto text-center">
+            <div class="col-11 col-md-9 col-xl-7 mx-auto text-center">
                 <h4>Something for everyone</h4>
                 <small class="text-muted">
                     Discounts available in SDC are tailored to our customers. No matter how old you are, whether you
@@ -260,7 +296,7 @@
     <!-- DISCOUNTS INFO SECTION END -->
 
     <!-- PARTNERS SECTION START -->
-    <div class="col-12 col-lg-5 text-center mx-auto mt-4 mb-5">
+    <div class="col-12 col-lg-9 col-xl-5 text-center mx-auto my-3">
         <p class="text-gray text-mono">
             Partnerships
         </p>
@@ -272,27 +308,24 @@
             gaining influences and long-lasting friendships, and ending with earning opportunities.
         </p>
 
-        <button type="button" [routerLink]="[ '/partners' ]" class="my-3 btn btn-lg btn-accent-outline btn-link">Become a SDC partner
-            <i class="fas fa-long-arrow-alt-right ml-2"></i>
+        <button type="button" [routerLink]="[ '/partners' ]" class="mt-3 btn btn-lg btn-accent-outline btn-link">Become a SDC partner
+            <i class="fas fa-long-ard-flex-alt-right ml-2"></i>
         </button>
+    </div>
 
-        <div class="container col-12 col-md-10 mx-auto align-items-center my-5 pb-1">
-            <div class="d-none d-md-flex justify-content-center partners-banner">
-                <img src="../../assets/images/atom.png" alt="atom logo" placement="top" ngbTooltip="Atom" tooltipClass="custom-tooltip">
-                <img src="../../assets/images/circleci.png" style="position: relative; top: 50%" alt="circleci logo" placement="top" ngbTooltip="Circle CI" tooltipClass="custom-tooltip">
-                <img src="../../assets/images/codeclimate.png" alt="codeclimate logo" placement="top" ngbTooltip="Code Climate" tooltipClass="custom-tooltip">
-                <img src="../../assets/images/ac-dc.png" style="position: relative; top: 50%" alt="ac/dc logo" placement="top" ngbTooltip="AC/DC" tooltipClass="custom-tooltip">
-                <img src="../../assets/images/travis-ci.png" alt="travis-ci logo" placement="top" ngbTooltip="Travis CI" tooltipClass="custom-tooltip">
-                <img src="../../assets/images/zenhubio.png" style="position: relative; top: 50%" alt="zenhubio logo" placement="top" ngbTooltip="Zenhubio" tooltipClass="custom-tooltip">
-                <img src="../../assets/images/google.png" alt="google logo" placement="top" ngbTooltip="Google" tooltipClass="custom-tooltip">
-
-                <!-- wrap every 2 on md and lg-->
-                <!-- <div *ngIf="(i + 1) % 2 === 0" class="w-100 d-none d-md-block d-xl-none"></div> -->
-                <!-- <div class="w-100 d-none d-sm-block d-lg-none"></div> -->
-
-            </div>
+    <div class="container-fluid col-11 col-md-12 mx-auto my-5 pb-1 text-center">
+        <div class="d-flex flex-wrap justify-content-center partners-banner">
+            <img src="../../assets/images/atom.png" alt="atom logo" placement="top" ngbTooltip="Atom" tooltipClass="custom-tooltip">
+            <img src="../../assets/images/circleci.png" class="partner-badge" alt="circleci logo" placement="top" ngbTooltip="Circle CI" tooltipClass="custom-tooltip">
+            <img src="../../assets/images/codeclimate.png" alt="codeclimate logo" placement="top" ngbTooltip="Code Climate" tooltipClass="custom-tooltip">
+            <img src="../../assets/images/ac-dc.png" class="partner-badge" alt="ac/dc logo" placement="top" ngbTooltip="AC/DC" tooltipClass="custom-tooltip">
+            <img src="../../assets/images/travis-ci.png" alt="travis-ci logo" placement="top" ngbTooltip="Travis CI" tooltipClass="custom-tooltip">
+            <img src="../../assets/images/zenhubio.png" class="partner-badge" alt="zenhubio logo" placement="top" ngbTooltip="Zenhubio" tooltipClass="custom-tooltip">
+            <img src="../../assets/images/google.png" alt="google logo" placement="top" ngbTooltip="Google" tooltipClass="custom-tooltip">
         </div>
-        <small class="text-gray partners-banner-text">*On {{ now | date: 'MMMM yyyy' }}</small>
+    </div>
+    <div class="d-flex">
+        <small class="text-gray partners-banner-text mt-2 mb-3 mx-auto">*On {{ now | date: 'MMMM yyyy' }}</small>
     </div>
     <!-- PARTNERS SECTION END -->
 

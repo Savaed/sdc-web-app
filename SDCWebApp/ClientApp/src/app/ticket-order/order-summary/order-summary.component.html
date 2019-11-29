@@ -1,6 +1,6 @@
-<div class="card custom-card shadow-sm">
+<div class="card custom-card shadow-sm mx-auto">
     <div class="card-header mb-3">
-        <div class="row">
+        <div class="d-flex">
             <i class="fas fa-shopping-cart mr-3"></i>
             <p class="card-title m-0"> Ticket cart </p>
         </div>
@@ -12,16 +12,18 @@
 
     <ng-template #elseTemplate>
         <div class="card-body py-2" *ngFor="let ticket of ticketCart | async">
-            <div class="row">
-                <p class="ticket-name m-0">{{ ticket.amount }}</p>
-                <p class="ticket-name m-0"> x {{ ticket.ticket.ticketTariff.title }}</p>
-                <p *ngIf="ticket.ticket.mostProfitableDiscount.discountValueInPercentage > 0" class="discount-value">
+            <div class="d-sm-flex">
+                <div class="d-flex">
+                    <p class="ticket-name m-0">{{ ticket.amount }}</p>
+                    <p class="ticket-name m-0"> x {{ ticket.ticket.ticketTariff.title }}</p>
+                </div>
+                <p *ngIf="ticket.ticket.mostProfitableDiscount.discountValueInPercentage > 0" class="discount-value my-0 ml-0 ml-sm-3">
                     -{{ ticket.ticket.mostProfitableDiscount.discountValueInPercentage }}%
                 </p>
                 <p class="ticket-price m-0 ml-auto">{{ ticket.ticketPrice | number:'1.2-2' }} PLN</p>
                 <i class="far fa-trash-alt ml-auto d-none" (click)="removeTicket(ticket)" placement="bottom" ngbTooltip="Remove" tooltipClass="custom-tooltip"></i>
             </div>
-            <small class="text-gray">{{ ticket.ticket.ticketTariff.overview }}</small>
+            <small class="text-gray mt-2 mt-sm-0">{{ ticket.ticket.ticketTariff.overview }}</small>
             <div class="ticket-card-divider"></div>
         </div>
         <div class="card-footer mt-3 d-flex">

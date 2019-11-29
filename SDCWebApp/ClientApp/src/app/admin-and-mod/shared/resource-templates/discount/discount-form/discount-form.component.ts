@@ -44,7 +44,7 @@ export class DiscountFormComponent implements OnInit {
         const discountType = control.get('type').value;
         const groupSize = control.get('groupSizeForDiscount').value;
 
-        if (discountType !== DiscountType[DiscountType.ForGroup] && groupSize > 0) {
+        if ((discountType !== DiscountType[DiscountType.ForGroup] && groupSize > 0) || (discountType === DiscountType[DiscountType.ForGroup] && groupSize === 0)) {
             return { invalidType: 'group size > 0 allowed only ForGroup type' };
         }
 
@@ -58,7 +58,7 @@ export class DiscountFormComponent implements OnInit {
             updatedAt: this.discount.updatedAt,
             description: this.description.value,
             type: this.type.value,
-            groupSizeForDiscount: this.groupSizeForDiscount.value > 0 ? this.groupSizeForDiscount.value : null,
+            groupSizeForDiscount: this.groupSizeForDiscount.value as number !== 0 ? this.groupSizeForDiscount.value : null,
             discountValueInPercentage: this.discountValueInPercentage.value
         };
 
@@ -79,7 +79,7 @@ export class DiscountFormComponent implements OnInit {
         const newDiscount: Discount = {
             description: this.description.value,
             type: this.type.value,
-            groupSizeForDiscount: this.groupSizeForDiscount.value,
+            groupSizeForDiscount: this.groupSizeForDiscount.value as number !== 0 ? this.groupSizeForDiscount.value : null,
             discountValueInPercentage: this.discountValueInPercentage.value
         };
 

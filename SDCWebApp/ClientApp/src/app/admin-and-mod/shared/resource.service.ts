@@ -67,6 +67,14 @@ export class ResourceService {
         private toast: ToastrService
     ) { }
 
+    public setResourceList(resources: any[]) {
+        this.currentResourceList.next(resources);
+    }
+
+    public setResourceType(resourceType: ResourceType) {
+        this.currentResourceType.next(resourceType);
+    }
+
     public setEditMode(index: number, value: boolean) {
         this.isEditMode.next(value);
         this.index.next(index);
@@ -101,7 +109,7 @@ export class ResourceService {
     public showTicketTariffs() {
         this.ticketTariffService.getAllTicketTariffs().subscribe(tt => {
             this.currentResourceList.next(tt);
-            this.resourceType.next(ResourceType.TicketTariff);
+            this.currentResourceType.next(ResourceType.TicketTariff);
         });
     }
 
@@ -134,15 +142,19 @@ export class ResourceService {
     }
 
     public showAddArticleForm() {
-        this.resourceType.next(ResourceType.Article);
+        this.currentResourceType.next(ResourceType.Article);
     }
 
     public showAddDiscountForm() {
-        this.resourceType.next(ResourceType.Discount);
+        this.currentResourceType.next(ResourceType.Discount);
     }
 
     public showAddVisitInfoForm() {
-        this.resourceType.next(ResourceType.VisitInfo);
+        this.currentResourceType.next(ResourceType.VisitInfo);
+    }
+
+    public showTicketTariffForm() {
+        this.currentResourceType.next(ResourceType.TicketTariff);
     }
 
     public edit(resource: Article | Discount | VisitInfo | TicketTariff) {

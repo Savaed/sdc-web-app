@@ -78,22 +78,29 @@
 
                         <div>
                             <label for="openingHourText">Opening hour</label>
-                            <input type="text" class="form-control" name="openingHourText" id="openingHourText" formControlName="openingHour" [class.is-invalid]="hour?.controls?.openingHour?.invalid && hour?.controls?.openingHour?.touched">
+                            <input type="text" class="form-control" name="openingHourText" id="openingHourText" formControlName="openingHour"
+                                [class.is-invalid]="hour?.controls?.openingHour?.invalid && hour?.controls?.openingHour?.touched">
 
                             <!-- OPENING HOUR VALIDATION ERRORS -->
                             <div *ngIf="hour.invalid && hour.touched">
+                                <small *ngIf="hour?.errors?.invalidHour && !(hour?.controls?.openingHour?.errors?.required) && !(hour?.controls?.closingHour?.errors?.pattern)" placement="right" ngbPopover="test" class="text-danger">Opening hour must be before closing hour</small>
                                 <small *ngIf="hour?.controls?.openingHour?.errors?.required" placement="right" ngbPopover="test" class="text-danger">Opening hour is required</small>
                                 <small *ngIf="hour?.controls?.openingHour?.errors?.pattern" class="text-danger">Time format must be 'HH:mm' between 00:00 and 23:59</small>
                             </div>
                         </div>
 
+                        
+
                         <div>
                             <label for="openingHourText">Closing hour</label>
-                            <input type="text" class="form-control" name="openingHourText" id="openingHourText" formControlName="closingHour" [class.is-invalid]="hour?.controls?.closingHour?.invalid && hour?.controls?.closingHour?.touched">
+                            <input type="text" class="form-control" name="openingHourText" id="openingHourText" formControlName="closingHour"
+                                [class.is-invalid]="hour?.controls?.closingHour?.invalid && hour?.controls?.closingHour?.touched">
 
                             <!-- CLOSING HOUR VALIDATION ERRORS -->
                             <div *ngIf="hour.invalid && hour.touched">
-                                <small *ngIf="hour?.controls?.closingHour?.errors?.required" placement="right" ngbPopover="test" class="text-danger">Closing hour is required</small>
+
+                                <small *ngIf="hour?.errors?.invalidHour && !(hour?.controls?.openingHour?.errors?.required) && !(hour?.controls?.closingHour?.errors?.pattern)" placement="right" class="text-danger">Closing hour must be after opening hour</small>
+                                <small *ngIf="hour?.controls?.closingHour?.errors?.required" placement="right" class="text-danger">Closing hour is required</small>
                                 <small *ngIf="hour?.controls?.closingHour?.errors?.pattern" class="text-danger">Time format must be 'HH:mm' between 00:00 and 23:59</small>
                             </div>
                         </div>
@@ -105,7 +112,7 @@
             </div>
 
             <button class="btn btn-accent-tight" (click)="testCRUD()" [disabled]="infoForm.invalid">OK</button>
-            
+
         </div>
     </form>
 </div>

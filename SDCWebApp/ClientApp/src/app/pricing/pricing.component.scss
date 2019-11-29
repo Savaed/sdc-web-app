@@ -1,6 +1,10 @@
 ul.ticket-details{
     margin: 35px 0;
 
+    @media screen and (max-width: 1200px) {
+        margin: 20px 0;        
+    }
+
     &>li{
         list-style-type: none;
         
@@ -18,11 +22,11 @@ ul.ticket-details{
     }
 }
 
-.visit-overview{
+.visit-overview {
     font-size: small;
 }
 
-.discount-table{
+.discount-table {
     text-align: center;
     width: 100%;
 
@@ -34,5 +38,6 @@ ul.ticket-details{
     td{
         width: 25%;
         font-size: 14px;
+        vertical-align: middle !important;
     }
 }

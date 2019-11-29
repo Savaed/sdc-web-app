@@ -107,8 +107,8 @@
     <div class="col-8 px-0 m-0">
         <div class="d-flex mt-4 border-bottom">
 
-            <mat-checkbox class="ml-3 pl-2"></mat-checkbox>
-            <i *ngIf="(resourceService.isAddModeEnable | async) || (resourceService.isEditModeEnable | async)" (click)="backToOverview()" class="fas fa-arrow-left ml-3"></i>
+            <mat-checkbox class="ml-3 pl-2 my-auto"></mat-checkbox>
+            <i *ngIf="(resourceService.isAddModeEnable | async) || (resourceService.isEditModeEnable | async)" (click)="backToOverview()" class="fas fa-arrow-left ml-3 my-auto"></i>
 
             <div class="dropdown ml-3">
                 <button class="btn btn-accent-tight shadow-sm" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -123,7 +123,7 @@
             </div>
 
             <div class="dropdown">
-                <button class="btn dropdown-toggle btn-flat" type="button" id="dropdownMenuButton" ngbTooltip="Filters (just placeholder)" placement="bottom" tooltipClass="custom-tooltip" data-toggle="dropdown"
+                <button class="btn dropdown-toggle btn-flat my-auto" type="button" id="dropdownMenuButton" ngbTooltip="Filters (just placeholder)" placement="bottom" tooltipClass="custom-tooltip" data-toggle="dropdown"
                     aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-sliders-h"></i>
                 </button>

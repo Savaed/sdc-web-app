@@ -23,7 +23,7 @@ const routes: Routes = [
     { path: 'login', component: LoginComponent },
     { path: 'visit-sdc', component: VisitSdcComponent },
     { path: 'partners', component: PartnersComponent },
-    { path: 'order', component: TicketOrderComponent, canActivate: [TicketOrderGuard] },
+    { path: 'order', component: TicketOrderComponent, canActivate: [TicketOrderGuard], canLoad: [TicketOrderGuard] },
     { path: 'pricing', component: PricingComponent },
     { path: 'error/:errorStatusCode', component: ErrorPageComponent },
     { path: 'news/:articleName', component: ArticleDetailsComponent },

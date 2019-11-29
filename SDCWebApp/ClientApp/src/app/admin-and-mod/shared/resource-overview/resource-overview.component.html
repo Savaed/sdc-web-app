@@ -2,7 +2,7 @@
     <mat-checkbox class="mx-3 resource-checkbox"></mat-checkbox>
     <p class="overview-info resource-overview-w-10 ml-2">{{ id | slice:0:8 }}</p>
     <p class="overview-info resource-overview-w-25">{{ mainInfo | slice:0:32 }}</p>
-    <ng-container *ngIf="secondaryInfo.length > 75; else elseTemplate">
+    <ng-container *ngIf="secondaryInfo?.length > 75; else elseTemplate">
         <p class="overview-info text-muted"> {{ secondaryInfo | slice:0:75 }}...</p>
     </ng-container>
     <ng-template #elseTemplate>

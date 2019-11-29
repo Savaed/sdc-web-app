@@ -1,9 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth.service';
-import { map } from 'rxjs/operators';
-import { observable, Observable, Subject, BehaviorSubject } from 'rxjs';
-import { ApiError } from '../../models/ApiResponse';
+import { BehaviorSubject } from 'rxjs';
 import { Router } from '@angular/router';
 
 @Component({
@@ -42,7 +40,7 @@ export class LoginFormComponent implements OnInit {
                     this.serverErrorResponse.next(response.error.message);
                     // console.log(response.error.message);
                 } else {
-                    this.router.navigate([`${this.accountService.userRole === 'administrator' ? 'admin' : 'mod'}/dashboard`]);
+                    this.router.navigate([`${this.accountService.userRole === 'administrator' ? 'administrator' : 'moderator'}/dashboard`]);
                 }
             });
     }

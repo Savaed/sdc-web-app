@@ -1,33 +1,33 @@
 <nav class="p-0 px-lg-5 shadow-sm navbar navbar-expand-lg navbar-light shadow-sm bg-light">
     <button class="navbar-toggler ml-auto m-2" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
-    </button>   
+    </button>
 
     <!-- NAV MENU START -->
-    <div class="collapse navbar-collapse border-top" id="navbarNav">
+    <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav text-center bg-light mr-auto">
-            <li class="nav-item mx-0 mr-lg-3 mr-xl-5 pl-lg-3">
-                <a class="nav-link" [routerLink]="[ '/' ]">HOME</a>
+            <li class="nav-item mx-0 mr-lg-3 mr-xl-5 pl-lg-3" data-toggle="collapse" data-target=".navbar-collapse.show">
+                <a class="nav-link" [routerLink]="[ '/' ]" [routerLinkActive]="[ 'active' ]" [routerLinkActiveOptions]="{ exact: true }">HOME</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" [routerLink]="[ '/visit-sdc' ]">VISIT</a>
+            <li class="nav-item" data-toggle="collapse" data-target=".navbar-collapse.show">
+                <a class="nav-link" [routerLink]="[ '/visit-sdc' ]" routerLinkActive="active">VISIT</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link mx-lg-3 mx-xl-5" [routerLink]="[ '/news' ]">DISCOVER</a>
+            <li class="nav-item" data-toggle="collapse" data-target=".navbar-collapse.show">
+                <a class="nav-link mx-lg-3 mx-xl-5" [routerLink]="[ '/news' ]" routerLinkActive="active">DISCOVER</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" [routerLink]="[ '/partners' ]">JOIN</a>
+            <li class="nav-item" data-toggle="collapse" data-target=".navbar-collapse.show">
+                <a class="nav-link" [routerLink]="[ '/partners' ]" routerLinkActive="active">JOIN</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link mx-lg-3 mx-xl-5" [routerLink]="[ '/pricing' ]">TICKETS</a>
+            <li class="nav-item" data-toggle="collapse" data-target=".navbar-collapse.show">
+                <a class="nav-link mx-lg-3 mx-xl-5" [routerLink]="[ '/pricing' ]" routerLinkActive="active">TICKETS</a>
             </li>
-            <li *ngIf="isLogged | async" class="nav-item mr-lg-auto">
+            <li *ngIf="isLogged | async" class="nav-item mr-lg-auto" data-toggle="collapse" data-target=".navbar-collapse.show">
 
                 <ng-container *ngIf="authService.userRole === 'administrator'; else elseTemplate">
-                    <a class="nav-link" [routerLink]="[ '/admin/dashboard' ]">ADMIN PANEL</a>
+                    <a class="nav-link" [routerLink]="[ '/administrator/dashboard' ]" routerLinkActive="active">ADMIN PANEL</a>
                 </ng-container>
                 <ng-template #elseTemplate>
-                    <a *ngIf="authService.userRole === 'moderator'" class="nav-link" [routerLink]="[ '/mod/dashboard' ]">MODERATOR PANEL</a>
+                    <a *ngIf="authService.userRole === 'moderator'" class="nav-link" [routerLink]="[ '/moderator/dashboard' ]" routerLinkActive="active">MODERATOR PANEL</a>
                 </ng-template>
 
             </li>
@@ -47,11 +47,11 @@
 
             <!-- LOGIN/LOGOUT BUTTON -->
             <ng-container *ngIf="!(isLogged | async); else logoutTemplate" class="d-flex">
-                <button type="button" class="my-3 btn btn-accent-outline-tight mx-auto" [routerLink]="[ '/login' ]">Login</button>
+                <button type="button" class="my-3 btn btn-accent-outline-tight mx-auto" [routerLink]="[ '/login' ]" routerLinkActive="active" data-toggle="collapse" data-target=".navbar-collapse.show">Login</button>
             </ng-container>
 
             <ng-template #logoutTemplate>
-                <button type="button" class="my-3 btn btn-accent-outline-tight mx-auto" [routerLink]="[ '/' ]" (click)="logout()">Logout</button>
+                <button type="button" class="my-3 btn btn-accent-outline-tight mx-auto" [routerLink]="[ '/' ]" (click)="logout()" routerLinkActive="active" data-toggle="collapse" data-target=".navbar-collapse.show">Logout</button>
             </ng-template>
         </div>
     </div>

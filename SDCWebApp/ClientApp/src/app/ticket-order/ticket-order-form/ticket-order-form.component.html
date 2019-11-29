@@ -18,10 +18,10 @@
         <!-- VISIT DAY -->
         <div class="col-12 p-0">
             <label>Visit day</label>
-            <div class="col-12 row">
-                <input matInput class="datepicker w-75" readonly="true" [matDatepicker]="sightseeingDay" placeholder="Choose visit day" [matDatepickerFilter]="filterGroupDates"
+            <div class="col-12 d-flex p-0">
+                <input matInput class="datepicker w-85" readonly="true" [matDatepicker]="sightseeingDay" placeholder="Choose visit day" [matDatepickerFilter]="filterGroupDates"
                     formControlName="visitDate">
-                <mat-datepicker-toggle matSuffix [for]="sightseeingDay" class="w-25"></mat-datepicker-toggle>
+                <mat-datepicker-toggle matSuffix [for]="sightseeingDay" class="w-15"></mat-datepicker-toggle>
                 <mat-datepicker #sightseeingDay></mat-datepicker>
             </div>
         </div>
@@ -30,7 +30,7 @@
         <div class="p-0">
             <label>Visit group</label>
             <div class="dropdown open available-groups mx-auto">
-                <button class="btn btn-lg btn-secondary dropdown-toggle w-75" [disabled]="isGroupButtonDisabled | async" type="button" id="groups" data-toggle="dropdown" aria-haspopup="true"
+                <button class="btn btn-lg btn-secondary dropdown-toggle w-100" [disabled]="isGroupButtonDisabled | async" type="button" id="groups" data-toggle="dropdown" aria-haspopup="true"
                     aria-expanded="false">
                     Choose visit group
                 </button>
@@ -62,9 +62,9 @@
             <label>Birthday</label>
             <i class="far fa-question-circle" placement="right" ngbPopover="Date of birth is optional and, if provided, will only be used to generate statistics for internal company use."></i>
             <div>
-                <input matInput class="datepicker w-75" [matDatepickerFilter]="filterBirthdayDates" readonly="true" [matDatepicker]="customerBirthday" placeholder="Choose your birthday date"
+                <input matInput class="datepicker w-85" [matDatepickerFilter]="filterBirthdayDates" readonly="true" [matDatepicker]="customerBirthday" placeholder="Choose your birthday date"
                     formControlName="birthdayDate">
-                <mat-datepicker-toggle matSuffix [for]="customerBirthday" class="w-25"></mat-datepicker-toggle>
+                <mat-datepicker-toggle matSuffix [for]="customerBirthday" class="w-15 justify-content-end"></mat-datepicker-toggle>
                 <mat-datepicker #customerBirthday></mat-datepicker>
             </div>
         </div>
@@ -72,7 +72,7 @@
         <!-- EMAIL -->
         <div>
             <label for="customer-email">Email</label>
-            <input type="text" [class.is-invalid]="email.invalid && email.touched" name="customer-email" id="customer-email" class="form-control w-75" aria-describedby="email-help"
+            <input type="text" [class.is-invalid]="email.invalid && email.touched" name="customer-email" id="customer-email" class="form-control w-100" aria-describedby="email-help"
                 formControlName="email">
         </div>
 
@@ -85,14 +85,16 @@
     <!-- CUSTOMER INFO END -->
 
     <!-- DISCOUNTS -->
-    <div class="form-group w-75">
+    <div class="form-group">
         <label>Discounts</label>
         <i class="far fa-question-circle" placement="right" ngbPopover="These inforamtion are only used to match the discount. 
         We will never disclose this information to third parties without your express consent."></i>
         <div class="form-group m-0">
-            <div class="btn-group" role="group" aria-label="Basic example">
-                <button *ngFor="let discount of ticketOrderService.discounts | async" class="btn btn-discount-outline" type="button" (click)="addDiscount(discount)">
-                    {{ discount.type | discountType }}</button>
+            <div class="btn-group mx-auto" role="group" aria-label="Basic example">
+                <button *ngFor="let discount of ticketOrderService.discounts | async; let i=index" class="btn btn-discount-outline" type="button" (click)="addDiscount(discount, i)"
+                [class.no-active]="!clickedDiscountIndexes.includes(i)"  [class.active]="clickedDiscountIndexes.includes(i)" >
+                    {{ discount.type | discountType }}
+                </button>
             </div>
         </div>
         <small id="discount-help" class="text-muted form-control-note">You can choose more than one information, but discounts do not accumulate.</small>
@@ -100,17 +102,17 @@
 
     <!-- TICKET AMOUNT -->
     <div class="form-group">
-        <div class="ticket-amount-slider w-75">
+        <div class="ticket-amount-slider w-100">
             <label for="number-of-tickets">Number of tickets</label>
-            <input type="range" min=0 [max]="maxTicketsNumber | async" name="number-of-tickets" id="number-of-tickets" class="custom-range w-100" aria-describedby="no-tickets-help"
+            <input type="range" min=0 [max]="maxTicketsNumber | async" name="number-of-tickets" id="number-of-tickets" class="custom-range" aria-describedby="no-tickets-help"
                 formControlName="numberOfTickets">
         </div>
         <small class="text-muted form-control-note">Ticket amount: <strong>{{ numberOfTickets.value }}</strong></small>
     </div>
 
-    <div class="row w-75">
+    <div class="d-flex w-100">
         <div class="col-6 p-0 pr-2">
-            <button class="btn btn-accent-tight btn-block" [disabled]="!ticketOrderForm.valid" (click)="addTickets()">Add ticket to cart</button>
+            <button class="btn btn-accent-tight btn-block" [disabled]="!ticketOrderForm.valid" (click)="addTickets()">Add ticket</button>
         </div>
         <div class="col-6 p-0 pl-2">
             <button class="btn btn-accent-outline-tight btn-block" [disabled]="!ticketOrderForm.valid" (click)="orderTickets()">Order ticket</button>
