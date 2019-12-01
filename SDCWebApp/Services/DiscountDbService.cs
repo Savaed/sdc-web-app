@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace SDCWebApp.Services
 {
-    // NOTE The code repeats in catch blocks, so why not wrap it in a function and call it when needed?
+    // NOTE: The code repeats in catch blocks, so why not wrap it in a function and call it when needed?
     // The answer is that an exception is caught in the catch block, and then a new exception with the caught exception as 
     // inner is thrown up. But if we catch the exception, then we call the function that creates and throws
     // new exception with caught one, stack persistence will not be preserved.

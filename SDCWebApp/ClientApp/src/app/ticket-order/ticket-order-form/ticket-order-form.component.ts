@@ -25,8 +25,8 @@ export class TicketOrderFormComponent implements OnInit {
     public groupInfo = new BehaviorSubject<GroupInfo[]>(new Array<GroupInfo>());
     public visitHour = new BehaviorSubject<Date>(undefined);
     public maxTicketsNumber = new BehaviorSubject<number>(0);
-
     public clickedDiscountIndexes = new Array<number>();
+    public isMobileLayout = new BehaviorSubject<boolean>(window.innerWidth <= 360);
 
     constructor(private formBuilder: FormBuilder,
         public ticketOrderService: TicketOrderService,
@@ -69,6 +69,10 @@ export class TicketOrderFormComponent implements OnInit {
     }
 
     ngOnInit() {
+        window.onresize = () => {
+            this.isMobileLayout.next(window.innerWidth <= 360);
+        };
+
         this.ticketOrderForm = this.formBuilder.group({
             customer: this.formBuilder.group({
                 email: ['', [Validators.email, Validators.required]],
@@ -107,11 +111,6 @@ export class TicketOrderFormComponent implements OnInit {
             this.customerDiscounts.splice(this.customerDiscounts.indexOf(discount), 1);
             this.clickedDiscountIndexes.splice(this.clickedDiscountIndexes.indexOf(index), 1);
         }
-
-        console.log(this.clickedDiscountIndexes);
-        console.log(this.customerDiscounts);
-        
-        
     }
 
     private onChanges() {

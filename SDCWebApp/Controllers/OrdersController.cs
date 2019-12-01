@@ -65,7 +65,7 @@ namespace SDCWebApp.Controllers
                 var response = new ResponseWrapper(new OrderResponseDto { Id = orderId, Customer = customerDto, Tickets = orderedTicketsDto });
                 _logger.LogInformation($"Finished method '{nameof(CreateOrderAsync)}'");
 
-                // TODO Send confirmation email. 
+                // TODO: Send confirmation email. 
 
                 return Created(orderUrl, response);
             }

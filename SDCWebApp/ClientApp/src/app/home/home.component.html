@@ -176,24 +176,22 @@
         </div>
 
         <!-- ARTICLE CARDS START -->
-        <div class="d-flex col-12 col-lg-9 flex-wrap justify-content-center mx-auto">
+        <div class="d-flex col-12 col-lg-9 flex-wrap justify-content-start mx-auto">
             <div class="col-12 col-md-6 col-xl-4 mb-4" *ngFor="let article of topThreeArticles | async">
                 <div class="custom-card m-0 h-100">
                     <div class="card-body h-100 p-0">
                         <img src="../../assets/images/glass-rod.jpg" class="card-img-top" alt="glass rod">
                         <div class="m-3">
-
                             <div>
                                 <h5 class="card-title">{{ article.title }}</h5>
                                 <p class="card-text text">{{ article.text | slice:0:270 }}...</p>
                             </div>
                             <div class="d-flex mt-3">
-                                <a [routerLink]="[ '/news', article.title ]"><small>Read more</small></a>
-                                <small class="text-muted my-0 ml-auto">{{ article.createdAt | date: 'dd LLLL yyyy, H:mm' }}</small>
+                                    <small> <a [routerLink]="[ '/news', article.title ]">Read more</a></small>
+                                <small class="text-muted ml-auto">{{ article.createdAt | date: 'dd LLLL yyyy, H:mm' }}</small>
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>

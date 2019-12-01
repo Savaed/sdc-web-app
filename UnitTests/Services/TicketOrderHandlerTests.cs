@@ -169,7 +169,7 @@ namespace UnitTests.Services
         // Attempt updating existent group by adding number of tickets greater than available places -> throw InvalidOperationException
         // Add ticket to group succeeded -> property Ticket contains those tickets
 
-        // NOTE I'm not sure this is the best idea to test method using another one to set required, private variable.
+        // NOTE: I'm not sure this is the best idea to test method using another one to set required, private variable.
         // In this case HandleOrderAsync() is using variables that had set before by CreateOrderAsync().
         // Without calls CreateOrderAsync(), a HandleOrderAsync() method is not able to do their job, so
         // I decide to callse CreateOrderAsync() before in this test as well as all next HandleOrderAsync() tests.

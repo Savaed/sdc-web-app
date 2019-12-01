@@ -90,9 +90,9 @@
         <i class="far fa-question-circle" placement="right" ngbPopover="These inforamtion are only used to match the discount. 
         We will never disclose this information to third parties without your express consent."></i>
         <div class="form-group m-0">
-            <div class="btn-group mx-auto" role="group" aria-label="Basic example">
+            <div class="mx-auto" [class.btn-group-vertical]="isMobileLayout | async" [class.btn-group]="!(isMobileLayout | async)" role="group" aria-label="Basic example">
                 <button *ngFor="let discount of ticketOrderService.discounts | async; let i=index" class="btn btn-discount-outline" type="button" (click)="addDiscount(discount, i)"
-                [class.no-active]="!clickedDiscountIndexes.includes(i)"  [class.active]="clickedDiscountIndexes.includes(i)" >
+                [class.no-active]="!clickedDiscountIndexes.includes(i)" [class.active]="clickedDiscountIndexes.includes(i)" >
                     {{ discount.type | discountType }}
                 </button>
             </div>

@@ -217,7 +217,7 @@ namespace UnitTests.Controllers
         [Test]
         public async Task GetRecentInfoAsync__Some_Infos_have_been_edited_since_the_creation_and_are_the_most_Recent__Should_return_200Ok_response_with_the_most_Recent_Info()
         {
-            // NOTE Some Infos may have been edited after creation, but there are other newer, unedited Infos.
+            // NOTE: Some Info may have been edited after creation, but there are other newer, unedited Infos.
             // Regardless of that the latest updated Info is the most Recent even if there are other, newer creted, but not updated (or updated latter) Infos.
             // Example :
             //          Info 1: created at: 12.12.2018, updated at: 12.6.2019  --> THIS IS THE MOST Recent Info

@@ -122,7 +122,7 @@ namespace SDCWebApp.Controllers
                 {
                     _logger.LogDebug("User register succeeded.");
 
-                    // TODO Send confirmation email.
+                    // TODO: Send confirmation email.
 
                     var registerInfo = new UserDto { Id = user.Id, UserName = user.UserName, LoggedOn = DateTime.MinValue };
                     string userUrl = $"users/{user.Id}";

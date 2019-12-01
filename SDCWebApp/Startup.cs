@@ -218,8 +218,8 @@ namespace SDCWebApp
 
         private string GetConnectionString(string connectionStringName)
         {
-            // HACK If environment is not Development then settings from Azure App Configuration service are used.
-            // But for this to work, the names of the secrets and all local settings as well as those on the azure MUST be the same.
+            // HACK: If environment is not Development then settings from Azure App Configuration service are used.
+            // But for this to work, the names of the secrets and all local settings as well as those on the Azure MUST be the same.
             var builder = new SqlConnectionStringBuilder(Configuration.GetConnectionString(connectionStringName));
             builder.Password = Configuration[ApiConstants.DbPassword];
             builder.UserID = Configuration[ApiConstants.DbUserId];

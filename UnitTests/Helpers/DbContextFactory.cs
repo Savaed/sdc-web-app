@@ -63,6 +63,9 @@ namespace UnitTests.Helpers
 
         private void ClearSeedData(ApplicationDbContext context)
         {
+            // BUG: Sql command 'TRUNCATE TABLE [table_name]' does not work as expected. An exception is thrown while performing unit tests:
+            // Microsoft.Data.Sqlite.SqliteException : SQLite Error 1: 'near "TRUNCATE": syntax error'.
+
             // Clear seed data. For unit test purposes it's not needed.
             var propeties = context
                 .GetType()

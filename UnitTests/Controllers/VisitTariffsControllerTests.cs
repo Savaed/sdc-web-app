@@ -181,7 +181,7 @@ namespace UnitTests.Controllers
         [Test]
         public async Task GetCurrentTariffAsync__Some_tariffs_have_been_edited_since_the_creation_and_are_the_most_current__Should_return_200Ok_response_with_the_most_current_tariff()
         {
-            // NOTE Some tariffs may have been edited after creation, but there are other newer, unedited tariffs.
+            // NOTE: Some tariffs may have been edited after creation, but there are other newer, unedited tariffs.
             // Regardless of that the latest updated tariff is the most current even if there are other, newer creted, but not updated (or updated latter) tariffs.
             // Example :
             //          tariff 1: created at: 12.12.2018, updated at: 12.6.2019  --> THIS IS THE MOST CURRENT TARIFF
