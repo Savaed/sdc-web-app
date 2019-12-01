@@ -24,6 +24,7 @@ application.
 	- C#
 	- ASP .NET Core Web Api 2.2
 	- Entity Framework Core
+	- Autofac
 	- NUnit, Moq, FluentAssertions
 	- FluentValidation
 	- Microsoft Azure
