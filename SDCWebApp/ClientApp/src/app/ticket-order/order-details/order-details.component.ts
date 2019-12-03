@@ -39,8 +39,6 @@ export class OrderDetailsComponent implements OnInit {
         }
 
         this.discountService.getAllDiscounts().subscribe(discounts => this.discounts.next(discounts));
-        this.ticketOrder.subscribe(x => console.log(x));
-        this.discounts.subscribe(z => console.log(z));
         this.ticketTariffSrevice.getRecentTicketTariffs().subscribe(tariffs => this.ticketTariffs.next(tariffs.tariffs));
     }
 

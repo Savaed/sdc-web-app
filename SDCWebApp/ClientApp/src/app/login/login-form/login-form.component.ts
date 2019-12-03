@@ -14,7 +14,7 @@ export class LoginFormComponent implements OnInit {
     private usernameValidaPattern = /^[a-z]+$/;
 
     public loginForm: FormGroup;
-    public serverErrorResponse = new BehaviorSubject<string>(null);
+    public serverErrorResponse = new BehaviorSubject<string>(undefined);
 
     public get username() { return this.loginForm.get('username'); }
     public get password() { return this.loginForm.get('password'); }
@@ -34,14 +34,15 @@ export class LoginFormComponent implements OnInit {
             return;
         }
 
-        this.accountService.login(this.username.value, this.password.value)
-            .subscribe(response => {
-                if (JSON.stringify(response.error) !== '{}') {
-                    this.serverErrorResponse.next(response.error.message);
-                    // console.log(response.error.message);
-                } else {
-                    this.router.navigate([`${this.accountService.userRole === 'administrator' ? 'administrator' : 'moderator'}/dashboard`]);
-                }
-            });
+        if (this.loginForm.valid) {
+            this.accountService.login(this.username.value, this.password.value)
+                .subscribe(response => {
+                    if (JSON.stringify(response.error) !== '{}') {
+                        this.serverErrorResponse.next(response.error.message);
+                    } else {
+                        this.router.navigate([`${this.accountService.userRole === 'administrator' ? 'administrator' : 'moderator'}/dashboard`]);
+                    }
+                });
+        }
     }
 }

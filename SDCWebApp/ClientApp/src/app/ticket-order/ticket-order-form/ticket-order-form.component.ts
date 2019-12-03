@@ -64,7 +64,7 @@ export class TicketOrderFormComponent implements OnInit {
     }
 
     public setVisitHour(group: GroupInfo) {
-        this.visitHour.next(group.sightseeingDate);
+        this.visitHour.next(new Date(group.sightseeingDate));
         this.maxTicketsNumber.next(group.availablePlace);
     }
 
@@ -127,6 +127,7 @@ export class TicketOrderFormComponent implements OnInit {
         const visitDate = new Date(this.visitDate.value);
         const visitTime = new Date(this.visitHour.getValue());
         const visitDateTime = new Date(visitDate.getFullYear(), visitDate.getMonth(), visitDate.getDate(), visitTime.getHours(), visitTime.getMinutes());
+
         this.ticketOrderService.addTicketToCart(this.customerDiscounts, visitDateTime, this.numberOfTickets.value);
         this.customerDiscounts = [];
         this.clickedDiscountIndexes = [];

@@ -7,7 +7,7 @@
             <div class="my-auto">
                 <small><strong>Your group: </strong></small>
                 <small *ngIf="visitDate.value !== '' && (visitHour | async) !== null; else elseBlock">
-                    {{ visitDate.value | date: 'dd LLLL yyyy'}}, {{ visitHour | async | date: 'H:mm' }}
+                    {{ visitDate.value | date: 'dd LLLL yyyy'}}, {{ visitHour | async | date: 'H:mm':'UTC' }}
                 </small>
                 <ng-template #elseBlock>
                     <small>Please choose visit date and group</small>
@@ -38,8 +38,7 @@
                     <div class="dropdown-divider"></div>
                     <div *ngFor="let group of groupInfo | async">
                         <button class="dropdown-item" (click)="setVisitHour(group)">
-                            <!-- {{group | json}} -->
-                            <h6 class="mt-1">{{ group.sightseeingDate | date:'H:mm' }} </h6>
+                            <h6 class="mt-1">{{ group.sightseeingDate | date:'H:mm':'UTC' }} </h6>
                             <div class="d-inline-flex align-items-center">
                                 <small class="text-gray">Available seats in the group:</small>
                                 <p class="available-groups-badge"> {{ group.availablePlace }} </p>
