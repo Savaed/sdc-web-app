@@ -26,8 +26,15 @@
                             <p class="card-text text">{{ article.text | slice:0:270 }}...</p>
                         </div>
                         <div class="d-flex mt-3">
-                                <small> <a [routerLink]="[ '/news', article.title ]">Read more</a></small>
-                            <small class="text-muted ml-auto">{{ article.createdAt | date: 'dd LLLL yyyy, H:mm' }}</small>
+                            <small> <a [routerLink]="[ '/news', article.title ]">Read more</a></small>
+
+                            <ng-container *ngIf="article?.updatedAt !== null; else elseTemplate">
+                                <small class="text-muted ml-auto">{{ article.updatedAt | date: 'dd LLLL yyyy, H:mm' }}</small>
+                            </ng-container>
+                            <ng-template #elseTemplate>
+                                <small class="text-muted ml-auto">{{ article.createdAt | date: 'dd LLLL yyyy, H:mm' }}</small>
+                            </ng-template>
+
                         </div>
                     </div>
                 </div>

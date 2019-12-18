@@ -40,10 +40,8 @@ export class DashboardComponent implements OnInit {
                 break;
 
             case ResourceType.TicketTariff:
-                console.log('showAddForm() type: ', ResourceType[resourceType]);
                 this.previousResourceType = this.resourceService.resourceType.getValue();
                 this.resourceService.showTicketTariffForm();
-
                 break;
         }
 

@@ -52,14 +52,14 @@ export class AuthService {
         return this.http.post<ApiResponse<LoginInfo>>(`${this.accountManageUrl}/login`, { username, password })
             .pipe(
                 map(response => {
-                    if (response.data != null && response.data !== undefined && JSON.stringify(response.error) === '{}') {
+                    if (response.data !== null && response.data !== undefined && JSON.stringify(response.error) === '{}') {
 
                         // Store user's login, role and tokens data.
                         localStorage.setItem('user-login', response.data.user.userName);
                         localStorage.setItem('user-role', this.jwtHelper.decodeToken(response.data.accessToken.token).role);
                         this.saveTokensInLocalStorage(response.data);
+                        console.log(`User '${username}' has been logged in.`);
                     }
-                    console.log(`User '${username}' has been logged in.`);
                     return response;
                 }));
     }

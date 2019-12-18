@@ -1,1 +1,1 @@
-export const ServerUrl = 'https://localhost:44350/api';
+export const ServerUrl = 'https://sdc-app.azurewebsites.net/api';

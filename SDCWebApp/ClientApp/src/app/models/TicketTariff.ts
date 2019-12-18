@@ -14,9 +14,9 @@ export class TicketTariff implements BaseResponseDataType {
 
 
     constructor(visitTariffId: string, createdAt: Date, id: string, updatedAt: Date, isPerHour: boolean, isPerPerson: boolean, defaultPrice: number, title: string,
-        overview: string, features: string[]) {
-        this.visitTariffId = visitTariffId,
-            this.createdAt = createdAt;
+                overview: string, features: string[]) {
+        this.visitTariffId = visitTariffId;
+        this.createdAt = createdAt;
         this.id = id;
         this.updatedAt = updatedAt;
         this.isPerPerson = isPerPerson;
@@ -93,7 +93,7 @@ export interface TicketTariffJson {
     id?: string;
     updatedAt?: Date;
     createdAt?: Date;
-    visitTariffId: string,
+    visitTariffId: string;
     description: string;
     isPerHour: boolean;
     isPerPerson: boolean;

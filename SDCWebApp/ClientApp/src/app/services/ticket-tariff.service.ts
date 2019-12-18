@@ -21,7 +21,10 @@ export class TicketTariffService {
     public getAllTicketTariffs(): Observable<TicketTariff[]> {
         return this.http.get<ApiResponse<TicketTariffJson[]>>(`${ServerUrl}/ticket-tariffs`)
             .pipe(
-                map(response => response.data.map(ticketTariffJson => TicketTariff.mapToTicketTariff(ticketTariffJson)))
+                map(response => {
+                    const ticketTariffs = response.data.map(ticketTariffJson => TicketTariff.mapToTicketTariff(ticketTariffJson));
+                    return ticketTariffs;
+                })
             );
     }
 
@@ -29,17 +32,25 @@ export class TicketTariffService {
         return this.http.get<ApiResponse<VisitTariff>>(`${ServerUrl}/visit-tariffs/recent`)
             .pipe(
                 map(response => {
+                    console.log('Ticket price list data of \'TicketTariffJson\' type: ', response.data.ticketTariffs[0]);
+
                     const x = {
                         tariffs: response.data.ticketTariffs.map(ticketTariffJson => TicketTariff.mapToTicketTariff(ticketTariffJson)),
                         visitTariffId: response.data.id
                     };
+
+                    console.log('After mapToTicketTariff(). Ticket price list data of \'TicketTariff\' type: ', x.tariffs[0]);
+
                     return x;
                 }));
     }
 
     public addTicketTariff(visitTariffId: string, ticketTariff: TicketTariff): Observable<TicketTariff> {
         // Map to JSON representation of ticket tariff object (with formated description).
+
+        console.log('Ticket price list data of \'TicketTariff\' type: ', ticketTariff);
         const ticketTariffJson = TicketTariff.mapFromTicketTariff(ticketTariff);
+        console.log('After mapFromTicketTariff(). Ticket price list data of \'TicketTariffJson\' type: ', ticketTariffJson);
 
         return this.http.post<ApiResponse<TicketTariffJson>>(`${ServerUrl}/visit-tariffs/${visitTariffId}/ticket-tariffs`, ticketTariffJson)
             .pipe(

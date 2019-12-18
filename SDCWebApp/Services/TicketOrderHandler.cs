@@ -280,6 +280,8 @@ namespace SDCWebApp.Services
         /// <exception cref="ArgumentException">$"Argument <see cref="OrderRequestDto"/> has property <see cref="OrderRequestDto.Customer"/> set to unexpected null.</exception>
         private Customer CreateCustomer(OrderRequestDto order)
         {
+            // NOTE: Maybe a better approach than the current one is to prohibit creating a new customer if they don't order any tickets?
+
             if (order is null)
             {
                 throw new ArgumentNullException(nameof(order), $"Argument {nameof(order)} cannot be null.");
