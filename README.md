@@ -13,7 +13,7 @@ The project uses the [API](https://documenter.getpostman.com/view/8564183/SVmvTy
 The development of this API and its documentation was the **main goal** of the whole project and allowed me to learn many things 
 related to working as a backend programmer.
 
-[Here](https://sdc-app.azurewebsites.net) is a working project website.
+[Here](https://sdc-app.azurewebsites.net) is a website. Unfortunately, the web application is currently unavailable.
 
 > It is worth mentioning that this project was created only for **educational purposes** and cannot be considered as a real-world 
 application. 
